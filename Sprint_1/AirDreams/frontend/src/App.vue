@@ -1,7 +1,19 @@
-<script setup>
-import HelloWorld from './components/HelloWorld.vue'
+<template>
+  <AddAirplaneForm />
+</template>
+
+<script>
+import AddAirplaneForm from './components/AddAirplaneForm.vue';
+  export default {
+    name: 'App',
+    components: {
+      AddAirplaneForm,
+    },
+  };
+
+
 </script>
 
-<template>
-  <HelloWorld />
-</template>
+<style>
+
+</style>
