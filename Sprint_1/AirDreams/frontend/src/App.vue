@@ -1,7 +1,7 @@
 <script setup>
-import HelloWorld from './components/HelloWorld.vue'
+import LandingPageAdmin from './components/LandingPageAdmin/LandingPageAdmin.vue'
 </script>
 
 <template>
-  <HelloWorld />
+  <LandingPageAdmin />
 </template>
