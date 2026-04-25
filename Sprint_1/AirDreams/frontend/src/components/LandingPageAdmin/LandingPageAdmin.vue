@@ -1,10 +1,17 @@
 <script setup>
+import { useRouter } from 'vue-router'
 import AdminHeader from '../AdminHeader.vue'
 import airplaneIcon from '../../assets/icons/airplane.svg'
 import routeIcon from '../../assets/icons/route.svg'
 import airportIcon from '../../assets/icons/airport.svg'
 import usersIcon from '../../assets/icons/users.svg'
 import reportsIcon from '../../assets/icons/reports.svg'
+
+const router = useRouter()
+
+const navigateTo = (path) => {
+    router.push(path)
+}
 </script>
 
 <template>
@@ -20,7 +27,7 @@ import reportsIcon from '../../assets/icons/reports.svg'
         <section>
             <h2>Administración de vuelos</h2>
             <div class="cards">
-            <div class="card">
+            <div class="card" @click="navigateTo('/')">
                 <img :src="airplaneIcon" alt="Airplane" class="icon blue">
                 <div>
                 <h3>Tipos de aeronave</h3>
@@ -29,7 +36,7 @@ import reportsIcon from '../../assets/icons/reports.svg'
                 <span class="arrow">›</span>
             </div>
 
-            <div class="card">
+            <div class="card" @click="navigateTo('/')">
                 <img :src="routeIcon" alt="Route" class="icon blue">
                 <div>
                 <h3>Crear ruta</h3>
@@ -38,7 +45,7 @@ import reportsIcon from '../../assets/icons/reports.svg'
                 <span class="arrow">›</span>
             </div>
 
-            <div class="card">
+            <div class="card" @click="navigateTo('/')">
                 <img :src="airportIcon" alt="Airport" class="icon blue">
                 <div>
                 <h3>Aeropuertos</h3>
@@ -52,7 +59,7 @@ import reportsIcon from '../../assets/icons/reports.svg'
         <section>
             <h2>Administración usuarios</h2>
             <div class="cards">
-            <div class="card">
+            <div class="card" @click="navigateTo('/')">
                 <img :src="usersIcon" alt="Users" class="icon blue">
                 <div>
                 <h3>Usuarios</h3>
@@ -66,7 +73,7 @@ import reportsIcon from '../../assets/icons/reports.svg'
         <section>
             <h2>Reportes</h2>
             <div class="cards">
-            <div class="card">
+            <div class="card" @click="navigateTo('/')">
                 <img :src="reportsIcon" alt="Reports" class="icon blue">
                 <div>
                 <h3>Reportes</h3>
