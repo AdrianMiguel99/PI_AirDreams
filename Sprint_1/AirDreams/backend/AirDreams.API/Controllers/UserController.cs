@@ -22,20 +22,11 @@ namespace AirDreams.API.Controllers
         {
             // TODO : User service and repository to get all users
             var users = userService.GetAllUsers();
-            return Ok(users);
-        }
-
-        // GET: api/User/{id}
-        [HttpGet("{id}")]
-        public ActionResult<UserDTO> GetById(int id)
-        {
-            // TODO : User service and repository to get a user by id
-            var user = userService.GetUserById(id);
-            if (user == null)
+            if (users == null || users.Count == 0)
             {
-                return NotFound(new { message = "User not found" });
+                return NotFound("No users found");
             }
-            return Ok(user);
+            return Ok(users);
         }
 
     }
