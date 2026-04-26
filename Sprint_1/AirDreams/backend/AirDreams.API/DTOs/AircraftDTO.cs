@@ -2,9 +2,9 @@ namespace AirDreams.API.DTOs
 {
     public class AircraftDTO
     {
-        public int id { get; set; }
-        public string model { get; set; }
-        public int seatsAmount { get; set; }
-        public string weight { get; set; }
+        public int Id { get; set; }
+        public string Model { get; set; }
+        public int SeatsAmount { get; set; }
+        public string Weight { get; set; }
     }
 }
