@@ -22,6 +22,7 @@ namespace AirDreams.API.Controllers
         {
             // TODO : User service and repository to get all users
             var users = userService.GetAllUsers();
+<<<<<<< HEAD
             return Ok(users);
         }
 
@@ -36,6 +37,13 @@ namespace AirDreams.API.Controllers
                 return NotFound(new { message = "User not found" });
             }
             return Ok(user);
+=======
+            if (users == null || users.Count == 0)
+            {
+                return NotFound("No users found");
+            }
+            return Ok(users);
+>>>>>>> dde80bb (Add User Controller and DTO)
         }
 
     }
