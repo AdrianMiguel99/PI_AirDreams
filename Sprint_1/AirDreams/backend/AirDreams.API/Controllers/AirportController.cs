@@ -16,17 +16,26 @@ namespace AirDreams.API.Controllers
             this.airportService = airportService;
         }
 
-        // GET: api/Airport for list
+        // GET: api/Airport
         [HttpGet]
         public ActionResult<List<AirportDTO>> GetAll()
         {
             // TODO : Airport service and repository to get all airports
             var airports = airportService.GetAllAirports();
-            if (airports == null || airports.Count == 0)
-            {
-                return NotFound("No airports found");
-            }
             return Ok(airports);
+        }
+
+        // GET: api/Airport/{id}
+        [HttpGet("{id}")]
+        public ActionResult<AirportDTO> GetById(string id)
+        {
+            // TODO : Airport service and repository to get an airport by id
+            var airport = airportService.GetAirportById(id);
+            if (airport == null)
+            {
+                return NotFound(new { message = "Airport not found" });
+            }
+            return Ok(airport);
         }
 
     }

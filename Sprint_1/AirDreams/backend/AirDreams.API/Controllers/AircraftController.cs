@@ -22,11 +22,20 @@ namespace AirDreams.API.Controllers
         {
             // TODO : Aircraft service and repository to get all aircrafts
             var aircrafts = aircraftService.GetAllAircrafts();
-            if (aircrafts == null || aircrafts.Count == 0)
-            {
-                return NotFound("No aircrafts found");
-            }
             return Ok(aircrafts);
+        }
+
+        // GET: api/Aircraft/{id}
+        [HttpGet("{id}")]
+        public ActionResult<AircraftDTO> GetById(string id)
+        {
+            // TODO : Aircraft service and repository to get an aircraft by id
+            var aircraft = aircraftService.GetAircraftById(id);
+            if (aircraft == null)
+            {
+                return NotFound(new { message = "Aircraft not found" });
+            }
+            return Ok(aircraft);
         }
 
     }
