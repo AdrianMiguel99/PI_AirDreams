@@ -9,9 +9,9 @@ namespace AirDreams.API.Controllers
     [ApiController]
     public class AirportController : ControllerBase
     {
-        private readonly IAirportService airportService;
+        private readonly AirportService airportService;
 
-        public AirportController(IAirportService airportService)
+        public AirportController(AirportService airportService)
         {
             this.airportService = airportService;
         }
