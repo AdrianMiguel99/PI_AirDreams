@@ -18,6 +18,10 @@
 
       <button @click="login">Ingresar</button>
 
+      <router-link to="/registro" class="registro-link">
+        ¿No tienes cuenta? Registrar usuario
+      </router-link>
+
       <p v-if="error" class="error">
         Correo o contraseña incorrectos.
       </p>
@@ -87,5 +91,13 @@ export default {
 .error {
   color: red;
   margin-top: 10px;
+}
+
+.registro-link {
+  display: block;
+  margin-top: 15px;
+  text-decoration: none;
+  color: #2f3e5c;
+  font-weight: bold;
 }
 </style>
