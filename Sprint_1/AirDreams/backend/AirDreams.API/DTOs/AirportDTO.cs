@@ -1,4 +1,4 @@
-namespace Airport.API.DTOs
+namespace AirDreams.API.DTOs
 {
     public class AirportDTO
     {
