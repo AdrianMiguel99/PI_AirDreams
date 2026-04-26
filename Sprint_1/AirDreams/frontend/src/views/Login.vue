@@ -41,11 +41,29 @@ export default {
   },
 
   methods: {
-    login() {
-      // SIMULACIÓN (luego backend)
-      if (this.correo === "admin@air.com" && this.password === "1234") {
-        alert("Login correcto");
-      } else {
+    async login() {
+        this.error = false;
+        
+        try {
+            const response = await fetch("http://localhost:5276/api/Auth/login", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+                correo: this.correo,
+                password: this.password
+            })
+        });
+
+        if (response.ok) {
+          alert("Login correcto");
+        } else {
+          this.error = true;
+        }
+
+      } catch (error) {
+        console.error(error);
         this.error = true;
       }
     }
