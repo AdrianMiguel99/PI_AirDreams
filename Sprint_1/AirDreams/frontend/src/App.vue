@@ -1,19 +1,7 @@
-<template>
-  <AddAirplaneForm />
-</template>
-
-<script>
-import AddAirplaneForm from './components/AddAirplaneForm.vue';
-  export default {
-    name: 'App',
-    components: {
-      AddAirplaneForm,
-    },
-  };
-
-
+<script setup>
+import { createRouter, createWebHistory } from "vue-router";
 </script>
 
-<style>
-
-</style>
+<template>
+  <router-view />
+</template>
