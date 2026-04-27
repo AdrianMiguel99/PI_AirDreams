@@ -1,9 +1,13 @@
+using System.Data;
+using Microsoft.Data.Sqlite; //Cambiar a Microsoft.Data.SqlCl
+using Dapper;
+using AirDreams.API.Repositories;
+using AirDreams.API.Services;
+
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllers();
-
 builder.Services.AddEndpointsApiExplorer();
-
 builder.Services.AddSwaggerGen();
 
 builder.Services.AddCors(options =>
@@ -17,7 +21,27 @@ builder.Services.AddCors(options =>
         });
 });
 
+builder.Services.AddScoped<IDbConnection>(sp =>
+    new SqliteConnection(builder.Configuration.GetConnectionString("DefaultConnection")));
+
+builder.Services.AddScoped<IAirportRepository, AirportRepository>();
+builder.Services.AddScoped<IAirportService, AirportService>();
+
 var app = builder.Build();
+
+using (var scope = app.Services.CreateScope())
+{
+    var connection = scope.ServiceProvider.GetRequiredService<IDbConnection>();
+    connection.Open();
+    connection.Execute(@"CREATE TABLE IF NOT EXISTS Airport (
+                          codeAirport TEXT PRIMARY KEY,
+                          adminID INTEGER NOT NULL,
+                          nameAirport TEXT NOT NULL,
+                          city TEXT NOT NULL,
+                          country TEXT NOT NULL,
+                          timeZone TEXT
+                        )");
+}
 
 if (app.Environment.IsDevelopment())
 {
@@ -25,14 +49,8 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
-// app.UseHttpsRedirection();
-
 app.UseRouting();
-
 app.UseCors("AllowVue");
-
 app.UseAuthorization();
-
 app.MapControllers();
-
 app.Run();
