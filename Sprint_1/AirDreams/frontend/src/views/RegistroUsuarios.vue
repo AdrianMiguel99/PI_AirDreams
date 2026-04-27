@@ -51,7 +51,9 @@ export default {
   },
 
   methods: {
-    registrarUsuario() {
+    async registrarUsuario() {
+      this.mensaje = "";
+
       if (
         !this.nombreCompleto ||
         !this.tipoUsuario ||
@@ -62,7 +64,34 @@ export default {
         return;
       }
 
-      this.mensaje = "Usuario registrado correctamente (simulación)";
+      try {
+        const response = await fetch("http://localhost:5276/api/Auth/register", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({
+            nombreCompleto: this.nombreCompleto,
+            tipoUsuario: this.tipoUsuario,
+            correo: this.correo,
+            cedula: this.cedula
+          })
+        });
+
+        const data = await response.text();
+        this.mensaje = data;
+
+        if (response.ok) {
+          this.nombreCompleto = "";
+          this.tipoUsuario = "";
+          this.correo = "";
+          this.cedula = "";
+        }
+
+      } catch (error) {
+        console.error(error);
+        this.mensaje = "Error de conexión con el servidor";
+      }
     }
   }
 };
