@@ -1,6 +1,6 @@
 using AirDreams.API.DTOs;
-using AirDreams.API.Repositories;
-using AirDreams.API.Services;
+using AirDreams.API.Repositories.Interfaces;
+using AirDreams.API.Services.Interfaces;
 
 namespace AirDreams.API.Services
 {
