@@ -1,3 +1,9 @@
+using AirDreams.API.DTOs;
+using AirDreams.API.Services;
+using AirDreams.API.Services.Interfaces;
+using AirDreams.API.Repositories;
+using AirDreams.API.Repositories.Interfaces;
+
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllers();
@@ -17,11 +23,8 @@ builder.Services.AddCors(options =>
         });
 });
 
-builder.Services.AddScoped<IService<AirportDTO>, AirportService>();
-builder.Services.AddScoped<IService<AircraftDTO>, AircraftService>();
+builder.Services.AddScoped<IRepository<UserDTO>, UserRepository>();
 builder.Services.AddScoped<IService<UserDTO>, UserService>();
-builder.Services.AddScoped<IService<RouteDTO>, RouteService>();
-builder.Services.AddScoped<IService<FlightDTO>, FlightService>();
 
 var app = builder.Build();
 
