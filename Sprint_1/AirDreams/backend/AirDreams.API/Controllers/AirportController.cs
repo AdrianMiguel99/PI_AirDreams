@@ -1,6 +1,5 @@
 using AirDreams.API.DTOs;
-using AirDreams.API.Services;
-using Microsoft.AspNetCore.Http;
+using AirDreams.API.Services.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 
 namespace AirDreams.API.Controllers
@@ -9,9 +8,9 @@ namespace AirDreams.API.Controllers
     [ApiController]
     public class AirportController : ControllerBase
     {
-        private readonly AirportService airportService;
+        private readonly IService<AirportDTO> airportService;
 
-        public AirportController(AirportService airportService)
+        public AirportController(IService<AirportDTO> airportService)
         {
             this.airportService = airportService;
         }
@@ -21,7 +20,7 @@ namespace AirDreams.API.Controllers
         public ActionResult<List<AirportDTO>> GetAll()
         {
             // TODO : Airport service and repository to get all airports
-            var airports = airportService.GetAllAirports();
+            var airports = airportService.GetAll();
             return Ok(airports);
         }
 
@@ -30,7 +29,7 @@ namespace AirDreams.API.Controllers
         public ActionResult<AirportDTO> GetById(string id)
         {
             // TODO : Airport service and repository to get an airport by id
-            var airport = airportService.GetAirportById(id);
+            var airport = airportService.GetById(id);
             if (airport == null)
             {
                 return NotFound(new { message = "Airport not found" });
