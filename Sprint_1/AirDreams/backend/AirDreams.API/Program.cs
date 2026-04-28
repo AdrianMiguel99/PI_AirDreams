@@ -17,6 +17,12 @@ builder.Services.AddCors(options =>
         });
 });
 
+builder.Services.AddScoped<IService<AirportDTO>, AirportService>();
+builder.Services.AddScoped<IService<AircraftDTO>, AircraftService>();
+builder.Services.AddScoped<IService<UserDTO>, UserService>();
+builder.Services.AddScoped<IService<RouteDTO>, RouteService>();
+builder.Services.AddScoped<IService<FlightDTO>, FlightService>();
+
 var app = builder.Build();
 
 if (app.Environment.IsDevelopment())

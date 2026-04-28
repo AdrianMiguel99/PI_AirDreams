@@ -1,6 +1,5 @@
 using AirDreams.API.DTOs;
-using AirDreams.API.Services;
-using Microsoft.AspNetCore.Http;
+using AirDreams.API.Services.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 
 namespace AirDreams.API.Controllers
@@ -9,9 +8,9 @@ namespace AirDreams.API.Controllers
     [ApiController]
     public class UserController : ControllerBase
     {
-        private readonly UserService userService;
+        private readonly IService<UserDTO> userService;
 
-        public UserController(UserService userService)
+        public UserController(IService<UserDTO> userService)
         {
             this.userService = userService;
         }
@@ -21,16 +20,16 @@ namespace AirDreams.API.Controllers
         public ActionResult<List<UserDTO>> GetAll()
         {
             // TODO : User service and repository to get all users
-            var users = userService.GetAllUsers();
+            var users = userService.GetAll();
             return Ok(users);
         }
 
         // GET: api/User/{id}
         [HttpGet("{id}")]
-        public ActionResult<UserDTO> GetById(int id)
+        public ActionResult<UserDTO> GetById(string id)
         {
             // TODO : User service and repository to get a user by id
-            var user = userService.GetUserById(id);
+            var user = userService.GetById(id);
             if (user == null)
             {
                 return NotFound(new { message = "User not found" });

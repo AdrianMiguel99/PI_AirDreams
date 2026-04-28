@@ -1,6 +1,5 @@
 using AirDreams.API.DTOs;
-using AirDreams.API.Services;
-using Microsoft.AspNetCore.Http;
+using AirDreams.API.Services.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 
 namespace AirDreams.API.Controllers
@@ -9,19 +8,19 @@ namespace AirDreams.API.Controllers
     [ApiController]
     public class AircraftController : ControllerBase
     {
-        private readonly AircraftService aircraftService;
+        private readonly IService<AircraftDTO> aircraftService;
 
-        public AircraftController(AircraftService aircraftService)
+        public AircraftController(IService<AircraftDTO> aircraftService)
         {
             this.aircraftService = aircraftService;
         }
 
-        // GET: api/Aircraft for list
+        // GET: api/Aircraft
         [HttpGet]
         public ActionResult<List<AircraftDTO>> GetAll()
         {
             // TODO : Aircraft service and repository to get all aircrafts
-            var aircrafts = aircraftService.GetAllAircrafts();
+            var aircrafts = aircraftService.GetAll();
             return Ok(aircrafts);
         }
 
@@ -30,7 +29,7 @@ namespace AirDreams.API.Controllers
         public ActionResult<AircraftDTO> GetById(string id)
         {
             // TODO : Aircraft service and repository to get an aircraft by id
-            var aircraft = aircraftService.GetAircraftById(id);
+            var aircraft = aircraftService.GetById(id);
             if (aircraft == null)
             {
                 return NotFound(new { message = "Aircraft not found" });
