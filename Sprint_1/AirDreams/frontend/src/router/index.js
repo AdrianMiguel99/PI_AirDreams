@@ -1,15 +1,34 @@
 import { createRouter, createWebHistory } from 'vue-router'
+
 import LandingPage from '../views/LandingPage.vue'
 import Login from '../views/Login.vue'
 import RegistroUsuarios from '../views/RegistroUsuarios.vue'
+import LandingPageAdmin from '../components/LandingPageAdmin/LandingPageAdmin.vue'
+import ListaUsuarios from '../components/ListaUsuarios.vue'
+//import AddAirplane from '../components/AddAirplaneForm.vue'
 
 const routes = [
-  { path: '/', component: LandingPage },
-  { path: '/login', component: Login },
-  { path: '/registro', component: RegistroUsuarios }
+  //Pagina principal
+  { path: '/', name: 'home', component: LandingPage },
+
+  //Login y registro
+  { path: '/login', name: 'login', component: Login },
+  { path: '/registro', name: 'registro', component: RegistroUsuarios },
+
+  //Panel administrador
+  { path: '/admin', name: 'admin', component: LandingPageAdmin },
+  { path: '/adminHome', name: 'adminHome', component: LandingPageAdmin },
+  
+  //Visualizar usuarios
+  { path: '/usuarios', name: 'adminUsuarios', component: ListaUsuarios },
+
+  //Agregar y visualizar aeronaves
+  //{ path: '/addPlane', name: 'addPlane', component: AddAirplane }
 ]
 
-export default createRouter({
+const router = createRouter({
   history: createWebHistory(),
   routes
 })
+
+export default router
