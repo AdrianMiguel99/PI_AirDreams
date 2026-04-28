@@ -1,6 +1,6 @@
     <template>
-    <div class="d-flex justify-content-center align-items-center vh-100">
-        <div class="card p-4 shadow" style="max-width: 600px; width: 100%">
+    <div class="container py-4 d-flex justify-content-center">
+        <div class="card p-4 shadow w-100" style="max-width: 700px">
         <h3 class="text-center mb-3">Formulario de creación de vuelos</h3>
 
         <form @submit.prevent="saveFlight">
@@ -47,7 +47,7 @@
             </div>
 
             <div class="form-group mb-3">
-            <label for="departureTime">Hora de salida</label>
+            <label for="departureTime">Fecha y Hora de salida</label>
             <input
                 v-model="formData.departureTime"
                 type="datetime-local"
@@ -58,7 +58,7 @@
             </div>
 
             <div class="form-group mb-3">
-            <label for="arrivalTime">Hora de llegada</label>
+            <label for="arrivalTime">Fecha y Hora de llegada</label>
             <input
                 v-model="formData.arrivalTime"
                 type="datetime-local"
@@ -68,26 +68,32 @@
             />
             </div>
 
-            <div class="form-group mb-3">
-            <label for="basePriceTurist">Precio base, para clase turista</label>
-            <input
-                v-model="formData.basePriceTurist"
-                type="number"
-                id="basePriceTurist"
-                class="form-control"
-                required
-            />
-            </div>
+            <div class="row">
+                <div class="col-md-6 form-group mb-3">
+                <label for="basePriceTurist">Precio base, para clase turista</label>
+                <input
+                    v-model="formData.basePriceTurist"
+                    type="number"
+                    id="basePriceTurist"
+                    class="form-control"
+                    max="99999"
+                    step="0.01"
+                    required
+                />
+                </div>
 
-            <div class="form-group mb-3">
-            <label for="basePriceFirstClass">Precio base, para primera clase</label>
-            <input
-                v-model="formData.basePriceFirstClass"
-                type="number"
-                id="basePriceFirstClass"
-                class="form-control"
-                required
-            />
+                <div class="col-md-6 form-group mb-3">
+                <label for="basePriceFirstClass">Precio base, para primera clase</label>
+                <input
+                    v-model="formData.basePriceFirstClass"
+                    type="number"
+                    id="basePriceFirstClass"
+                    class="form-control"
+                    max="99999"
+                    step="0.01"
+                    required
+                />
+                </div>
             </div>
 
             <div class="form-group mb-3">
@@ -96,7 +102,9 @@
                 v-model="formData.maxWeightLuggage"
                 type="number"
                 id="maxWeightLuggage"
+                max="9999"
                 class="form-control"
+
                 required
             />
             </div>
@@ -216,6 +224,11 @@
         },
         saveFlight() {
             console.log("Formulario a guardar:", this.formData);
+
+            if (this.formData.originAirport === this.formData.destinationAirport) {
+                alert("El aeropuerto de origen y destino no pueden ser el mismo.");
+                return;
+            }
 
         // axios
         //     .post("https://localhost:7019/api/Flight", this.formData)
