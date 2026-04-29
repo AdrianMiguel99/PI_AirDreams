@@ -62,7 +62,7 @@ namespace AirDreams.API.Repositories
                 Id = user.EmployeeId,
                 FullName = $"{user.FirstName} {user.LastName}",
                 Email = user.Email,
-                IsOperator = user.IsOperator
+                Role = user.IsOperator ? "Operador" : "Administrador"
             };
         }
 

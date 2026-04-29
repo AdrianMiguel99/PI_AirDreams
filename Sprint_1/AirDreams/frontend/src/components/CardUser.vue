@@ -1,14 +1,14 @@
 <template>
   <div class="card">
     <div class="top">
-      <h3>{{ usuario.nombreCompleto }}</h3>
-      <span class="rol">{{ usuario.rol }}</span>
+      <h3>{{ user.fullName }}</h3>
+      <span class="role">{{ user.role }}</span>
     </div>
 
     <div class="middle">
       <div class="email-section">
-        <p>Correo</p>
-        <small>{{ usuario.correo }}</small>
+        <p>Email</p>
+        <small>{{ user.email }}</small>
       </div>
     </div>
   </div>
@@ -17,7 +17,7 @@
 <script>
 export default {
   props: {
-    usuario: Object
+    user: Object
   }
 };
 </script>
@@ -37,7 +37,7 @@ export default {
   align-items: center;
 }
 
-.rol {
+.role {
   background: #e3f2fd;
   padding: 5px 12px;
   border-radius: 20px;
