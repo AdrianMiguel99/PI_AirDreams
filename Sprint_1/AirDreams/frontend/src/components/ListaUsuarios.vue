@@ -17,6 +17,7 @@
 </template>
 
 <script>
+import axios from "axios";
 import CardUser from "./CardUser.vue";
 
 export default {
@@ -31,11 +32,9 @@ export default {
   },
   methods: {
     fetchUsers() {
-      fetch('http://localhost:5276/api/User')
-        .then(response => response.json())
-        .then(data => {
-          this.users = data;
-        });
+      axios.get("http://localhost:5276/api/User").then((response) => {
+        this.users = response.data;
+      });
     }
   },
   created: function () {
