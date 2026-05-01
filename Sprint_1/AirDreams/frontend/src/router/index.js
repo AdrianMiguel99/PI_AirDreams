@@ -5,6 +5,7 @@ import Login from '../views/Login.vue'
 import RegistroUsuarios from '../views/RegistroUsuarios.vue'
 import LandingPageAdmin from '../components/LandingPageAdmin/LandingPageAdmin.vue'
 import AddAirplane from '../components/AddAirplaneForm.vue'
+import AirportManagement from '../components/AirportManagement.vue'
 
 const routes = [
   //Pagina principal
@@ -19,7 +20,9 @@ const routes = [
   { path: '/adminHome', name: 'adminHome', component: LandingPageAdmin },
 
   //Agregar y visualizar aeronaves
-  { path: '/addPlane', name: 'addPlane', component: AddAirplane }
+  { path: '/addPlane', name: 'addPlane', component: AddAirplane },
+
+  { path: '/admin/airports', name: 'airports', component: AirportManagement }
 ]
 
 const router = createRouter({
