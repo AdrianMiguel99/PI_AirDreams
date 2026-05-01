@@ -24,14 +24,14 @@ namespace AirDreams.API.Repositories
             string query = @"
                 INSERT INTO dbo.Aircraft
                     (plateNumber, maxWeight, cantPasajeros,
-                     cant_Asientos_Fila_Firstclass, cant_Filas_Firstclass,
-                     cant_Asientos_Fila_Turista, cant_Filas_Turista,
-                     modelo, adminId)
+                        cant_Asientos_Fila_Firstclass, cant_Filas_Firstclass,
+                        cant_Asientos_Fila_Turista, cant_Filas_Turista,
+                    modelo, adminId)
                 VALUES
                     (@plateNumber, @maxWeight, @cantPasajeros,
-                     @cant_Asientos_Fila_Firstclass, @cant_Filas_Firstclass,
-                     @cant_Asientos_Fila_Turista, @cant_Filas_Turista,
-                     @modelo, @adminId)";
+                        @cant_Asientos_Fila_Firstclass, @cant_Filas_Firstclass,
+                        @cant_Asientos_Fila_Turista, @cant_Filas_Turista,
+                        @modelo, @adminId)";
 
             var affectedRows = _connection.Execute(query, aircraft);
             return affectedRows > 0;

@@ -19,11 +19,11 @@
                 Aeropuerto de origen
                 </label>
                 <input
-                v-model="airportQuery"
+                v-model="originAirportQuery"
                 type="text"
                 id="originAirport"
-                @focus="showResults = true"
-                @input="onAirportInput"
+                @focus="showOriginResults = true"
+                @input="onOriginAirportInput"
                 placeholder="Ej: SJO o Juan Santamaría"
                 autocomplete="off"
                 class="form-control"
@@ -31,34 +31,53 @@
             />
 
             <ul
-                v-if="showResults && filteredAirports.length > 0"
+                v-if="showOriginResults && filteredOriginAirports.length > 0"
                 class="list-group position-absolute w-100 shadow"
                 style="z-index: 1000; max-height: 200px; overflow-y: auto;"
             >
                 <li
-                v-for="airport in filteredAirports"
+                v-for="airport in filteredOriginAirports"
                 :key="airport.id"
                 class="list-group-item list-group-item-action"
-                @click="selectAirport(airport)"
+                @click="selectOriginAirport(airport)"
                 style="cursor: pointer"
                 >
                 {{ airport.code }} - {{ airport.name }}
                 </li>
             </ul>
             </div>
-
-            <div class="col-md-6 mb-3">
-            <label for="destinationAirport" class="form-label">
+            
+            <div class="col-md-6 position-relative mb-3">
+                <label for="destinationAirport" class="form-label">
                 Aeropuerto de destino
-            </label>
-            <input
-                v-model="formData.destinationAirport"
-                type="text"
+                </label>
+                <input
+                v-model="destinationAirportQuery"
+                type="text"4
                 id="destinationAirport"
-                class="form-control"
+                @focus="showDestinationResults = true"
+                @input="onDestinationAirportInput"
                 placeholder="Ej: LIR o Daniel Oduber"
+                autocomplete="off"
+                class="form-control"
                 required
             />
+
+            <ul
+                v-if="showDestinationResults && filteredDestinationAirports.length > 0"
+                class="list-group position-absolute w-100 shadow"
+                style="z-index: 1000; max-height: 200px; overflow-y: auto;"
+            >
+                <li
+                v-for="airport in filteredDestinationAirports"
+                :key="airport.id"
+                class="list-group-item list-group-item-action"
+                @click="selectDestinationAirport(airport)"
+                style="cursor: pointer"
+                >
+                {{ airport.code }} - {{ airport.name }}
+                </li>
+            </ul>
             </div>
 
             <div class="col-md-6 mb-3">
@@ -219,15 +238,36 @@
                 />
             </div>
 
-            <div class="col-12 mb-3">
-                <label class="form-label">Modelo de aeronave</label>
+            <div class="col-12 position-relative mb-3">
+                <label for="aircraftModel" class="form-label"> Aeronave </label>
+
                 <input
-                v-model="formData.aircraftModel"
+                v-model="aircraftQuery"
                 type="text"
-                id="flightModel"
+                id="aircraftModel"
+                @focus="showAircraftResults = true"
+                @input="onAircraftInput"
+                placeholder="Ej: TI-BFJ o Boeing 737"
+                autocomplete="off"
                 class="form-control"
                 required
-                />
+            />
+
+            <ul
+                v-if="showAircraftResults && filteredAircrafts.length > 0"
+                class="list-group position-absolute w-100 shadow"
+                style="z-index: 1000; max-height: 200px; overflow-y: auto;"
+            >
+                <li
+                    v-for="aircraft in filteredAircrafts"
+                    :key="aircraft.id"
+                    class="list-group-item list-group-item-action"
+                    @click="selectAircraft(aircraft)"
+                    style="cursor: pointer"
+                    >
+                    {{ aircraft.plateNumber }} - {{ aircraft.modelo }}
+                </li>
+            </ul>    
             </div>
 
             <div class="col-12 d-flex justify-content-end mt-2">
@@ -253,9 +293,16 @@
     name: "FlightRegister",
     data() {
         return {
-        airportQuery: "",
-        showResults: false,
-        selectedAirport: null,
+        aircraftQuery: "",
+        showAircraftResults: false,
+        selectedAircraft: null,
+        aircrafts: [],
+        originAirportQuery: "",
+        destinationAirportQuery: "",
+        showOriginResults: false,
+        showDestinationResults: false,
+        selectedOriginAirport: null,
+        selectedDestinationAirport: null,
         airports: [],
         formData: {
             originAirport: "",
@@ -292,18 +339,18 @@
     };
     },
     computed: {
-        filteredAirports() {
-            const query = this.airportQuery.trim().toLowerCase();
-            if (!query) return [];
-
-            return this.airports.filter(
-                (airport) =>
-                airport.code.toLowerCase().includes(query) ||
-                airport.name.toLowerCase().includes(query)
-            );
+        filteredOriginAirports() {
+            return this.filterAirports(this.originAirportQuery);
+        },
+        filteredDestinationAirports() {
+            return this.filterAirports(this.destinationAirportQuery);
+        },
+        filteredAircrafts(){
+            return this.filterAircrafts(this.aircraftQuery);
         }
     },
     mounted(){
+        this.loadAircrafts();
         this.loadAirports();
     },
     methods: {
@@ -316,21 +363,83 @@
             console.error('No se pudieron cargar aeropuertos', e);
             }
         },
-        onAirportInput() {
-            this.showResults = true;
+        async loadAircrafts(){
+            try {
+            const res = await axios.get('/api/Airplane');
+            // adapter según la forma del DTO que devuelva el backend
+            this.aircrafts = res.data.map((a, i) => ({
+                id: i+1,
+                plateNumber: a.plateNumber || a.PlateNumber,
+                modelo: a.aircraftModel || a.modelo || a.Model
+            }));
+            } catch (e) {
+            console.error('No se pudieron cargar los aviones', e);
+            }
+        },
+        filterAirports(queryValue) {
+            const query = queryValue.trim().toLowerCase();
+            if (!query) return [];
+
+            return this.airports.filter(
+                (airport) => {
+                const code = String(airport.code || "").toLowerCase();
+                const name = String(airport.name || "").toLowerCase();
+                return code.includes(query) || name.includes(query);
+                }
+            );
+        },
+        filterAircrafts(){
+            const query = this.aircraftQuery.trim().toLowerCase();
+            if (!query) return [];
+            
+            return this.aircrafts.filter((aircraft) => {
+                const plateNumber = String(aircraft.plateNumber || "").toLowerCase();
+                const aircraftModel = String(aircraft.modelo || "").toLowerCase();
+                return plateNumber.includes(query) || aircraftModel.includes(query);
+                }
+            );
+        },
+        onAircraftInput(){
+            this.showAircraftfResults = true;
+            this.formData.aircraftModel = "";
+        },
+        selectAircraft(aircraft) {
+            this.selectedAircraft = aircraft;
+            this.aircraftQuery = `${aircraft.plateNumber} - ${aircraft.modelo}`;
+            this.formData.aircraftModel = aircraft.plateNumber;
+            this.showAircraftResults = false;
+        },
+        onOriginAirportInput() {
+            this.showOriginResults = true;
             this.formData.originAirport = "";
         },
-        selectAirport(airport) {
-            this.selectedAirport = airport;
-            this.airportQuery = `${airport.code} - ${airport.name}`;
+        onDestinationAirportInput() {
+            this.showDestinationResults = true;
+            this.formData.destinationAirport = "";
+        },
+        selectOriginAirport(airport) {
+            this.selectedOriginAirport = airport;
+            this.originAirportQuery = `${airport.code} - ${airport.name}`;
             this.formData.originAirport = airport.code;
-            this.showResults = false;
+            this.showOriginResults = false;
+        },
+        selectDestinationAirport(airport) {
+            this.selectedDestinationAirport = airport;
+            this.destinationAirportQuery = `${airport.code} - ${airport.name}`;
+            this.formData.destinationAirport = airport.code;
+            this.showDestinationResults = false;
         },
         async saveFlight() {
             console.log("Formulario a guardar:", this.formData);
 
+            
             if (this.formData.originAirport === this.formData.destinationAirport) {
                 alert("El aeropuerto de origen y destino no pueden ser el mismo.");
+                return;
+            }
+
+            if (!this.formData.aircraftModel) {
+                alert("Debe seleccionar una aeronave desde la lista.");
                 return;
             }
             const dtDepart = new Date(this.formData.departureTime);
@@ -346,7 +455,7 @@
             // YYYY-MM-DD
             const toDate = (date) => date.toISOString().split("T")[0];
 
-            const codeSalida = extractCode(this.formData.originAirport || this.airportQuery);
+            const codeSalida = extractCode(this.formData.originAirport || this.originAirportQuery);
             const codeLlegada = extractCode(this.formData.destinationAirport);
 
             const pad = (n) => String(n).padStart(2, "0");
@@ -354,7 +463,7 @@
             // stimatedTime: usa input o calcula diferencia
             let stimatedTime = this.formData.flightDuration;
             if (!stimatedTime) {
-                const diffMs = dtArrival - dtDepart;
+                const diffMs = dtArrive - dtDepart;
                 const h = Math.floor(diffMs / 3600000);
                 const m = Math.floor((diffMs % 3600000) / 60000);
                 stimatedTime = `${pad(h)}:${pad(m)}:00`;
@@ -364,12 +473,12 @@
 
             const payload = {
                 adminID: 1, // cambiar según admin real
-                codeAirportSalida: this.formData.originAirport,
-                codeAirportLlegada: this.formData.destinationAirport,
+                codeAirportSalida: codeSalida,
+                codeAirportLlegada: codeLlegada,
                 plateNumber: this.formData.aircraftModel || 'TEST123', // debe existir en Aircraft
                 firstClassPrice: parseFloat(this.formData.basePriceFirstClass),
                 turistClassPrice: parseFloat(this.formData.basePriceTurist),
-                stimatedTime: this.formData.flightDuration || toTime(new Date(0,0,0, dtArrive.getHours()-dtDepart.getHours(), dtArrive.getMinutes()-dtDepart.getMinutes())), // "HH:MM:SS"
+                stimatedTime: stimatedTime,
                 routeState: this.formData.status,
                 maxWeightLuggage: parseFloat(this.formData.maxWeightLuggage),
                 priceLuggage: parseFloat(this.formData.priceLuggage),
@@ -410,4 +519,3 @@
         border-color: #384467;
     }
 </style>
-
