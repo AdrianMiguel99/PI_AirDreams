@@ -27,6 +27,12 @@ builder.Services.AddScoped<IDbConnection>(sp =>
 builder.Services.AddScoped<IAirportRepository, AirportRepository>();
 builder.Services.AddScoped<IAirportService, AirportService>();
 
+builder.Services.AddScoped<IService<AirportDTO>, AirportService>();
+builder.Services.AddScoped<IService<AircraftDTO>, AircraftService>();
+builder.Services.AddScoped<IService<UserDTO>, UserService>();
+builder.Services.AddScoped<IService<RouteDTO>, RouteService>();
+builder.Services.AddScoped<IService<FlightDTO>, FlightService>();
+
 var app = builder.Build();
 
 using (var scope = app.Services.CreateScope())
