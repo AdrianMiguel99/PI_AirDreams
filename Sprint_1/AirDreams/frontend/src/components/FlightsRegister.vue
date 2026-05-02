@@ -1,18 +1,29 @@
-    <template>
-    <div class="container py-4 d-flex justify-content-center">
-        <div class="card p-4 shadow w-100" style="max-width: 700px">
-        <h3 class="text-center mb-3">Formulario de creación de vuelos</h3>
+<template>
+    <div class="page-wrapper py-5">
+    <div class="container">
+
+        <h1 class="page-title mb-2">Gestión de Vuelos</h1>
+        <p class="page-subtitle mb-4">
+            Registra nuevos vuelos y consulta los vuelos existentes.
+        </p>
+
+        <div class="card flight-card p-4 shadow-sm mb-5">
+        <h3 class="section-title mb-3">Registrar Vuelo</h3>
 
         <form @submit.prevent="saveFlight">
-            <div class="position-relative mb-3">
-            <label for="originAirport" class="form-label">Aeropuerto de origen</label>
-            <input
+            <div class="row">
+
+            <div class="col-md-6 position-relative mb-3">
+                <label for="originAirport" class="form-label">
+                Aeropuerto de origen
+                </label>
+                <input
                 v-model="airportQuery"
                 type="text"
                 id="originAirport"
                 @focus="showResults = true"
                 @input="onAirportInput"
-                placeholder="Escriba el código o el nombre del aeropuerto"
+                placeholder="Ej: SJO o Juan Santamaría"
                 autocomplete="off"
                 class="form-control"
                 required
@@ -35,19 +46,24 @@
             </ul>
             </div>
 
-            <div class="form-group mb-3">
-            <label for="destinationAirport">Aeropuerto de destino</label>
+            <div class="col-md-6 mb-3">
+            <label for="destinationAirport" class="form-label">
+                Aeropuerto de destino
+            </label>
             <input
                 v-model="formData.destinationAirport"
                 type="text"
                 id="destinationAirport"
                 class="form-control"
+                placeholder="Ej: LIR o Daniel Oduber"
                 required
             />
             </div>
 
-            <div class="form-group mb-3">
-            <label for="departureTime">Fecha y Hora de salida</label>
+            <div class="col-md-6 mb-3">
+            <label for="departureTime" class="form-label">
+                Fecha y hora de salida
+            </label>
             <input
                 v-model="formData.departureTime"
                 type="datetime-local"
@@ -57,8 +73,10 @@
             />
             </div>
 
-            <div class="form-group mb-3">
-            <label for="arrivalTime">Fecha y Hora de llegada</label>
+            <div class="col-md-6 mb-3">
+            <label for="arrivalTime" class="form-label">
+                Fecha y hora de llegada
+            </label>
             <input
                 v-model="formData.arrivalTime"
                 type="datetime-local"
@@ -68,60 +86,42 @@
             />
             </div>
 
-            <div class="row">
-                <div class="col-md-6 form-group mb-3">
-                <label for="basePriceTurist">Precio base, para clase turista</label>
-                <input
-                    v-model="formData.basePriceTurist"
-                    type="number"
-                    id="basePriceTurist"
-                    class="form-control"
-                    max="99999"
-                    step="0.01"
-                    required
-                />
-                </div>
-
-                <div class="col-md-6 form-group mb-3">
-                <label for="basePriceFirstClass">Precio base, para primera clase</label>
-                <input
-                    v-model="formData.basePriceFirstClass"
-                    type="number"
-                    id="basePriceFirstClass"
-                    class="form-control"
-                    max="99999"
-                    step="0.01"
-                    required
-                />
-                </div>
-            </div>
-
-            <div class="form-group mb-3">
-            <label for="maxWeightLuggage">Peso máximo permitido para equipaje (kg)</label>
+            <div class="col-md-4 mb-3">
+            <label for="basePriceTurist" class="form-label">
+                Precio clase turista
+            </label>
             <input
-                v-model="formData.maxWeightLuggage"
+                v-model="formData.basePriceTurist"
                 type="number"
-                id="maxWeightLuggage"
-                max="9999"
+                id="basePriceTurist"
                 class="form-control"
-
+                min="0"
+                max="99999"
+                step="0.01"
                 required
             />
             </div>
 
-            <div class="form-group mb-3">
-            <label for="priceLuggage">Precio por equipaje adicional</label>
+            <div class="col-md-4 mb-3">
+                <label for="basePriceFirstClass" class="form-label">
+                Precio primera clase
+                </label>
             <input
-                v-model="formData.priceLuggage"
+                v-model="formData.basePriceFirstClass"
                 type="number"
-                id="priceLuggage"
+                id="basePriceFirstClass"
                 class="form-control"
+                min="0"
+                max="99999"
+                step="0.01"
                 required
             />
             </div>
 
-            <div class="form-group mb-3">
-            <label for="status">Estado</label>
+            <div class="col-md-4 mb-3">
+            <label for="status" class="form-label">
+                Estado
+            </label>
             <select
                 v-model="formData.status"
                 id="status"
@@ -138,28 +138,109 @@
             </select>
             </div>
 
-            <div class="form-group mb-3">
+            <div class="col-md-6 mb-3">
+            <label for="maxWeightLuggage" class="form-label">
+                Peso máximo de equipaje, kg
+            </label>
+            <input
+                v-model="formData.maxWeightLuggage"
+                type="number"
+                id="maxWeightLuggage"
+                min="0"
+                max="9999"
+                class="form-control"
+                required
+            />
+            </div>
+
+            <div class="col-md-6 mb-3">
+            <label for="priceLuggage" class="form-label">
+                Precio por equipaje adicional
+            </label>
+            <input
+                v-model="formData.priceLuggage"
+                type="number"
+                id="priceLuggage"
+                min="0"
+                step="0.01"
+                class="form-control"
+                required
+            />
+            </div>
+
+            <div class="col-12 mb-3">
             <label class="form-label">Frecuencia de vuelo</label>
-            <div class="form-check" v-for="day in weekDays" :key="day.value">
+
+                <div class="frequency-box">
+                    <div
+                    class="form-check form-check-inline"
+                    v-for="day in weekDays"
+                    :key="day.value"
+                    >
+                    <input
+                        class="form-check-input"
+                        type="checkbox"
+                        :id="day.value"
+                        :value="day.value"
+                        v-model="formData.frequency"
+                    />
+                    <label class="form-check-label" :for="day.value">
+                        {{ day.label }}
+                    </label>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-12 mb-3">
+                <label class="form-label">Duración del vuelo</label>
                 <input
-                class="form-check-input"
-                type="checkbox"
-                :id="day.value"
-                :value="day.value"
-                v-model="formData.frequency"
+                v-model="formData.flightDuration"
+                type="Time"
+                id="flightDuration"
+                min="00:00"
+                step="0.01"
+                class="form-control"
+                required
                 />
-                <label class="form-check-label" :for="day.value">
-                {{ day.label }}
-                </label>
-            </div>
             </div>
 
-            <button type="submit" class="btn btn-success w-100">Guardar</button>
-        </form>
+            <div class="col-12 mb-3">
+                <label class="form-label">Distancia(KM)</label>
+                <input
+                v-model="formData.flightDistance"
+                type="number"
+                id="flightDistance"
+                min="0"
+                step="0.01"
+                class="form-control"
+                required
+                />
+            </div>
+
+            <div class="col-12 mb-3">
+                <label class="form-label">Modelo de aeronave</label>
+                <input
+                v-model="formData.aircraftModel"
+                type="text"
+                id="flightModel"
+                class="form-control"
+                required
+                />
+            </div>
+
+            <div class="col-12 d-flex justify-content-end mt-2">
+            <button type="submit" class="btn btn-primary">
+                Registrar Vuelo
+            </button>
+            </div>
+
         </div>
+        </form>
     </div>
-    </template>
 
+    </div>
+</div>
+</template>
     <script>
     import axios from "axios";
 
@@ -183,6 +264,9 @@
             arrivalTime: "",
             basePriceTurist: 0,
             basePriceFirstClass: 0,
+            flightDuration: "",
+            flightDistance: 0,
+            aircraftModel: "",
             maxWeightLuggage: 0,
             priceLuggage: 0,
             status: "",
