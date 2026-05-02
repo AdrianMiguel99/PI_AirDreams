@@ -1,8 +1,8 @@
 <template>
-  <form @submit.prevent="registrarAeronave" class="form-wrapper">
-    <div class="form-card">
-
+  <form @submit.prevent="registrarAeronave" class="form-container">
+    <div class="form-subcontainer">
       <div class="form-column">
+
         <div class="mb-3">
           <label for="matricula" class="form-label">Matrícula (10 caracteres max)</label>
           <input v-model="aeronave.matricula" type="text" maxlength="10" class="form-control" id="matricula" placeholder="Ejm: TI-BFJ">
@@ -82,25 +82,23 @@ export default {
 </script>
 
 <style scoped>
-.form-wrapper {
+.form-container {
+  display: flex;
   justify-content: center;
-  margin-top: 25px;
+  max-width: 50%;
 }
 
-.form-card {
-  width: 670px;
-  padding: 28px 32px 38px;
+.form-subcontainer {
+  width: 90%;
   display: grid;
-  grid-template-columns: 1fr 1fr;
-  column-gap: 95px;
-  background-color: white;
-  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
+  column-gap: 60px;
 }
 
 .form-label {
   font-family: 'Inter', sans-serif;
-  color: #222;
-  font-weight: 500;
+  color: #384467;
+  font-weight: semi-bold;
+   text-align: left;
 }
 
 .form-control {

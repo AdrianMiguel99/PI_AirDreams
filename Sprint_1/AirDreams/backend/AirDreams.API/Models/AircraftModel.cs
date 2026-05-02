@@ -2,7 +2,7 @@
 {
     public class AircraftModel
     {
-        public string matricula { get; set; }
+        public string plateNumber { get; set; }
         public int maxWeight { get; set; }
         public int cantPasajeros { get; set; }
 
