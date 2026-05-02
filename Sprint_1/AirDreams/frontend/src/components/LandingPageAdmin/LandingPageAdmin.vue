@@ -45,7 +45,7 @@ const navigateTo = (path) => {
                 <span class="arrow">›</span>
             </div>
 
-            <div class="card" @click="navigateTo('/')">
+            <div class="card" @click="navigateTo('/admin/airports')">
                 <img :src="airportIcon" alt="Airport" class="icon blue">
                 <div>
                 <h3>Aeropuertos</h3>
