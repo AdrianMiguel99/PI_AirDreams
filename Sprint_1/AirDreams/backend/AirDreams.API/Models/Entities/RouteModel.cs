@@ -1,9 +1,8 @@
 namespace AirDreams.API.Models
 {
-    public class FlightModel
+    public class RouteModel
     {
-        public int FlightID { get; set; }
-        public string CodeFlight { get; set; } = string.Empty;
+        public int RouteID { get; set; }
         public string CodeAirportOrigin { get; set; } = string.Empty;
         public string CodeAirportDestination { get; set; } = string.Empty;
         public DateTime DepartureTime { get; set; }
