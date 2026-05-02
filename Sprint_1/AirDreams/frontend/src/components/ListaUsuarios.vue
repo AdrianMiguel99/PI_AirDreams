@@ -1,5 +1,6 @@
 <template>
   <div>
+    <AdminHeader />
     <h2>Usuarios</h2>
 
     <div v-if="users.length === 0">
@@ -19,11 +20,13 @@
 <script>
 import axios from "axios";
 import CardUser from "./CardUser.vue";
+import AdminHeader from "./AdminHeader.vue";
 
 export default {
   name: "UserList",
   components: {
-    CardUser
+    CardUser,
+    AdminHeader
   },
   data() {
     return {
