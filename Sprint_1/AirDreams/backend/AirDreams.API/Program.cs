@@ -1,3 +1,6 @@
+using AirDreams.API.Repository;
+using AirDreams.API.Services;
+
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllers();
@@ -16,6 +19,13 @@ builder.Services.AddCors(options =>
                   .AllowAnyMethod();
         });
 });
+
+builder.Services.AddScoped<AircraftRepository>(provider =>
+{
+    var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
+    return new AircraftRepository(connectionString);
+});
+builder.Services.AddScoped<AircraftService>();
 
 var app = builder.Build();
 
