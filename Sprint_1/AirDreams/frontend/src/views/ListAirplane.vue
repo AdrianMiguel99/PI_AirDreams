@@ -16,7 +16,7 @@
           <td>{{ airplane.modelo }}</td>
           <td>
             <button @click="editAirplane(index)" class="btn btn-primary">Editar</button>
-            <button @click="deleteAirplane(index)" class="btn btn-danger">Eliminar</button>
+            <button @click="deleteAirplane(airplane.plateNumber)" class="btn btn-danger">Eliminar</button>
           </td>
         </tr>
       </tbody>
@@ -37,8 +37,17 @@ export default {
   },
 
   methods: {
-    deleteAirplane(index) {
-      this.airplanes.splice(index, 1);
+    //TODO: Implementar deleteAirplane y editAirplane
+    deleteAirplane(plateNumber) {
+    axios.delete(`https://localhost:7136/api/Airplane/${plateNumber}`)
+      .then(() => {
+        alert('Aeronave eliminada con éxito');
+        this.getAirplanes();
+      })
+      .catch(error => {
+        console.error("ERROR:", error.response?.data);
+        alert('Error al eliminar la aeronave');
+      });
     },
 
     editAirplane(index) {
@@ -46,16 +55,22 @@ export default {
     },
 
     getAirplanes() {
-  axios.get('https://localhost:7136/api/Airplane')
-    .then(response => {
-      console.log("DATA:", response.data);
+      axios.get('https://localhost:7136/api/Airplane').then(response => {
       this.airplanes = response.data;
     })
-    .catch(error => {
+      .catch(error => {
       console.error("ERROR:", error);
-    });
-}
+      });
+    },
+
+    saveAirplane() {
+      axios.post('https://localhost:7136/api/Airplane', this.airplane).then(response => {
+        alert('Aeronave guardada con éxito');
+        this.getAirplanes();
+      })
+    }
   },
+
 
   created() {
     this.getAirplanes();
