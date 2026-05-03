@@ -24,8 +24,8 @@ builder.Services.AddCors(options =>
         });
 });
 
-builder.Services.AddScoped<IRepository<UserDTO>, UserRepository>();
-builder.Services.AddScoped<IService<UserDTO>, UserService>();
+builder.Services.AddScoped<IUserRepository, UserRepository>();
+builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IDbConnection>(sp =>
     new SqlConnection(builder.Configuration.GetConnectionString("DefaultConnection")));
 
