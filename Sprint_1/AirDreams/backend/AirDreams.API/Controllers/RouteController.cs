@@ -18,6 +18,10 @@ namespace AirDreams.API.Controllers
         [HttpPost]
         public async Task<IActionResult> Create([FromBody] CreateRouteModel model)
         {
+
+            // dentro de Create(...)
+            Console.WriteLine($"CodeAirportSalida='{model.CodeAirportSalida}', CodeAirportLlegada='{model.CodeAirportLlegada}'");
+
             if (model == null)
             {
                 return BadRequest(new { message = "Route data is required" });

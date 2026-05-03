@@ -1,7 +1,8 @@
 <template>
-    <div class="page-wrapper py-5">
     <div class="container">
-
+        <AdminHeader />
+        <div class="page">
+            <div class="content">
         <h1 class="page-title mb-2">Gestión de Vuelos</h1>
         <p class="page-subtitle mb-4">
             Registra nuevos vuelos y consulta los vuelos existentes.
@@ -234,29 +235,27 @@
             </button>
             </div>
 
+            </div>
+            </form>
         </div>
-        </form>
-    </div>
 
+        </div>
     </div>
 </div>
 </template>
     <script>
     import axios from "axios";
+import AdminHeader from "./AdminHeader.vue";
 
     export default {
+    components: { AdminHeader },
     name: "FlightRegister",
     data() {
         return {
         airportQuery: "",
         showResults: false,
         selectedAirport: null,
-        airports: [
-            { id: 1, code: "SJO", name: "Juan Santamaría" },
-            { id: 2, code: "LIR", name: "Daniel Oduber" },
-            { id: 3, code: "MAD", name: "Madrid-Barajas" },
-            { id: 4, code: "JFK", name: "John F. Kennedy" }
-        ],
+        airports: [],
         formData: {
             originAirport: "",
             destinationAirport: "",
@@ -272,6 +271,14 @@
             status: "",
                 frequency: []
         },
+        StatusOptions: [
+            { label: "A tiempo", value: "On-Time" },
+            { label: "Abordando", value: "Boarding" },
+            { label: "Retrasado", value: "Delayed" },
+            { label: "Cancelado", value: "Cancelled" },
+            { label: "En vuelo", value: "In-Flight" },
+            { label: "Aterrizó", value: "Landed" }
+        ],
         weekDays: [
             { value: "Monday", label: "Lunes" },
             { value: "Tuesday", label: "Martes" },
@@ -295,7 +302,19 @@
             );
         }
     },
+    mounted(){
+        this.loadAirports();
+    },
     methods: {
+        async loadAirports(){
+            try {
+            const res = await axios.get('/api/Airport');
+            // adapter según la forma del DTO que devuelva el backend
+            this.airports = res.data.map((a, i) => ({ id: i+1, code: a.code || a.Code || a.CodeAirport, name: a.name || a.Name || a.NameAirport }));
+            } catch (e) {
+            console.error('No se pudieron cargar aeropuertos', e);
+            }
+        },
         onAirportInput() {
             this.showResults = true;
             this.formData.originAirport = "";
@@ -316,11 +335,18 @@
             const dtDepart = new Date(this.formData.departureTime);
             const dtArrive = new Date(this.formData.arrivalTime);
 
+            const extractCode = s => {
+                if (!s) return '';
+                return s.includes(' - ') ? s.split(' - ')[0].trim() : s.trim();
+            };
+
             // formato HH:MM:SS
             const toTime = (date) => date.toTimeString().split(" ")[0]; 
             // YYYY-MM-DD
             const toDate = (date) => date.toISOString().split("T")[0];
 
+            const codeSalida = extractCode(this.formData.originAirport || this.airportQuery);
+            const codeLlegada = extractCode(this.formData.destinationAirport);
 
             const pad = (n) => String(n).padStart(2, "0");
 
@@ -343,6 +369,9 @@
                 firstClassPrice: parseFloat(this.formData.basePriceFirstClass),
                 turistClassPrice: parseFloat(this.formData.basePriceTurist),
                 stimatedTime: this.formData.flightDuration || toTime(new Date(0,0,0, dtArrive.getHours()-dtDepart.getHours(), dtArrive.getMinutes()-dtDepart.getMinutes())), // "HH:MM:SS"
+                routeState: this.StatusOptions[this.formData.status] || "On-Time",
+                maxWeightLuggage: parseFloat(this.formData.maxWeightLuggage),
+                priceLuggage: parseFloat(this.formData.priceLuggage),
                 distance: parseFloat(this.formData.flightDistance),
                 Frequencies: this.formData.frequency.map(day => ({
                 dayOfWeek: day,
