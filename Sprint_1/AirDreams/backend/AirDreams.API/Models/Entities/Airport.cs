@@ -1,4 +1,5 @@
 namespace AirDreams.API.Models.Entities
+
 {
     public class Airport
     {
