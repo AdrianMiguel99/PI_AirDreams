@@ -4,6 +4,7 @@ import LandingPage from '../views/LandingPage.vue'
 import Login from '../views/Login.vue'
 import RegistroUsuarios from '../views/RegistroUsuarios.vue'
 import LandingPageAdmin from '../components/LandingPageAdmin/LandingPageAdmin.vue'
+import ListaUsuarios from '../components/ListaUsuarios.vue'
 import AddAirplane from '../components/AddAirplaneForm.vue'
 import AirportManagement from '../components/AirportManagement.vue'
 
@@ -18,6 +19,9 @@ const routes = [
   //Panel administrador
   { path: '/admin', name: 'admin', component: LandingPageAdmin },
   { path: '/adminHome', name: 'adminHome', component: LandingPageAdmin },
+  
+  //Visualizar usuarios
+  { path: '/admin/usuarios', name: 'adminUsuarios', component: ListaUsuarios },
 
   //Agregar y visualizar aeronaves
   { path: '/addPlane', name: 'addPlane', component: AddAirplane },
