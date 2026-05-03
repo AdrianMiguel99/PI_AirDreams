@@ -6,6 +6,7 @@ import RegistroUsuarios from '../views/RegistroUsuarios.vue'
 import LandingPageAdmin from '../components/LandingPageAdmin/LandingPageAdmin.vue'
 import AddAirplane from '../components/AddAirplaneForm.vue'
 import AirportManagement from '../components/AirportManagement.vue'
+import FlightsRegister from '../components/FlightsRegister.vue'
 
 const routes = [
   //Pagina principal

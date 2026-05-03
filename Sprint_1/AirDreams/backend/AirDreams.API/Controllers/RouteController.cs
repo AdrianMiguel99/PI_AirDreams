@@ -1,41 +1,36 @@
-using AirDreams.API.DTOs;
-using AirDreams.API.Services.Interfaces;
+using AirDreams.API.Models;
+using AirDreams.API.Repositories;
 using Microsoft.AspNetCore.Mvc;
 
 namespace AirDreams.API.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("api/routes")]
     [ApiController]
     public class RouteController : ControllerBase
     {
-        private readonly IService<RouteDTO> routeService;
+        private readonly IRouteRepository _routeRepository;
 
-        public RouteController(IService<RouteDTO> routeService)
+        public RouteController(IRouteRepository routeRepository)
         {
-            this.routeService = routeService;
+            _routeRepository = routeRepository;
         }
 
-        // GET: api/Route
-        [HttpGet]
-        public ActionResult<List<RouteDTO>> GetAll()
+        [HttpPost]
+        public async Task<IActionResult> Create([FromBody] CreateRouteModel model)
         {
-            // TODO : Route service and repository to get all routes
-            var routes = routeService.GetAll();
-            return Ok(routes);
-        }
-
-        // GET: api/Route/{id}
-        [HttpGet("{id}")]
-        public ActionResult<RouteDTO> GetById(string id)
-        {
-            // TODO : Route service and repository to get a route by id
-            var route = routeService.GetById(id);
-            if (route == null)
+            if (model == null)
             {
-                return NotFound(new { message = "Route not found" });
+                return BadRequest(new { message = "Route data is required" });
             }
-            return Ok(route);
-        }
 
+            if (model.CodeAirportSalida == model.CodeAirportLlegada)
+            {
+                return BadRequest(new { message = "Origin and destination must differ" });
+            }
+
+            var id = await _routeRepository.CreateRouteWithFrequenciesAsync(model);
+
+            return CreatedAtAction(nameof(Create), new { id }, new { RouteID = id });
+        }
     }
 }

@@ -306,22 +306,63 @@
             this.formData.originAirport = airport.code;
             this.showResults = false;
         },
-        saveFlight() {
+        async saveFlight() {
             console.log("Formulario a guardar:", this.formData);
 
             if (this.formData.originAirport === this.formData.destinationAirport) {
                 alert("El aeropuerto de origen y destino no pueden ser el mismo.");
                 return;
             }
+            const dtDepart = new Date(this.formData.departureTime);
+            const dtArrive = new Date(this.formData.arrivalTime);
 
-        // axios
-        //     .post("https://localhost:7019/api/Flight", this.formData)
-        //     .then(() => {
-        //     this.$router.push("/");
-        //     })
-        //     .catch((error) => {
-        //     console.log(error);
-        //     });
+            // formato HH:MM:SS
+            const toTime = (date) => date.toTimeString().split(" ")[0]; 
+            // YYYY-MM-DD
+            const toDate = (date) => date.toISOString().split("T")[0];
+
+
+            const pad = (n) => String(n).padStart(2, "0");
+
+            // stimatedTime: usa input o calcula diferencia
+            let stimatedTime = this.formData.flightDuration;
+            if (!stimatedTime) {
+                const diffMs = dtArrival - dtDepart;
+                const h = Math.floor(diffMs / 3600000);
+                const m = Math.floor((diffMs % 3600000) / 60000);
+                stimatedTime = `${pad(h)}:${pad(m)}:00`;
+            } else if (stimatedTime.length === 5) {
+                stimatedTime = stimatedTime + ":00";
+            }
+
+            const payload = {
+                adminID: 1, // cambiar según admin real
+                codeAirportSalida: this.formData.originAirport,
+                codeAirportLlegada: this.formData.destinationAirport,
+                plateNumber: this.formData.aircraftModel || 'TEST123', // debe existir en Aircraft
+                firstClassPrice: parseFloat(this.formData.basePriceFirstClass),
+                turistClassPrice: parseFloat(this.formData.basePriceTurist),
+                stimatedTime: this.formData.flightDuration || toTime(new Date(0,0,0, dtArrive.getHours()-dtDepart.getHours(), dtArrive.getMinutes()-dtDepart.getMinutes())), // "HH:MM:SS"
+                distance: parseFloat(this.formData.flightDistance),
+                Frequencies: this.formData.frequency.map(day => ({
+                dayOfWeek: day,
+                departureTime: toTime(dtDepart),
+                estimatedArrivalTime: toTime(dtArrive),
+                startingDate: toDate(dtDepart),
+                endingDate: toDate(new Date(dtDepart.getFullYear(), dtDepart.getMonth()+6, dtDepart.getDate())), // 6 meses por defecto
+                active: true
+                }))
+            };
+
+            try {
+                // usa ruta relativa para aprovechar proxy Vite (/api -> backend)
+                const res = await axios.post("/api/routes", payload);
+                console.log("Creada ruta:", res.data);
+                this.$router.push("/");
+            } catch (err) {
+                console.error(err);
+                alert("Error registrando vuelo (ver consola).");
+            }
         }
     }
 };

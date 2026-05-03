@@ -26,6 +26,8 @@ builder.Services.AddScoped<IDbConnection>(sp =>
 
 builder.Services.AddScoped<IAirportRepository, AirportRepository>();
 builder.Services.AddScoped<IAirportService, AirportService>();
+builder.Services.AddScoped<IRouteRepository, RouteRepository>();
+
 
 // Comentar por ahora hasta que existan bien estos servicios
 // builder.Services.AddScoped<IService<AirportDTO>, AirportService>();
@@ -40,16 +42,25 @@ using (var scope = app.Services.CreateScope())
 {
     var connection = scope.ServiceProvider.GetRequiredService<IDbConnection>();
     connection.Open();
-    connection.Execute(@"CREATE TABLE IF NOT EXISTS Airport (
-                        codeAirport TEXT PRIMARY KEY,
-                        adminID INTEGER NOT NULL,
-                        nameAirport TEXT NOT NULL,
-                        city TEXT NOT NULL,
-                        country TEXT NOT NULL,
-                        timeZone TEXT
-                        )");
-}
 
+    connection.Execute(@"
+        IF NOT EXISTS (
+            SELECT * 
+            FROM sys.tables 
+            WHERE name = 'Airport'
+        )
+        BEGIN
+            CREATE TABLE Airport (
+                codeAirport VARCHAR(10) PRIMARY KEY,
+                adminID TINYINT NOT NULL,
+                nameAirport VARCHAR(100) NOT NULL,
+                city VARCHAR(100) NOT NULL,
+                country VARCHAR(100) NOT NULL,
+                timeZone VARCHAR(100) NULL
+            );
+        END
+    ");
+}
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
