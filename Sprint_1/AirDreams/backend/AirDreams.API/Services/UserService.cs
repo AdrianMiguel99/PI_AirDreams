@@ -24,9 +24,9 @@ namespace AirDreams.API.Services
             return user;
         }
 
-        public UserModel GetUserByEmail(string email)
+        public RegisterUserModel GetUserByEmail(string email)
         {
-            return _users.FirstOrDefault(u => u.Correo == email);
+            return _userRepository.GetByEmail(email);
         }
     }
 }
