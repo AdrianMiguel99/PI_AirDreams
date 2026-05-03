@@ -37,5 +37,27 @@ namespace AirDreams.API.Services
             }
             return result;
         }
+
+        public string DeleteAircraft(string plateNumber)
+        {
+            var result = string.Empty;
+
+            try
+            {
+                var isDeleted = aircraftRepository.DeleteAircraft(plateNumber);
+
+                if (!isDeleted)
+                {
+                    result = "No se pudo eliminar la aeronave";
+                }
+ 
+            }
+            catch (Exception ex)
+            {
+                result = ex.Message;
+            }
+
+            return result;
+        }
     }
 }

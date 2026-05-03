@@ -40,5 +40,22 @@ namespace AirDreams.API.Controllers
                 return BadRequest(result);
             }
         }
+
+        [HttpDelete("{plateNumber}")]
+        public IActionResult Delete(string plateNumber)
+        {
+
+            var result = aircraftService.DeleteAircraft(plateNumber);
+
+            if (string.IsNullOrEmpty(result))
+            {
+                return Ok(true);
+            }
+            else
+            {
+                return BadRequest(result);
+            }
+
+        }
     }
 }

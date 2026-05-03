@@ -40,5 +40,19 @@ namespace AirDreams.API.Repository
             var affectedRows = connection.Execute(query, aircraft);
             return affectedRows > 0;
         }
+    
+
+        //Eliminar aeronave
+        public bool DeleteAircraft(string plateNumber)
+        {
+            using var connection = new SqlConnection(_connectionString);
+
+            string query = "DELETE FROM Aircraftt WHERE plateNumber = @plateNumber";
+
+            var affectedRows = connection.Execute(query, new { plateNumber });
+
+            return affectedRows > 0;
+
+        }
     }
 }

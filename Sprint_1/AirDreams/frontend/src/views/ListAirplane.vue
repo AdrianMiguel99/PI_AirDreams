@@ -37,7 +37,7 @@ export default {
   },
 
   methods: {
-    //TODO: Implementar deleteAirplane y editAirplane
+    //TODO: Implementar editAirplane
     deleteAirplane(plateNumber) {
     axios.delete(`https://localhost:7136/api/Airplane/${plateNumber}`)
       .then(() => {
