@@ -59,7 +59,7 @@ const navigateTo = (path) => {
         <section>
             <h2>Administración usuarios</h2>
             <div class="cards">
-            <div class="card" @click="navigateTo('/registro')">
+            <div class="card" @click="navigateTo('/admin/Usuarios')">
                 <img :src="usersIcon" alt="Users" class="icon blue">
                 <div>
                 <h3>Usuarios</h3>
