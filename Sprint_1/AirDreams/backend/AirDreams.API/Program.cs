@@ -1,5 +1,5 @@
 using System.Data;
-using Microsoft.Data.Sqlite; //Cambiar a Microsoft.Data.SqlCl
+using Microsoft.Data.SqlClient; 
 using Dapper;
 using AirDreams.API.Repositories;
 using AirDreams.API.Services;
@@ -22,32 +22,13 @@ builder.Services.AddCors(options =>
 });
 
 builder.Services.AddScoped<IDbConnection>(sp =>
-    new SqliteConnection(builder.Configuration.GetConnectionString("DefaultConnection")));
+    new SqlConnection(builder.Configuration.GetConnectionString("DefaultConnection")));
 
 builder.Services.AddScoped<IAirportRepository, AirportRepository>();
 builder.Services.AddScoped<IAirportService, AirportService>();
 
-builder.Services.AddScoped<IService<AirportDTO>, AirportService>();
-builder.Services.AddScoped<IService<AircraftDTO>, AircraftService>();
-builder.Services.AddScoped<IService<UserDTO>, UserService>();
-builder.Services.AddScoped<IService<RouteDTO>, RouteService>();
-builder.Services.AddScoped<IService<FlightDTO>, FlightService>();
 
 var app = builder.Build();
-
-using (var scope = app.Services.CreateScope())
-{
-    var connection = scope.ServiceProvider.GetRequiredService<IDbConnection>();
-    connection.Open();
-    connection.Execute(@"CREATE TABLE IF NOT EXISTS Airport (
-                          codeAirport TEXT PRIMARY KEY,
-                          adminID INTEGER NOT NULL,
-                          nameAirport TEXT NOT NULL,
-                          city TEXT NOT NULL,
-                          country TEXT NOT NULL,
-                          timeZone TEXT
-                        )");
-}
 
 if (app.Environment.IsDevelopment())
 {

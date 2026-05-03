@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using System.Text.Json;
 
 namespace AirDreams.API.Controllers
 {
@@ -6,35 +7,57 @@ namespace AirDreams.API.Controllers
     [Route("api/locations")]
     public class LocationsController : ControllerBase
     {
-        private static readonly List<string> Countries = new()
-        {
-            "Costa Rica", "Estados Unidos", "España", "México",
-            "Colombia", "Panamá", "Argentina", "Brasil"
-        };
+        private static List<CountryEntry>? _countries;
 
-        private static readonly Dictionary<string, List<string>> CitiesByCountry = new()
+        private List<CountryEntry> LoadCountries()
         {
-            { "Costa Rica", new() { "San José", "Liberia" } },
-            { "Estados Unidos", new() { "Miami", "Nueva York", "Los Ángeles" } },
-            { "España", new() { "Madrid", "Barcelona" } },
-            { "México", new() { "Ciudad de México", "Cancún" } },
-            { "Colombia", new() { "Bogotá", "Medellín" } },
-            { "Panamá", new() { "Panamá" } },
-            { "Argentina", new() { "Buenos Aires" } },
-            { "Brasil", new() { "São Paulo", "Rio de Janeiro" } }
-        };
+            if (_countries != null) return _countries;
+
+            var filePath = Path.Combine(Directory.GetCurrentDirectory(), "Data", "countriesData.json");
+            var json = System.IO.File.ReadAllText(filePath);
+
+            using var doc = JsonDocument.Parse(json);
+            var root = doc.RootElement;
+
+            var list = new List<CountryEntry>();
+            foreach (var element in root.EnumerateArray())
+            {
+                string name = element.TryGetProperty("name", out var nameProp) ? nameProp.GetString() ?? "" : "";
+                var cities = new List<string>();
+                if (element.TryGetProperty("cities", out var citiesProp))
+                {
+                    foreach (var city in citiesProp.EnumerateArray())
+                        cities.Add(city.GetString() ?? "");
+                }
+                list.Add(new CountryEntry { Name = name, Cities = cities });
+            }
+
+            _countries = list;
+            return _countries;
+        }
 
         [HttpGet("countries")]
-        public IActionResult GetCountries() => Ok(Countries);
+        public IActionResult GetCountries()
+        {
+            var countries = LoadCountries();
+            var countryNames = countries.Select(c => c.Name).ToList();
+            return Ok(countryNames);
+        }
 
         [HttpGet("cities")]
         public IActionResult GetCities([FromQuery] string country)
         {
-            if (string.IsNullOrWhiteSpace(country))
-                return BadRequest("Debe especificar un país.");
-            return CitiesByCountry.TryGetValue(country, out var cities)
-                ? Ok(cities)
-                : Ok(new List<string>());
+            if (string.IsNullOrWhiteSpace(country)) return BadRequest("Especifique un país.");
+            var countries = LoadCountries();
+            var entry = countries.FirstOrDefault(c =>
+                c.Name.Equals(country, StringComparison.OrdinalIgnoreCase));
+            return Ok(entry?.Cities ?? new List<string>());
+        }
+
+        private class CountryEntry
+        {
+            public string Name { get; set; } = string.Empty;
+            public List<string> Cities { get; set; } = new List<string>();
         }
     }
 }

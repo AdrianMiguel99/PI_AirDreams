@@ -135,7 +135,9 @@ export default {
       timeZone: ''
     })
 
-    // Obtener países al montar
+    const API_BASE = import.meta.env.VITE_API_URL
+
+    // Cargar países al montar
     onMounted(async () => {
       await cargarPaises()
       await obtenerAeropuertos()
@@ -143,10 +145,10 @@ export default {
 
     const cargarPaises = async () => {
       try {
-        const res = await fetch('http://localhost:5173/api/locations/countries') // Reemplaza xxxx por el puerto de tu API
+        const res = await fetch(`${API_BASE}/api/locations/countries`)
         paises.value = await res.json()
       } catch (e) {
-        console.error('Error al cargar países', e)
+        console.error('Error al cargar países:', e)
       }
     }
 
@@ -156,23 +158,27 @@ export default {
         return
       }
       try {
-        const res = await fetch(`http://localhost:5173/api/locations/cities?country=${encodeURIComponent(form.country)}`)
+        const res = await fetch(`${API_BASE}/api/locations/cities?country=${encodeURIComponent(form.country)}`)
         ciudades.value = await res.json()
-        form.city = '' // resetear ciudad al cambiar país
+        form.city = '' 
       } catch (e) {
-        console.error('Error al cargar ciudades', e)
+        console.error('Error al cargar ciudades:', e)
       }
     }
 
     const obtenerAeropuertos = async () => {
       cargando.value = true
       try {
-        const res = await fetch('http://localhost:5173/api/airports', {
-          headers: { 'Admin-ID': '1' } // valor temporal de administrador
+        const res = await fetch(`${API_BASE}/api/airports`, {
+          headers: { 'Admin-ID': '1' } 
         })
-        aeropuertos.value = await res.json()
+        if (res.ok) {
+          aeropuertos.value = await res.json()
+        } else {
+          console.error('Error al obtener aeropuertos')
+        }
       } catch (e) {
-        console.error('Error al obtener aeropuertos', e)
+        console.error('Error de conexión:', e)
       } finally {
         cargando.value = false
       }
@@ -180,14 +186,14 @@ export default {
 
     const registrarAeropuerto = async () => {
       mensaje.value = ''
-      // Validación extra (aunque el HTML ya valida)
+      // Validación adicional
       if (!/^[A-Z]{3}$/.test(form.code)) {
         mensaje.value = 'El código debe ser exactamente 3 letras mayúsculas.'
         tipoMensaje.value = 'alert-danger'
         return
       }
       try {
-        const res = await fetch('http://localhost:5173/api/airports', {
+        const res = await fetch(`${API_BASE}/api/airports`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',

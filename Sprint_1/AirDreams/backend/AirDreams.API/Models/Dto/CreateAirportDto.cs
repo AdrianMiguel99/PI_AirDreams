@@ -20,6 +20,6 @@ namespace AirDreams.API.Models.Dtos
         [MaxLength(56)]
         public string Country { get; set; } = string.Empty;
 
-        public string? TimeZone { get; set; }
+        public TimeSpan? TimeZone { get; set; }
     }
 }
