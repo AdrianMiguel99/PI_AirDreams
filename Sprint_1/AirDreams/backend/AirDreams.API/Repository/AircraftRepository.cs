@@ -23,21 +23,22 @@ namespace AirDreams.API.Repository
         }
 
         //Agregar aeronave
-        public void AddAircraft(AircraftModel aircraft)
+        public bool AddAircraft(AircraftModel aircraft)
         {
             using var connection = new SqlConnection(_connectionString);
 
             string query = @"
-        INSERT INTO dbo.Aircraftt
-        (plateNumber, maxWeight, cantPasajeros, modelo,
-         cant_Asientos_Fila_Firstclass, cant_Filas_Firstclass,
-         cant_Asientos_Fila_Turista, cant_Filas_Turista)
-        VALUES
-        (@matricula, @maxWeight, @cantPasajeros, @modelo,
-         @cant_Asientos_Fila_Firstclass, @cant_Filas_Firstclass,
-         @cant_Asientos_Fila_Turista, @cant_Filas_Turista)";
+                INSERT INTO dbo.Aircraftt
+                    (plateNumber, maxWeight, cantPasajeros,
+                    cant_Asientos_Fila_Firstclass, cant_Filas_Firstclass,
+                    cant_Asientos_Fila_Turista, cant_Filas_Turista, modelo)
+                VALUES
+                    (@plateNumber, @maxWeight, @cantPasajeros,
+                     @cant_Asientos_Fila_Firstclass, @cant_Filas_Firstclass,
+                     @cant_Asientos_Fila_Turista, @cant_Filas_Turista, @modelo)";
 
-            connection.Execute(query, aircraft);
+            var affectedRows = connection.Execute(query, aircraft);
+            return affectedRows > 0;
         }
     }
 }

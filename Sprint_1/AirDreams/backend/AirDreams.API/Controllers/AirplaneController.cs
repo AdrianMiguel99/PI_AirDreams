@@ -22,10 +22,23 @@ namespace AirDreams.API.Controllers
         }
 
         [HttpPost]
-        public IActionResult Post([FromBody] AircraftModel aircraft)
+        public async Task<ActionResult<bool>> AddAirplane(AircraftModel aircraft)
         {
-            aircraftService.AddAircraft(aircraft);
-            return Ok("Aeronave registrada correctamente");
+            if (aircraft == null)
+            {
+                return BadRequest();
+            }
+
+            var result = aircraftService.AddAircraft(aircraft);
+            if (string.IsNullOrEmpty(result))
+            {
+                return Ok(true);
+
+            }
+            else
+            {
+                return BadRequest(result);
+            }
         }
     }
 }

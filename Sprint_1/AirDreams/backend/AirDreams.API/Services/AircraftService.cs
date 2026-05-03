@@ -19,10 +19,23 @@ namespace AirDreams.API.Services
         }
 
         // 🔹 Registrar aeronave
-        public void AddAircraft(AircraftModel aircraft)
+        public string AddAircraft(AircraftModel aircraft)
         {
-            // aquí podrías meter validaciones después
-            aircraftRepository.AddAircraft(aircraft);
+
+            var result = string.Empty;
+            try
+            {
+                var isAdded = aircraftRepository.AddAircraft(aircraft);
+                if (!isAdded)
+                {
+                    result = "Error al registrar la aeronave.";
+                }
+                
+            }catch (Exception ex)
+            {
+                result = ex.Message;
+            }
+            return result;
         }
     }
 }
