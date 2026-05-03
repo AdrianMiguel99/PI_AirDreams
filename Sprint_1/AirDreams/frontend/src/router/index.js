@@ -19,6 +19,8 @@ const routes = [
   { path: '/admin', name: 'admin', component: LandingPageAdmin },
   { path: '/adminHome', name: 'adminHome', component: LandingPageAdmin },
 
+  { path: '/flights-register', name: 'flightsRegister', component: FlightsRegister },
+  
   //Agregar y visualizar aeronaves
   { path: '/addPlane', name: 'addPlane', component: AddAirplane },
 
