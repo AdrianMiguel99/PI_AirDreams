@@ -1,5 +1,5 @@
 using System.Data;
-using Microsoft.Data.Sqlite; //Cambiar a Microsoft.Data.SqlCl
+using Microsoft.Data.SqlClient; //Cambiar a Microsoft.Data.SqlCl
 using Dapper;
 using AirDreams.API.Repositories;
 using AirDreams.API.Services;
@@ -22,16 +22,17 @@ builder.Services.AddCors(options =>
 });
 
 builder.Services.AddScoped<IDbConnection>(sp =>
-    new SqliteConnection(builder.Configuration.GetConnectionString("DefaultConnection")));
+    new SqlConnection(builder.Configuration.GetConnectionString("AirDreamsContext")));
 
 builder.Services.AddScoped<IAirportRepository, AirportRepository>();
 builder.Services.AddScoped<IAirportService, AirportService>();
 
-builder.Services.AddScoped<IService<AirportDTO>, AirportService>();
-builder.Services.AddScoped<IService<AircraftDTO>, AircraftService>();
-builder.Services.AddScoped<IService<UserDTO>, UserService>();
-builder.Services.AddScoped<IService<RouteDTO>, RouteService>();
-builder.Services.AddScoped<IService<FlightDTO>, FlightService>();
+// Comentar por ahora hasta que existan bien estos servicios
+// builder.Services.AddScoped<IService<AirportDTO>, AirportService>();
+// builder.Services.AddScoped<IService<AircraftDTO>, AircraftService>();
+// builder.Services.AddScoped<IService<UserDTO>, UserService>();
+// builder.Services.AddScoped<IService<RouteDTO>, RouteService>();
+// builder.Services.AddScoped<IService<FlightDTO>, FlightService>();
 
 var app = builder.Build();
 

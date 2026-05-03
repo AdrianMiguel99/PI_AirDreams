@@ -17,7 +17,7 @@
         </h1>
 
         <!-- Boton de listar aeronaves-->
-         <div class="row justify-content-end letra_bold" >
+        <div class="row justify-content-end letra_bold" >
             <div class="col-2">
                 <a href="">
                     <button type="button" class="btn btn-outline-secondary boton_listar">
