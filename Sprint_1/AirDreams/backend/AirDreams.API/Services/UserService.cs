@@ -4,11 +4,11 @@ using AirDreams.API.Services.Interfaces;
 
 namespace AirDreams.API.Services
 {
-    public class UserService : IService<UserDTO>
+    public class UserService : IUserService
     {
-        private readonly IRepository<UserDTO> userRepository;
+        private readonly IUserRepository userRepository;
 
-        public UserService(IRepository<UserDTO> userRepository)
+        public UserService(IUserRepository userRepository)
         {
             this.userRepository = userRepository;
         }
@@ -18,9 +18,9 @@ namespace AirDreams.API.Services
             return userRepository.GetAll();
         }
 
-        public UserDTO GetById(string id)
+        public List<UserDTO> Search(string searchTerm)
         {
-            return userRepository.GetById(id);
+            return userRepository.Search(searchTerm);
         }
     }
 }

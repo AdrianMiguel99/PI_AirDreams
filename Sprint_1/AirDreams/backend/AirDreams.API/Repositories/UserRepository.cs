@@ -6,7 +6,7 @@ using Dapper;
 
 namespace AirDreams.API.Repositories
 {
-    public class UserRepository : IRepository<UserDTO>
+    public class UserRepository : IUserRepository
     {
         private readonly IDbConnection _connection;
 
@@ -56,29 +56,35 @@ namespace AirDreams.API.Repositories
             return result;
         }
 
-        public UserDTO GetById(string id)
+        public List<UserDTO> Search(string searchTerm)
         {
-            if (byte.TryParse(id, out byte employeeId))
+            const string sql = @"
+                SELECT 
+                    ae.employeeID,
+                    ae.nameEmployee + ' ' + ae.lastnames AS fullName,
+                    ae.emailInternalUser AS email,
+                    CASE 
+                        WHEN a.employeeID IS NOT NULL THEN 'Administrador'
+                        ELSE 'Operador'
+                    END AS role
+                FROM AirlineEmployee ae
+                LEFT JOIN Admin a 
+                    ON ae.employeeID = a.employeeID
+                LEFT JOIN Operator o 
+                    ON ae.employeeID = o.employeeID
+                WHERE 
+                    ae.nameEmployee LIKE '%' + @searchTerm + '%'
+                    OR ae.lastnames LIKE '%' + @searchTerm + '%'
+                    OR ae.emailInternalUser LIKE '%' + @searchTerm + '%';
+            ";
+            
+            var dynamicUsers = _connection.Query(sql, new { searchTerm = $"%{searchTerm}%" }).ToList<dynamic>();
+            List<UserDTO> result = new List<UserDTO>();
+            foreach (var user in dynamicUsers)
             {
-                const string sql = @"
-                    SELECT 
-                        ae.employeeID,
-                        ae.nameEmployee + ' ' + ae.lastnames AS fullName,
-                        ae.emailUser AS email,
-                        CASE 
-                            WHEN a.employeeID IS NOT NULL THEN 'Administrador'
-                            ELSE 'Operador'
-                        END AS role
-                    FROM AirlineEmployee ae
-                    LEFT JOIN Admin a ON ae.employeeID = a.employeeID
-                    LEFT JOIN Operator o ON ae.employeeID = o.employeeID
-                    WHERE ae.employeeID = @Id
-                ";
-
-                var user = _connection.QueryFirstOrDefault(sql, new { Id = employeeId });
-                return user != null ? MapToUserDTO(user) : null;
+                result.Add(MapToUserDTO(user));
             }
-            return null;
-        }
+            return result;
+        }     
     }
 }
