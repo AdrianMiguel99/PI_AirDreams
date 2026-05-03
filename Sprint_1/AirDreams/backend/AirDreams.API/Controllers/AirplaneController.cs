@@ -57,5 +57,38 @@ namespace AirDreams.API.Controllers
             }
 
         }
+
+        [HttpGet("{plateNumber}")]
+        public ActionResult<AircraftModel> GetByPlateNumber(string plateNumber)
+        {
+            var aircraft = aircraftService.GetAircraftByPlateNumber(plateNumber);
+
+            if (aircraft == null)
+            {
+                return NotFound("Aeronave no encontrada.");
+            }
+
+            return Ok(aircraft);
+        }
+
+        [HttpPut("{plateNumber}")]
+        public IActionResult Update(string plateNumber, AircraftModel aircraft)
+        {
+            if (aircraft == null || plateNumber != aircraft.plateNumber)
+            {
+                return BadRequest("Datos inválidos.");
+            }
+
+            var result = aircraftService.UpdateAircraft(aircraft);
+
+            if (string.IsNullOrEmpty(result))
+            {
+                return Ok(true);
+            }
+            else
+            {
+                return BadRequest(result);
+            }
+        }
     }
 }

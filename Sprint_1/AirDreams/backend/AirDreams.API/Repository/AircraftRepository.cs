@@ -54,5 +54,42 @@ namespace AirDreams.API.Repository
             return affectedRows > 0;
 
         }
+
+
+        public AircraftModel? GetAircraftByPlateNumber(string plateNumber)
+        {
+            using var connection = new SqlConnection(_connectionString);
+
+            string query = @"
+        SELECT *
+        FROM dbo.Aircraftt
+        WHERE plateNumber = @plateNumber";
+
+            return connection.QueryFirstOrDefault<AircraftModel>(
+                query,
+                new { plateNumber }
+            );
+        }
+
+        public bool UpdateAircraft(AircraftModel aircraft)
+        {
+            using var connection = new SqlConnection(_connectionString);
+
+            string query = @"
+        UPDATE dbo.Aircraftt
+        SET 
+            maxWeight = @maxWeight,
+            cantPasajeros = @cantPasajeros,
+            cant_Asientos_Fila_Firstclass = @cant_Asientos_Fila_Firstclass,
+            cant_Filas_Firstclass = @cant_Filas_Firstclass,
+            cant_Asientos_Fila_Turista = @cant_Asientos_Fila_Turista,
+            cant_Filas_Turista = @cant_Filas_Turista,
+            modelo = @modelo
+        WHERE plateNumber = @plateNumber";
+
+            var affectedRows = connection.Execute(query, aircraft);
+
+            return affectedRows > 0;
+        }
     }
 }

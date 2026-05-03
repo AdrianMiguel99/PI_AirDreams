@@ -59,5 +59,31 @@ namespace AirDreams.API.Services
 
             return result;
         }
+
+        public AircraftModel? GetAircraftByPlateNumber(string plateNumber)
+        {
+            return aircraftRepository.GetAircraftByPlateNumber(plateNumber);
+        }
+
+        public string UpdateAircraft(AircraftModel aircraft)
+        {
+            var result = string.Empty;
+
+            try
+            {
+                var isUpdated = aircraftRepository.UpdateAircraft(aircraft);
+
+                if (!isUpdated)
+                {
+                    result = "No se pudo actualizar la aeronave.";
+                }
+            }
+            catch (Exception ex)
+            {
+                result = ex.Message;
+            }
+
+            return result;
+        }
     }
 }
