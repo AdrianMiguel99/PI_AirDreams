@@ -1,5 +1,5 @@
 ﻿using AirDreams.API.Models;
-using AirDreams.API.Services;
+using AirDreams.API.Services.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 
 namespace AirDreams.API.Controllers
@@ -8,54 +8,48 @@ namespace AirDreams.API.Controllers
     [ApiController]
     public class AirplaneController : ControllerBase
     {
-        private readonly AircraftService aircraftService;
+        private readonly IAircraftService aircraftService;
 
-        public AirplaneController(AircraftService aircraftService)
+        public AirplaneController(IAircraftService aircraftService)
         {
             this.aircraftService = aircraftService;
         }
 
         [HttpGet]
-        public List<AircraftModel> Get()
+        public ActionResult<List<AircraftModel>> Get()
         {
-            return aircraftService.GetAircrafts();
+            return Ok(aircraftService.GetAircrafts());
         }
 
         [HttpPost]
-        public async Task<ActionResult<bool>> AddAirplane(AircraftModel aircraft)
+        public ActionResult<bool> AddAirplane([FromBody] AircraftModel aircraft)
         {
             if (aircraft == null)
             {
-                return BadRequest();
+                return BadRequest("Datos inválidos.");
             }
 
             var result = aircraftService.AddAircraft(aircraft);
+
             if (string.IsNullOrEmpty(result))
             {
                 return Ok(true);
+            }
 
-            }
-            else
-            {
-                return BadRequest(result);
-            }
+            return BadRequest(result);
         }
 
         [HttpDelete("{plateNumber}")]
         public IActionResult Delete(string plateNumber)
         {
-
             var result = aircraftService.DeleteAircraft(plateNumber);
 
             if (string.IsNullOrEmpty(result))
             {
                 return Ok(true);
             }
-            else
-            {
-                return BadRequest(result);
-            }
 
+            return BadRequest(result);
         }
 
         [HttpGet("{plateNumber}")]
@@ -72,7 +66,7 @@ namespace AirDreams.API.Controllers
         }
 
         [HttpPut("{plateNumber}")]
-        public IActionResult Update(string plateNumber, AircraftModel aircraft)
+        public IActionResult Update(string plateNumber, [FromBody] AircraftModel aircraft)
         {
             if (aircraft == null || plateNumber != aircraft.plateNumber)
             {
@@ -85,10 +79,8 @@ namespace AirDreams.API.Controllers
             {
                 return Ok(true);
             }
-            else
-            {
-                return BadRequest(result);
-            }
+
+            return BadRequest(result);
         }
     }
 }
