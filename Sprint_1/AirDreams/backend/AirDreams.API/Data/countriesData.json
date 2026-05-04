@@ -1,0 +1,34 @@
+[
+  {
+    "name": "Costa Rica",
+    "cities": [ "San José", "Liberia" ]
+  },
+  {
+    "name": "Estados Unidos",
+    "cities": [ "Miami", "Nueva York", "Los Ángeles" ]
+  },
+  {
+    "name": "España",
+    "cities": [ "Madrid", "Barcelona" ]
+  },
+  {
+    "name": "México",
+    "cities": [ "Ciudad de México", "Cancún" ]
+  },
+  {
+    "name": "Colombia",
+    "cities": [ "Bogotá", "Medellín" ]
+  },
+  {
+    "name": "Panamá",
+    "cities": [ "Panamá" ]
+  },
+  {
+    "name": "Argentina",
+    "cities": [ "Buenos Aires" ]
+  },
+  {
+    "name": "Brasil",
+    "cities": [ "São Paulo", "Rio de Janeiro" ]
+  }
+]
