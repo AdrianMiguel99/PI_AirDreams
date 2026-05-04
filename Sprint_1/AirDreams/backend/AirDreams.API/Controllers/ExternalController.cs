@@ -7,9 +7,9 @@ namespace AirDreams.API.Controllers
     [Route("api/[controller]")]
     public class ExternalController : ControllerBase
     {
-        private readonly IExternalFlightService _flightService;
+        private readonly IFlightService _flightService;
 
-        public ExternalController(IExternalFlightService flightService)
+        public ExternalController(IFlightService flightService)
         {
             _flightService = flightService;
         }
@@ -26,7 +26,8 @@ namespace AirDreams.API.Controllers
         {
             try
             {
-                var flights = await _flightService.SearchFlightsAsync(origin, destination, earliestDeparture, latestDeparture, quantityOfPassengers, apiKey);
+                await _flightService.ValidateApiKeyAsync(apiKey);
+                var flights = await _flightService.SearchFlightsAsync(origin, destination, earliestDeparture, latestDeparture, quantityOfPassengers);
                 var response = new { flights };
                 return Ok(response);
             }
