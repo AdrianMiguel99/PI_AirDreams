@@ -1,10 +1,17 @@
 <script setup>
 import { ref } from 'vue'
+import { useRouter } from 'vue-router'
 
+const router = useRouter()
 const isUserMenuOpen = ref(false)
 
 const toggleUserMenu = () => {
   isUserMenuOpen.value = !isUserMenuOpen.value
+}
+
+const navigateTo = (path) => {
+  router.push(path)
+  isUserMenuOpen.value = false
 }
 </script>
 
@@ -18,8 +25,8 @@ const toggleUserMenu = () => {
     </button>
 
     <div v-if="isUserMenuOpen" class="userMenuDropdown">
-      <a href="#" class="menuItem">Perfil</a>
-      <a href="#" class="menuItem">Cerrar sesión</a>
+      <button @click="navigateTo('/admin')" class="menuItem">Perfil</button>
+      <button @click="navigateTo('/login')" class="menuItem">Cerrar sesión</button>
     </div>
   </header>
 </template>
@@ -32,6 +39,7 @@ const toggleUserMenu = () => {
   align-items: center;
   padding: 12px;
   position: relative;
+  z-index: 100;
 }
 
 .logo {
@@ -61,6 +69,8 @@ const toggleUserMenu = () => {
   border-radius: 4px;
   min-width: 150px;
   margin-top: 8px;
+  z-index: 1000;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 }
 
 .menuItem {
@@ -69,6 +79,11 @@ const toggleUserMenu = () => {
   color: #032056;
   font-size: 14px;
   text-decoration: none;
+  background: none;
+  border: none;
+  cursor: pointer;
+  width: 100%;
+  text-align: left;
 }
 
 .menuItem:hover {
