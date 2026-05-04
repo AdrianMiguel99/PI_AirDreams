@@ -3,6 +3,7 @@ import { createRouter, createWebHistory } from 'vue-router'
 import LandingPage from '../views/LandingPage.vue'
 import Login from '../views/Login.vue'
 import RegistroUsuarios from '../views/RegistroUsuarios.vue'
+import CompleteRegistration from '../views/CompleteRegistration.vue'
 import LandingPageAdmin from '../components/LandingPageAdmin/LandingPageAdmin.vue'
 import AddAirplaneView from '../views/AddAirplaneView.vue'
 import ListAirplaneView from '../views/ListAirplane.vue'
@@ -12,6 +13,12 @@ import AirportManagement from '../components/AirportManagement.vue'
 import FlightsRegister from '../components/FlightsRegister.vue'
 
 const routes = [
+  
+  {
+    path: '/completar-registro',
+    name: 'CompleteRegistration',
+    component: CompleteRegistration
+  },
   { path: '/', name: 'home', component: LandingPage },
 
   { path: '/login', name: 'login', component: Login },

@@ -1,6 +1,5 @@
 <template>
   <div class="login-container">
-
     <div class="login-card">
       <h2>Iniciar Sesión</h2>
 
@@ -8,25 +7,24 @@
         v-model="correo"
         type="email" 
         placeholder="Correo electrónico" 
+        :class="{ errorInput: errorCorreo }"
       />
 
       <input 
         v-model="password"
         type="password" 
         placeholder="Contraseña" 
+        :class="{ errorInput: errorPassword }"
       />
 
-      <button @click="login">Ingresar</button>
+      <button @click="login" :disabled="cargando">
+        {{ cargando ? "Ingresando..." : "Ingresar" }}
+      </button>
 
-      <router-link to="/registro" class="registro-link">
-        ¿No tienes cuenta? Registrar usuario
-      </router-link>
-
-      <p v-if="error" class="error">
-        Correo o contraseña incorrectos.
+      <p v-if="mensaje" class="error">
+        {{ mensaje }}
       </p>
     </div>
-
   </div>
 </template>
 
@@ -36,42 +34,64 @@ export default {
     return {
       correo: "",
       password: "",
-      error: false
+      mensaje: "",
+      cargando: false,
+      errorCorreo: false,
+      errorPassword: false
     };
   },
 
   methods: {
     async login() {
-        this.error = false;
-        
-        try {
-            const response = await fetch("http://localhost:5276/api/Auth/login", {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json"
-            },
-            body: JSON.stringify({
-                correo: this.correo,
-                password: this.password
-            })
+      this.mensaje = "";
+      this.errorCorreo = false;
+      this.errorPassword = false;
+
+      if (!this.correo || !this.password) {
+        this.mensaje = "Correo o contraseña incorrecta";
+        this.errorCorreo = true;
+        this.errorPassword = true;
+        return;
+      }
+
+      this.cargando = true;
+
+      try {
+        const response = await fetch("http://localhost:5276/api/auth/login", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({
+            correo: this.correo,
+            password: this.password
+          })
         });
 
-        if (response.ok) {
-          alert("Login correcto");
-        } else {
-          this.error = true;
-        }
+        const data = await response.json();
 
+        if (response.ok) {
+          localStorage.setItem("user", JSON.stringify(data.user));
+          this.$router.push("/");
+        } else {
+          this.mensaje = data.message || "Correo o contraseña incorrecta";
+          this.errorCorreo = true;
+          this.errorPassword = true;
+        }
       } catch (error) {
         console.error(error);
-        this.error = true;
+        this.mensaje = "Error de conexión con el servidor";
+        this.errorCorreo = true;
+        this.errorPassword = true;
+      } finally {
+        this.cargando = false;
       }
     }
   }
 };
 </script>
 
-<style>
+<style scoped>
 .login-container {
   height: 100vh;
   display: flex;
@@ -89,12 +109,20 @@ export default {
   text-align: center;
 }
 
+.login-card h2 {
+  margin-bottom: 20px;
+}
+
 .login-card input {
   width: 100%;
   margin: 10px 0;
   padding: 10px;
   border-radius: 8px;
   border: 1px solid #ccc;
+}
+
+.login-card input.errorInput {
+  border-color: red;
 }
 
 .login-card button {
@@ -104,6 +132,11 @@ export default {
   border: none;
   background: #2f3e5c;
   color: white;
+  cursor: pointer;
+}
+
+.login-card button:disabled {
+  background: #999;
 }
 
 .error {
