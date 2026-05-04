@@ -1,21 +1,31 @@
+using AirDreams.API.Repositories;
+using AirDreams.API.Services;
+using Microsoft.Data.SqlClient;
+using System.Data;
+
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllers();
-
 builder.Services.AddEndpointsApiExplorer();
-
 builder.Services.AddSwaggerGen();
 
 builder.Services.AddCors(options =>
 {
-    options.AddPolicy("AllowVue",
-        policy =>
-        {
-            policy.WithOrigins("http://localhost:5173")
-                  .AllowAnyHeader()
-                  .AllowAnyMethod();
-        });
+    options.AddPolicy("AllowAngularApp", policy =>
+    {
+        policy.WithOrigins("http://localhost:5173")
+              .AllowAnyHeader()
+              .AllowAnyMethod()
+              .AllowCredentials();
+    });
 });
+
+builder.Services.AddScoped<IDbConnection>(sp => 
+    new SqlConnection(builder.Configuration.GetConnectionString("DefaultConnection")));
+
+builder.Services.AddScoped<IUserRepository, UserRepository>();
+builder.Services.AddScoped<IUserService, UserService>();
+builder.Services.AddScoped<IEmailService, EmailService>();
 
 var app = builder.Build();
 
@@ -25,14 +35,9 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
-// app.UseHttpsRedirection();
-
-app.UseRouting();
-
-app.UseCors("AllowVue");
-
+app.UseHttpsRedirection();
+app.UseCors("AllowAngularApp");
 app.UseAuthorization();
-
 app.MapControllers();
 
 app.Run();
