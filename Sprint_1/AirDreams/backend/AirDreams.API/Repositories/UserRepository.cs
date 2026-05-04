@@ -33,19 +33,8 @@ namespace AirDreams.API.Repositories
                     ae.employeeID,
                     ae.nameEmployee + ' ' + ae.lastnames AS fullName,
                     ae.emailInternalUser AS email,
-                    'Administrador' AS role
-                FROM Admin a
-                JOIN AirlineEmployee ae ON a.employeeID = ae.employeeID
-
-                UNION ALL
-
-                SELECT 
-                    ae.employeeID,
-                    ae.nameEmployee + ' ' + ae.lastnames AS fullName,
-                    ae.emailInternalUser AS email,
-                    'Operador' AS role
-                FROM Operator o
-                JOIN AirlineEmployee ae ON o.employeeID = ae.employeeID
+                    ae.role
+                FROM AirlineEmployee ae;
             ";
             var dynamicUsers = _connection.Query(sql).ToList<dynamic>();
             List<UserDTO> result = new List<UserDTO>();
@@ -63,19 +52,12 @@ namespace AirDreams.API.Repositories
                     ae.employeeID,
                     ae.nameEmployee + ' ' + ae.lastnames AS fullName,
                     ae.emailInternalUser AS email,
-                    CASE 
-                        WHEN a.employeeID IS NOT NULL THEN 'Administrador'
-                        ELSE 'Operador'
-                    END AS role
+                    ae.role
                 FROM AirlineEmployee ae
-                LEFT JOIN Admin a 
-                    ON ae.employeeID = a.employeeID
-                LEFT JOIN Operator o 
-                    ON ae.employeeID = o.employeeID
                 WHERE 
-                    ae.nameEmployee LIKE '%' + @searchTerm + '%'
-                    OR ae.lastnames LIKE '%' + @searchTerm + '%'
-                    OR ae.emailInternalUser LIKE '%' + @searchTerm + '%';
+                    ae.nameEmployee LIKE @searchTerm
+                    OR ae.lastnames LIKE @searchTerm
+                    OR ae.emailInternalUser LIKE @searchTerm;
             ";
             
             var dynamicUsers = _connection.Query(sql, new { searchTerm = $"%{searchTerm}%" }).ToList<dynamic>();
