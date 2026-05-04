@@ -1,8 +1,11 @@
 using System.Data;
-using Microsoft.Data.SqlClient; //Cambiar a Microsoft.Data.SqlCl
+using Microsoft.Data.SqlClient;
 using Dapper;
 using AirDreams.API.Repositories;
+using AirDreams.API.Repositories.Interfaces;
 using AirDreams.API.Services;
+using AirDreams.API.Services.Interfaces;
+using AirDreams.API.DTOs;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -21,6 +24,8 @@ builder.Services.AddCors(options =>
         });
 });
 
+builder.Services.AddScoped<IUserRepository, UserRepository>();
+builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IDbConnection>(sp =>
     new SqlConnection(builder.Configuration.GetConnectionString("AirDreamsContext")));
 
@@ -36,6 +41,8 @@ builder.Services.AddScoped<IRouteRepository, RouteRepository>();
 // builder.Services.AddScoped<IService<RouteDTO>, RouteService>();
 // builder.Services.AddScoped<IService<FlightDTO>, FlightService>();
 
+builder.Services.AddScoped<AircraftRepository>();
+builder.Services.AddScoped<AircraftService>();
 var app = builder.Build();
 
 using (var scope = app.Services.CreateScope())
