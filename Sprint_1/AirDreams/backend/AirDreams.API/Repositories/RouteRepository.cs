@@ -11,6 +11,23 @@ public class RouteRepository : IRouteRepository
         _connection = connection;
     }
 
+    public async Task<IEnumerable<CreateRouteModel>> GetAllAsync()
+    {
+        const string sql = @"
+        SELECT r.idRoute AS Id, r.plateNumber AS PlateNumber,
+                r.turistClassPrice AS TouristPrice, r.firstClassPrice AS FirstClassPrice,
+                r.stimatedTime AS StimatedTime,
+                r.codeAirportSalida AS DepartureCode, a1.nameAirport AS DepartureName,
+                r.codeAirportLlegada AS ArrivalCode, a2.nameAirport AS ArrivalName
+        FROM Route r
+        LEFT JOIN Airport a1 ON r.codeAirportSalida = a1.codeAirport
+        LEFT JOIN Airport a2 ON r.codeAirportLlegada = a2.codeAirport
+        ";
+        
+        var routes = await _connection.QueryAsync<CreateRouteModel>(sql);
+        return routes;
+    }
+
     public async Task<int> CreateRouteWithFrequenciesAsync(CreateRouteModel model)
     {
         if (_connection.State == ConnectionState.Closed) _connection.Open();

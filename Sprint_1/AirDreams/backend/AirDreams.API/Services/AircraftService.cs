@@ -1,5 +1,5 @@
 ﻿using AirDreams.API.Models;
-using AirDreams.API.Repository;
+using AirDreams.API.Repositories;
 
 namespace AirDreams.API.Services
 {

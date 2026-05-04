@@ -36,5 +36,14 @@ namespace AirDreams.API.Controllers
 
             return CreatedAtAction(nameof(Create), new { id }, new { RouteID = id });
         }
+
+        [HttpGet]
+
+        public async Task<ActionResult<IEnumerable<CreateRouteModel>>> GetAllAsync()
+        {
+            var routes = await _routeRepository.GetAllAsync();
+            return Ok(routes);
+        }
+
     }
 }

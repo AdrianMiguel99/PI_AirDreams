@@ -32,6 +32,7 @@ builder.Services.AddScoped<IDbConnection>(sp =>
 builder.Services.AddScoped<IAirportRepository, AirportRepository>();
 builder.Services.AddScoped<IAirportService, AirportService>();
 builder.Services.AddScoped<IRouteRepository, RouteRepository>();
+builder.Services.AddScoped<IRouteRepository, RouteRepository>();
 
 
 // Comentar por ahora hasta que existan bien estos servicios
@@ -41,8 +42,11 @@ builder.Services.AddScoped<IRouteRepository, RouteRepository>();
 // builder.Services.AddScoped<IService<RouteDTO>, RouteService>();
 // builder.Services.AddScoped<IService<FlightDTO>, FlightService>();
 
-builder.Services.AddScoped<AircraftRepository>();
+builder.Services.AddScoped<AircraftRepository>(sp =>
+    new AircraftRepository(builder.Configuration.GetConnectionString("AirDreamsContext")));
 builder.Services.AddScoped<AircraftService>();
+
+
 var app = builder.Build();
 
 using (var scope = app.Services.CreateScope())

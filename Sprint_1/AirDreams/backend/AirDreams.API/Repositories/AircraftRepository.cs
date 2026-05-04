@@ -2,7 +2,8 @@
 using Dapper;
 using Microsoft.Data.SqlClient;
 
-namespace AirDreams.API.Repository
+namespace AirDreams.API.Repositories
+
 {
     public class AircraftRepository
     {
@@ -34,8 +35,8 @@ namespace AirDreams.API.Repository
                     cant_Asientos_Fila_Turista, cant_Filas_Turista, modelo)
                 VALUES
                     (@plateNumber, @maxWeight, @cantPasajeros,
-                     @cant_Asientos_Fila_Firstclass, @cant_Filas_Firstclass,
-                     @cant_Asientos_Fila_Turista, @cant_Filas_Turista, @modelo)";
+                    @cant_Asientos_Fila_Firstclass, @cant_Filas_Firstclass,
+                    @cant_Asientos_Fila_Turista, @cant_Filas_Turista, @modelo)";
 
             var affectedRows = connection.Execute(query, aircraft);
             return affectedRows > 0;
