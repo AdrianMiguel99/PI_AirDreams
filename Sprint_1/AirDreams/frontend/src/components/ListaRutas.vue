@@ -60,26 +60,26 @@ async fetchRoutes() {
     this.errorMessage = ''
 
     try {
-        // usa la URL relativa para aprovechar proxy Vite si lo tienes: '/api/routes'
-        const response = await axios.get('/api/routes')
-        const raw = response.data || []
+    // usa la URL relativa para aprovechar proxy Vite si lo tienes: '/api/routes'
+    const response = await axios.get('/api/routes')
+    const raw = response.data || []
 
-        // Normalizar cada ruta a los campos que usa la UI
-        this.routes = raw.map(r => {
-        const routeID = r.idRoute || r.Id || r.RouteID || r.routeID || r.id || null
-        const codeSalida = r.codeAirportSalida || r.CodeAirportSalida || r.departureCode || r.DepartureCode || ''
-        const codeLlegada = r.codeAirportLlegada || r.CodeAirportLlegada || r.arrivalCode || r.ArrivalCode || ''
-        // tomar duración desde stimatedTime (puede venir como "hh:mm:ss" o TimeSpan)
-        let flightDuration = ''
-        const st = r.stimatedTime || r.StimatedTime || r.duration || r.Duracion || ''
-        if (st && typeof st === 'string') {
-            const parts = st.split(':')
-            if (parts.length >= 2) {
-            const minutes = Number(parts[0]) * 60 + Number(parts[1])
-            flightDuration = minutes
-            } else {
-            flightDuration = st
-            }
+    // Normalizar cada ruta a los campos que usa la UI
+    this.routes = raw.map(r => {
+    const routeID = r.idRoute || r.Id || r.RouteID || r.routeID || r.id || null
+    const codeSalida = r.codeAirportLSalida || r.CodeAirportSalida || r.departureCode || r.DepartureCode || ''
+    const codeLlegada = r.codeAirportLlegada || r.CodeAirportLlegada || r.arrivalCode || r.ArrivalCode || ''
+      // tomar duración desde stimatedTime (puede venir como "hh:mm:ss" o TimeSpan)
+    let flightDuration = ''
+    const st = r.stimatedTime || r.StimatedTime || r.duration || r.Duracion || ''
+    if (st && typeof st === 'string') {
+        const parts = st.split(':')
+        if (parts.length >= 2) {
+          const minutes = Number(parts[0]) * 60 + Number(parts[1])
+        flightDuration = minutes
+        } else {
+        flightDuration = st
+        }
     }
     const basePrice = r.turistClassPrice || r.TouristPrice || r.basePrice || r.BasePrice || r.firstClassPrice || 0
 

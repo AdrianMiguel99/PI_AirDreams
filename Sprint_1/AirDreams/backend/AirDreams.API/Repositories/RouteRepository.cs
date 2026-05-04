@@ -22,16 +22,16 @@ public class RouteRepository : IRouteRepository
     r.stimatedTime AS Duration,
     r.firstClassPrice AS FirstClassPrice,
     r.turistClassPrice AS TouristPrice,
-    a1.codeAirport AS DepCode,
-    a1.nameAirport AS DepName,
-    a1.city AS DepCity,
-    a1.country AS DepCountry,
-    a1.timeZone AS DepTimeZone,
-    a2.codeAirport AS ArrCode,
-    a2.nameAirport AS ArrName,
-    a2.city AS ArrCity,
-    a2.country AS ArrCountry,
-    a2.timeZone AS ArrTimeZone
+    a1.codeAirport AS DepSplit,
+    a1.nameAirport AS Name,
+    a1.city AS City,
+    a1.country AS Country,
+    a1.timeZone AS TimeZone,
+    a2.codeAirport AS ArrSplit,
+    a2.nameAirport AS Name,
+    a2.city AS City,
+    a2.country AS Country,
+    a2.timeZone AS TimeZone
     FROM Route r
     LEFT JOIN Airport a1 ON r.codeAirportSalida = a1.codeAirport
     LEFT JOIN Airport a2 ON r.codeAirportLlegada = a2.codeAirport;
@@ -46,12 +46,12 @@ public class RouteRepository : IRouteRepository
             route.ArrivalAirport = arr ?? new AirportDTO { Code = (route.ArrivalAirport?.Code ?? ""), Name = (route.ArrivalAirport?.Name ?? "") };
             return route;
         },
-        splitOn: "DepCode,ArrCode"
+        splitOn: "DepSplit,ArrSplit"
     );
 
-    // Dapper no mapeará automáticamente AirportDTO propiedades si los alias no coinciden; para asegurarlo, puedes reconstruir dep/arr:
+
     var list = result.ToList();
-    // si deseas formatear Duration o nombres, hazlo aquí
+
     return list;
     }
 
