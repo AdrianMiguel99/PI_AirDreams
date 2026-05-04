@@ -38,6 +38,8 @@ builder.Services.AddScoped<IAirportService, AirportService>();
 //builder.Services.AddScoped<IService<RouteDTO>, RouteService>();
 //builder.Services.AddScoped<IService<FlightDTO>, FlightService>();
 
+builder.Services.AddScoped<AircraftRepository>();
+builder.Services.AddScoped<AircraftService>();
 var app = builder.Build();
 
 if (app.Environment.IsDevelopment())
