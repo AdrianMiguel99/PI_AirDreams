@@ -1,8 +1,14 @@
+using System.ComponentModel.DataAnnotations;
+
 namespace AirDreams.API.Models
 {
     public class LoginModel
     {
-        public string Correo { get; set; }
-        public string Password { get; set; }
+        [Required]
+        [EmailAddress]
+        public string Correo { get; set; } = string.Empty;
+        
+        [Required]
+        public string Password { get; set; } = string.Empty;
     }
 }
