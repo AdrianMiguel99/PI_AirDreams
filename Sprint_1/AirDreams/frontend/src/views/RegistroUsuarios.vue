@@ -1,37 +1,28 @@
 <template>
   <div class="registro-container">
     <div class="registro-card">
-      <h2>Registro de Usuarios</h2>
-
-      <input
-        v-model="nombreCompleto"
-        type="text"
-        placeholder="Nombre completo"
-      />
-
-      <select v-model="tipoUsuario">
-        <option disabled value="">Seleccione tipo de usuario</option>
-        <option>Administrador</option>
-        <option>Operario</option>
-      </select>
+      <h2>Invitar Usuario</h2>
+      <p class="subtitulo">Solo administradores pueden invitar nuevos usuarios</p>
 
       <input
         v-model="correo"
         type="email"
         placeholder="Correo electrónico"
+        :class="{ errorInput: errorCorreo }"
+        @input="errorCorreo = false"
       />
 
-      <input
-        v-model="cedula"
-        type="text"
-        placeholder="Cédula (0-0000-0000)"
-      />
+      <select v-model="tipoUsuario" :class="{ errorInput: errorTipo }">
+        <option disabled value="">Seleccione tipo de usuario</option>
+        <option>Administrador</option>
+        <option>Operario</option>
+      </select>
 
-      <button @click="registrarUsuario">
-        Registrar
+      <button @click="enviarInvitacion" :disabled="cargando">
+        {{ cargando ? "Enviando..." : "Enviar Invitación" }}
       </button>
 
-      <p v-if="mensaje" class="mensaje">
+      <p v-if="mensaje" :class="mensajeError ? 'error' : 'exito'">
         {{ mensaje }}
       </p>
     </div>
@@ -42,62 +33,74 @@
 export default {
   data() {
     return {
-      nombreCompleto: "",
-      tipoUsuario: "",
       correo: "",
-      cedula: "",
-      mensaje: ""
+      tipoUsuario: "",
+      mensaje: "",
+      mensajeError: false,
+      cargando: false,
+      errorCorreo: false,
+      errorTipo: false
     };
   },
 
   methods: {
-    async registrarUsuario() {
+    async enviarInvitacion() {
       this.mensaje = "";
-
-      if (
-        !this.nombreCompleto ||
-        !this.tipoUsuario ||
-        !this.correo ||
-        !this.cedula
-      ) {
-        this.mensaje = "Todos los campos son obligatorios";
+      this.mensajeError = false;
+      
+      if (!this.correo) {
+        this.errorCorreo = true;
+        this.mensaje = "El correo es obligatorio";
+        this.mensajeError = true;
+        return;
+      }
+      
+      if (!this.tipoUsuario) {
+        this.errorTipo = true;
+        this.mensaje = "Debe seleccionar un tipo de usuario";
+        this.mensajeError = true;
         return;
       }
 
+      this.cargando = true;
+
       try {
-        const response = await fetch("http://localhost:5276/api/Auth/register", {
+        const response = await fetch("http://localhost:5276/api/auth/invite", {
           method: "POST",
           headers: {
             "Content-Type": "application/json"
           },
           body: JSON.stringify({
-            nombreCompleto: this.nombreCompleto,
-            tipoUsuario: this.tipoUsuario,
             correo: this.correo,
-            cedula: this.cedula
+            tipoUsuario: this.tipoUsuario
           })
         });
 
-        const data = await response.text();
-        this.mensaje = data;
+        const data = await response.json();
 
         if (response.ok) {
-          this.nombreCompleto = "";
-          this.tipoUsuario = "";
+          this.mensaje = data.message || "Invitación enviada exitosamente";
+          this.mensajeError = false;
           this.correo = "";
-          this.cedula = "";
+          this.tipoUsuario = "";
+        } else {
+          this.mensaje = data.message || "Error al enviar la invitación";
+          this.mensajeError = true;
         }
 
       } catch (error) {
         console.error(error);
         this.mensaje = "Error de conexión con el servidor";
+        this.mensajeError = true;
+      } finally {
+        this.cargando = false;
       }
     }
   }
 };
 </script>
 
-<style>
+<style scoped>
 .registro-container {
   min-height: 100vh;
   display: flex;
@@ -116,6 +119,12 @@ export default {
 }
 
 .registro-card h2 {
+  margin-bottom: 10px;
+}
+
+.subtitulo {
+  color: #666;
+  font-size: 14px;
   margin-bottom: 20px;
 }
 
@@ -126,6 +135,12 @@ export default {
   padding: 12px;
   border-radius: 8px;
   border: 1px solid #ccc;
+  font-size: 16px;
+}
+
+.registro-card input.errorInput,
+.registro-card select.errorInput {
+  border-color: red;
 }
 
 .registro-card button {
@@ -137,11 +152,23 @@ export default {
   background: #2f3e5c;
   color: white;
   cursor: pointer;
+  font-size: 16px;
 }
 
-.mensaje {
+.registro-card button:disabled {
+  background: #999;
+  cursor: not-allowed;
+}
+
+.exito {
   margin-top: 15px;
-  color: #2f3e5c;
+  color: green;
+  font-weight: bold;
+}
+
+.error {
+  margin-top: 15px;
+  color: red;
   font-weight: bold;
 }
 </style>
