@@ -160,7 +160,7 @@ export default {
       try {
         const res = await fetch(`${API_BASE}/api/locations/cities?country=${encodeURIComponent(form.country)}`)
         ciudades.value = await res.json()
-        form.city = '' 
+        form.city = '' // resetear ciudad al cambiar país
       } catch (e) {
         console.error('Error al cargar ciudades:', e)
       }
@@ -170,7 +170,7 @@ export default {
       cargando.value = true
       try {
         const res = await fetch(`${API_BASE}/api/airports`, {
-          headers: { 'Admin-ID': '1' } 
+          headers: { 'Admin-ID': '1' } // temporal, luego se cambiará por token
         })
         if (res.ok) {
           aeropuertos.value = await res.json()
