@@ -1,4 +1,4 @@
-﻿using AirDreams.API.Models.Entities;
+using AirDreams.API.Models.Entities;
 
 namespace AirDreams.API.Repositories
 {

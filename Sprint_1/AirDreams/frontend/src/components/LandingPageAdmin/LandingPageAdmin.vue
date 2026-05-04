@@ -36,7 +36,7 @@ const navigateTo = (path) => {
                 <span class="arrow">›</span>
             </div>
 
-            <div class="card" @click="navigateTo('/')">
+            <div class="card" @click="navigateTo('/admin/flightsRegister')">
                 <img :src="routeIcon" alt="Route" class="icon blue">
                 <div>
                 <h3>Crear ruta</h3>
@@ -59,7 +59,7 @@ const navigateTo = (path) => {
         <section>
             <h2>Administración usuarios</h2>
             <div class="cards">
-            <div class="card" @click="navigateTo('/')">
+            <div class="card" @click="navigateTo('/admin/Usuarios')">
                 <img :src="usersIcon" alt="Users" class="icon blue">
                 <div>
                 <h3>Usuarios</h3>
@@ -73,7 +73,7 @@ const navigateTo = (path) => {
         <section>
             <h2>Reportes</h2>
             <div class="cards">
-            <div class="card" @click="navigateTo('/')">
+            <div class="card" @click="navigateTo('/admin')">
                 <img :src="reportsIcon" alt="Reports" class="icon blue">
                 <div>
                 <h3>Reportes</h3>

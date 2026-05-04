@@ -8,33 +8,27 @@ namespace AirDreams.API.Controllers
     [ApiController]
     public class UserController : ControllerBase
     {
-        private readonly IService<UserDTO> userService;
+        private readonly IUserService userService;
 
-        public UserController(IService<UserDTO> userService)
+        public UserController(IUserService userService)
         {
             this.userService = userService;
         }
 
-        // GET: api/User for list
+        // GET: api/User
         [HttpGet]
         public ActionResult<List<UserDTO>> GetAll()
         {
-            // TODO : User service and repository to get all users
             var users = userService.GetAll();
             return Ok(users);
         }
 
-        // GET: api/User/{id}
-        [HttpGet("{id}")]
-        public ActionResult<UserDTO> GetById(string id)
+        // GET: api/User/search?searchTerm=value
+        [HttpGet("search")]
+        public ActionResult<List<UserDTO>> Search([FromQuery] string searchTerm)
         {
-            // TODO : User service and repository to get a user by id
-            var user = userService.GetById(id);
-            if (user == null)
-            {
-                return NotFound(new { message = "User not found" });
-            }
-            return Ok(user);
+            var users = userService.Search(searchTerm);
+            return Ok(users);
         }
 
     }
