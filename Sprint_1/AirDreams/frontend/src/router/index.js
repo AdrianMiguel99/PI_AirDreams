@@ -7,6 +7,8 @@ import LandingPageAdmin from '../components/LandingPageAdmin/LandingPageAdmin.vu
 import AddAirplaneView from '../views/AddAirplaneView.vue'
 import ListAirplaneView from '../views/ListAirplane.vue'
 import EditAirplane from '../views/EditAirplane.vue'
+import ListaUsuarios from '../components/ListaUsuarios.vue'
+import AirportManagement from '../components/AirportManagement.vue'
 
 const routes = [
   { path: '/', name: 'home', component: LandingPage },
@@ -16,10 +18,15 @@ const routes = [
 
   { path: '/admin', name: 'admin', component: LandingPageAdmin },
   { path: '/adminHome', name: 'adminHome', component: LandingPageAdmin },
+  
+  //Visualizar usuarios
+  { path: '/admin/usuarios', name: 'adminUsuarios', component: ListaUsuarios },
 
   { path: '/addPlane', name: 'addPlane', component: AddAirplaneView },
   { path: '/listPlanes', name: 'listPlanes', component: ListAirplaneView },
   { path: '/editPlane/:plateNumber', name: 'editPlane', component: EditAirplane }
+
+  { path: '/admin/airports', name: 'airports', component: AirportManagement }
 ]
 
 const router = createRouter({

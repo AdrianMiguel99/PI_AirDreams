@@ -17,5 +17,25 @@ namespace AirDreams.API.Controllers
 
             return Unauthorized("Correo o contraseña incorrectos");
         }
+        // REGISTER
+        [HttpPost("register")]
+        public IActionResult Register([FromBody] RegisterModel register)
+        {
+            if (
+                string.IsNullOrEmpty(register.NombreCompleto) ||
+                string.IsNullOrEmpty(register.TipoUsuario) ||
+                string.IsNullOrEmpty(register.Correo) ||
+                string.IsNullOrEmpty(register.Cedula)
+            )
+            {
+                return BadRequest("Todos los campos son obligatorios");
+            }
+            
+            // guardar en BD
+            // generar token
+            // enviar correo real
+
+            return Ok("Usuario registrado. Correo enviado.");
+        }
     }
 }
