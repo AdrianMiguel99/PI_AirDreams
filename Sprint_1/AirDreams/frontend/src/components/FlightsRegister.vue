@@ -230,7 +230,7 @@
             </div>
 
             <div class="col-12 d-flex justify-content-end mt-2">
-            <button type="submit" class="btn btn-primary">
+            <button type="submit" class="btn btn-primary boton_registrar">
                 Registrar Vuelo
             </button>
             </div>
@@ -396,3 +396,17 @@ import AdminHeader from "./AdminHeader.vue";
     }
 };
 </script>
+
+<style scoped>
+    .frequency-box {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 15px;
+    }
+
+    .boton_registrar {
+        background-color: #384467;
+        border-color: #384467;
+    }
+</style>
+
