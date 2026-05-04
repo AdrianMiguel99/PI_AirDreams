@@ -1,4 +1,5 @@
 using AirDreams.API.Models;
+using AirDreams.API.DTOs;
 using System.Threading.Tasks;
 
 namespace AirDreams.API.Repositories
@@ -17,6 +18,9 @@ namespace AirDreams.API.Repositories
         Task<UserModel?> GetUserByEmail(string email);
         
         Task<UserModel?> GetUserById(int id);
+
+        List<UserDTO> GetAll();
+        List<UserDTO> Search(string searchTerm);
     }
     
     public class InvitationData
