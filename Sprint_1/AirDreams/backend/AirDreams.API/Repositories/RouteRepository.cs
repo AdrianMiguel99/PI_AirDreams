@@ -1,6 +1,7 @@
 using System.Data;
 using Dapper;
 using AirDreams.API.Models;
+using AirDreams.API.DTOs;
 
 public class RouteRepository : IRouteRepository
 {
@@ -11,21 +12,47 @@ public class RouteRepository : IRouteRepository
         _connection = connection;
     }
 
-    public async Task<IEnumerable<CreateRouteModel>> GetAllAsync()
+    public async Task<IEnumerable<RouteDTO>> GetAllAsync()
     {
-        const string sql = @"
-        SELECT r.idRoute AS Id, r.plateNumber AS PlateNumber,
-                r.turistClassPrice AS TouristPrice, r.firstClassPrice AS FirstClassPrice,
-                r.stimatedTime AS StimatedTime,
-                r.codeAirportSalida AS DepartureCode, a1.nameAirport AS DepartureName,
-                r.codeAirportLlegada AS ArrivalCode, a2.nameAirport AS ArrivalName
-        FROM Route r
-        LEFT JOIN Airport a1 ON r.codeAirportSalida = a1.codeAirport
-        LEFT JOIN Airport a2 ON r.codeAirportLlegada = a2.codeAirport
-        ";
-        
-        var routes = await _connection.QueryAsync<CreateRouteModel>(sql);
-        return routes;
+    if (_connection.State == ConnectionState.Closed) _connection.Open();
+
+    var sql = @"
+    SELECT
+    r.idRoute AS Id,
+    r.stimatedTime AS Duration,
+    r.firstClassPrice AS FirstClassPrice,
+    r.turistClassPrice AS TouristPrice,
+    a1.codeAirport AS DepCode,
+    a1.nameAirport AS DepName,
+    a1.city AS DepCity,
+    a1.country AS DepCountry,
+    a1.timeZone AS DepTimeZone,
+    a2.codeAirport AS ArrCode,
+    a2.nameAirport AS ArrName,
+    a2.city AS ArrCity,
+    a2.country AS ArrCountry,
+    a2.timeZone AS ArrTimeZone
+    FROM Route r
+    LEFT JOIN Airport a1 ON r.codeAirportSalida = a1.codeAirport
+    LEFT JOIN Airport a2 ON r.codeAirportLlegada = a2.codeAirport;
+    ";
+
+    
+    var result = await _connection.QueryAsync<RouteDTO, AirportDTO, AirportDTO, RouteDTO>(
+        sql,
+        (route, dep, arr) =>
+        {
+            route.DepartureAirport = dep ?? new AirportDTO { Code = (route.DepartureAirport?.Code ?? ""), Name = (route.DepartureAirport?.Name ?? "") };
+            route.ArrivalAirport = arr ?? new AirportDTO { Code = (route.ArrivalAirport?.Code ?? ""), Name = (route.ArrivalAirport?.Name ?? "") };
+            return route;
+        },
+        splitOn: "DepCode,ArrCode"
+    );
+
+    // Dapper no mapeará automáticamente AirportDTO propiedades si los alias no coinciden; para asegurarlo, puedes reconstruir dep/arr:
+    var list = result.ToList();
+    // si deseas formatear Duration o nombres, hazlo aquí
+    return list;
     }
 
     public async Task<int> CreateRouteWithFrequenciesAsync(CreateRouteModel model)

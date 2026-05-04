@@ -2,7 +2,7 @@ namespace AirDreams.API.DTOs
 {
     public class RouteDTO
     {
-        public string Id { get; set; }
+        public int Id { get; set; }
         public string DepartureTime { get; set; }
         public string ArrivalTime { get; set; }
         public string Duration { get; set; }
