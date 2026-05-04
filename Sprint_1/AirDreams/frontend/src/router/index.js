@@ -9,6 +9,7 @@ import ListAirplaneView from '../views/ListAirplane.vue'
 import EditAirplane from '../views/EditAirplane.vue'
 import ListaUsuarios from '../components/ListaUsuarios.vue'
 import AirportManagement from '../components/AirportManagement.vue'
+import FlightsRegister from '../components/FlightsRegister.vue'
 
 const routes = [
   { path: '/', name: 'home', component: LandingPage },
@@ -18,7 +19,9 @@ const routes = [
 
   { path: '/admin', name: 'admin', component: LandingPageAdmin },
   { path: '/adminHome', name: 'adminHome', component: LandingPageAdmin },
-  
+
+  { path: '/admin/flightsRegister', name: 'flightsRegister', component: FlightsRegister },
+    
   //Visualizar usuarios
   { path: '/admin/usuarios', name: 'adminUsuarios', component: ListaUsuarios },
 

@@ -143,7 +143,7 @@ export default {
 
     const cargarPaises = async () => {
       try {
-        const res = await fetch('http://localhost:5173/api/locations/countries') // Reemplaza xxxx por el puerto de tu API
+        const res = await fetch('http://localhost:5276/api/locations/countries') // Reemplaza xxxx por el puerto de tu API
         paises.value = await res.json()
       } catch (e) {
         console.error('Error al cargar países', e)
@@ -167,7 +167,7 @@ export default {
     const obtenerAeropuertos = async () => {
       cargando.value = true
       try {
-        const res = await fetch('http://localhost:5173/api/airports', {
+        const res = await fetch('http://localhost:5276/api/airports', {
           headers: { 'Admin-ID': '1' } // valor temporal de administrador
         })
         aeropuertos.value = await res.json()
@@ -187,7 +187,7 @@ export default {
         return
       }
       try {
-        const res = await fetch('http://localhost:5173/api/airports', {
+        const res = await fetch('http://localhost:5276/api/airports', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
