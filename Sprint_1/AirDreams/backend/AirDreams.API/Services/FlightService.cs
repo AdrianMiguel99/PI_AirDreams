@@ -42,8 +42,9 @@ namespace AirDreams.API.Services.Interfaces
                 throw new UnauthorizedAccessException("INVALID_API_KEY: La API key es requerida.");
             }
 
-            bool isValidApiKey = await _flightRepository.ValidateApiKeyAsync(apiKey);
-            if (!isValidApiKey)
+            var airline = await _flightRepository.ValidateApiKeyAsync(apiKey);
+
+            if (string.IsNullOrEmpty(airline))
             {
                 throw new UnauthorizedAccessException("INVALID_API_KEY: La API key proporcionada no es válida.");
             }
