@@ -1,5 +1,7 @@
-using Microsoft.AspNetCore.Mvc;
 using AirDreams.API.Models;
+using AirDreams.API.Services;
+using Microsoft.AspNetCore.Mvc;
+using System.Threading.Tasks;
 
 namespace AirDreams.API.Controllers
 {
@@ -7,67 +9,100 @@ namespace AirDreams.API.Controllers
     [Route("api/[controller]")]
     public class AuthController : ControllerBase
     {
-        private readonly UserService userService;
+        private readonly IUserService _userService;
 
-        public AuthController()
+        public AuthController(IUserService userService)
         {
-            userService = new UserService();
+            _userService = userService;
         }
+
+        // Endpoint para administrador envíe invitación (solo Administradores)
+        [HttpPost("invite")]
+        public async Task<IActionResult> SendInvitation([FromBody] InvitationModel model)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(new { errors = ModelState.Values });
+            }
+
+            var result = await _userService.SendInvitation(model);
+
+            if (result.success)
+            {
+                return Ok(new { message = result.message });
+            }
+
+            return BadRequest(new { message = result.message });
+        }
+
+        [HttpGet("validate-invitation")]
+        public async Task<IActionResult> ValidateInvitation([FromQuery] string token)
+        {
+            if (string.IsNullOrEmpty(token))
+            {
+                return BadRequest(new { message = "Token requerido" });
+            }
+
+            var result = await _userService.ValidateInvitationToken(token);
+
+            if (result == null || !result.IsValid)
+            {
+                return BadRequest(new { message = result?.Message ?? "Token inválido" });
+            }
+
+            return Ok(new { 
+                isValid = true, 
+                email = result.Email,
+                tipoUsuario = result.TipoUsuario,
+                message = result.Message 
+            });
+        }
+
+        // Endpoint para completar registro (usuario invitado)
+        [HttpPost("complete-registration")]
+        public async Task<IActionResult> CompleteRegistration([FromBody] CompleteRegistrationModel model)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(new { errors = ModelState.Values });
+            }
+
+            var result = await _userService.CompleteRegistration(model);
+
+            if (result.success)
+            {
+                return Ok(new { message = result.message });
+            }
+
+            return BadRequest(new { message = result.message });
+        }
+
         [HttpPost("login")]
-        public IActionResult Login([FromBody] LoginModel login)
+        public async Task<IActionResult> Login([FromBody] LoginModel model)
         {
-            if (login.Correo == "admin@air.com" && login.Password == "1234")
+            if (!ModelState.IsValid)
             {
-                return Ok("Login correcto");
+                return BadRequest(new { errors = ModelState.Values });
             }
 
-            return Unauthorized("Correo o contraseña incorrectos");
-        }
-        // REGISTER
-        [HttpPost("register")]
-        public IActionResult Register([FromBody] RegisterModel register)
-        {
-            if (
-                string.IsNullOrEmpty(register.NombreCompleto) ||
-                string.IsNullOrEmpty(register.TipoUsuario) ||
-                string.IsNullOrEmpty(register.Correo) ||
-                string.IsNullOrEmpty(register.Cedula)
-            )
+            var result = await _userService.Login(model);
+
+            if (result.success)
             {
-                return BadRequest("Todos los campos son obligatorios");
+                // Aquí JWT token para mantener la sesión, pero por ahora solo devolvemos datos básicos
+                return Ok(new { 
+                    message = result.message,
+                    user = new 
+                    {
+                        result.user.Id,
+                        result.user.NombreCompleto,
+                        result.user.Correo,
+                        result.user.TipoUsuario
+                    }
+                });
             }
-            
-            var user = await userServuce
-            // guardar en BD
-            // generar token
-            // enviar correo real
 
-            return Ok("Usuario registrado. Correo enviado.");
-        }
-
-        [HttpPost("register")]
-        public async Task<IActionResult> Register(RegisterRequest req)
-        {
-            try
-            {
-                var userId = await _registerService.Execute(
-                    req.Nombre,
-                    req.Email,
-                    req.Cedula,
-                    req.TipoUsuario
-                );
-
-            // await _sendActivationEmailService.Execute(userId, req.Email);
-
-                return Ok("Usuario registrado. Revisa tu correo.");
-            }
-            catch (Exception ex)
-            {
-                if (ex.Message == "El correo ya está registrado")
-                    return BadRequest("El correo ya está en uso");
-
-                return StatusCode(500, "Error interno");
-            }
+            return Unauthorized(new { message = "Correo o contraseña incorrecta" });
         }
     }
 }
