@@ -65,7 +65,7 @@ export default {
 
   methods: {
     saveAirplane(aeronave) {
-      axios.post('https://localhost:7136/api/Airplane', aeronave).then(() => {
+      axios.post('http://localhost:5276/api/Airplane', aeronave).then(() => {
           alert('Aeronave registrada correctamente');
         })
         .catch(() => {
