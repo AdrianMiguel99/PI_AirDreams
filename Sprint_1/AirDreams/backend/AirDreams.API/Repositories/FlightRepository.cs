@@ -1,7 +1,7 @@
 using System.Data;
 using AirDreams.API.DTOs;
 using AirDreams.API.Models;
-using AirDreams.API.Repositories.Interfaces;
+using AirDreams.API.Repositories;
 using Dapper;
 
 namespace AirDreams.API.Repositories
@@ -24,6 +24,16 @@ namespace AirDreams.API.Repositories
             ";
 
             return await _connection.QueryFirstOrDefaultAsync<string>(sql, new { apiKey });
+        }
+
+        public async Task<IEnumerable<dynamic>> SearchFlightsAsync(
+            string origin,
+            string destination,
+            TimeSpan earliestTime,
+            TimeSpan latestTime,
+            int quantityOfPassengers
+        )
+        {
         }
     }
 }
