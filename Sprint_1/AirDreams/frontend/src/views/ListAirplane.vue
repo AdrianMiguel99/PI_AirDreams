@@ -58,7 +58,7 @@ export default {
 
   methods: {
     getAirplanes() {
-      axios.get('https://localhost:7136/api/Airplane')
+      axios.get('http://localhost:5276/api/Airplane')
         .then(response => {
           this.airplanes = response.data;
         })
@@ -68,7 +68,7 @@ export default {
     },
 
     deleteAirplane(plateNumber) {
-      axios.delete(`https://localhost:7136/api/Airplane/${plateNumber}`).then(() => {
+      axios.delete(`http://localhost:5276/api/Airplane/${plateNumber}`).then(() => {
           alert('Aeronave eliminada con éxito');
           //recargar pagina para actualizar la lista de aeronaves
           this.getAirplanes();
