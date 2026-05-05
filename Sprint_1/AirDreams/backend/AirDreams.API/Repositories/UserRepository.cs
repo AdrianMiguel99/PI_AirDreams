@@ -33,7 +33,10 @@ namespace AirDreams.API.Repositories
                     ae.employeeID,
                     ae.nameEmployee + ' ' + ae.lastnames AS fullName,
                     ae.emailInternalUser AS email,
-                    ae.role
+                    CASE 
+                        WHEN ae.isAdmin = 1 THEN 'Admin'
+                        WHEN ae.isOperator = 1 THEN 'Operator'
+                    END AS role
                 FROM AirlineEmployee ae;
             ";
             var dynamicUsers = _dbConnection.Query(sql).ToList<dynamic>();
@@ -52,7 +55,10 @@ namespace AirDreams.API.Repositories
                     ae.employeeID,
                     ae.nameEmployee + ' ' + ae.lastnames AS fullName,
                     ae.emailInternalUser AS email,
-                    ae.role
+                    CASE 
+                        WHEN ae.isAdmin = 1 THEN 'Admin'
+                        WHEN ae.isOperator = 1 THEN 'Operator'
+                    END AS role
                 FROM AirlineEmployee ae
                 WHERE 
                     ae.nameEmployee LIKE @searchTerm
