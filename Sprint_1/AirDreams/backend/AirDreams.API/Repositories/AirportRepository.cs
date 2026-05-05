@@ -1,4 +1,4 @@
-﻿using System.Data;
+using System.Data;
 using AirDreams.API.Models.Entities;
 using Dapper;
 
@@ -29,7 +29,7 @@ namespace AirDreams.API.Repositories
         public async Task<Airport> CreateAsync(Airport airport)
         {
             const string sql = @"INSERT INTO Airport (codeAirport, adminID, nameAirport, city, country, timeZone)
-                                 VALUES (@CodeAirport, @AdminID, @NameAirport, @City, @Country, @TimeZone)";
+                                VALUES (@CodeAirport, @AdminID, @NameAirport, @City, @Country, @TimeZone)";
             await _connection.ExecuteAsync(sql, airport);
             return airport; // no hay identidad, la PK es el código
         }

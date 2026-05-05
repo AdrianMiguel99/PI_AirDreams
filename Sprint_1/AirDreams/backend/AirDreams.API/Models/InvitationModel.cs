@@ -2,13 +2,13 @@ using System.ComponentModel.DataAnnotations;
 
 namespace AirDreams.API.Models
 {
-    public class LoginModel
+    public class InvitationModel
     {
         [Required]
-        [EmailAddress]
+        [EmailAddress(ErrorMessage = "Formato de correo inválido")]
         public string Correo { get; set; } = string.Empty;
         
         [Required]
-        public string Password { get; set; } = string.Empty;
+        public string TipoUsuario { get; set; } = string.Empty; // Administrador u Operario
     }
 }

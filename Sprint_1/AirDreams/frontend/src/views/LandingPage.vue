@@ -5,15 +5,15 @@
     <FormularioBusqueda />
     
     <ListaVuelos 
-    v-if="busquedaRealizada"
-    :vuelos="vuelosPaginados" 
+      v-if="busquedaRealizada"
+      :vuelos="vuelosPaginados" 
     />
 
     <Paginacion 
-    v-if="busquedaRealizada"
-    :total="vuelos.length" 
-    :porPagina="10"
-    @cambiarPagina="cambiarPagina"
+      v-if="busquedaRealizada"
+      :total="vuelos.length" 
+      :porPagina="10"
+      @cambiarPagina="cambiarPagina"
     />
   </div>
 </template>
@@ -37,28 +37,7 @@ export default {
   data() {
     return {
       paginaActual: 1,
-      vuelos: [
-        {
-          id: 1,
-          numero: "AD101",
-          origen: "SJO",
-          destino: "MEX",
-          salida: "2026-05-01 08:00",
-          llegada: "2026-05-01 12:00",
-          duracion: "4h",
-          conexion: "Directo"
-        },
-        {
-          id: 2,
-          numero: "AD202",
-          origen: "SJO",
-          destino: "USA",
-          salida: "2026-05-02 10:00",
-          llegada: "2026-05-02 15:00",
-          duracion: "5h",
-          conexion: "1 escala"
-        }
-      ],
+      vuelos: [],
       busquedaRealizada: false
     };
   },
@@ -70,27 +49,15 @@ export default {
     }
   },
 
-methods: {
-  buscarVuelos() {
-    this.busquedaRealizada = true;
+  methods: {
+    buscarVuelos() {
+      this.busquedaRealizada = true;
+      // Aquí iría la llamada a la API de vuelos
+    },
 
-    this.vuelos = [
-      {
-        id: 1,
-        numero: "AD101",
-        origen: "SJO",
-        destino: "MEX",
-        salida: "2026-05-01 08:00",
-        llegada: "2026-05-01 12:00",
-        duracion: "4h",
-        conexion: "Directo"
-      }
-    ];
-  },
-
-  cambiarPagina(pagina) {
-    this.paginaActual = pagina;
+    cambiarPagina(pagina) {
+      this.paginaActual = pagina;
+    }
   }
-}
-}
+};
 </script>

@@ -1,4 +1,4 @@
-﻿namespace AirDreams.API.Models.Entities
+namespace AirDreams.API.Models.Entities
 {
     public class Admin
     {

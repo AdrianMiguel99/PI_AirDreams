@@ -1,5 +1,5 @@
 using System.Data;
-using Microsoft.Data.SqlClient;
+using Microsoft.Data.SqlClient; 
 using Dapper;
 using AirDreams.API.Repositories;
 using AirDreams.API.Repositories.Interfaces;
@@ -19,8 +19,8 @@ builder.Services.AddCors(options =>
         policy =>
         {
             policy.WithOrigins("http://localhost:5173")
-                  .AllowAnyHeader()
-                  .AllowAnyMethod();
+                .AllowAnyHeader()
+                .AllowAnyMethod();
         });
 });
 
@@ -31,13 +31,20 @@ builder.Services.AddScoped<IDbConnection>(sp =>
 
 builder.Services.AddScoped<IAirportRepository, AirportRepository>();
 builder.Services.AddScoped<IAirportService, AirportService>();
+builder.Services.AddScoped<IRouteRepository, RouteRepository>();
+builder.Services.AddScoped<IEmailService, EmailService>();
 
-//builder.Services.AddScoped<IService<AirportDTO>, AirportService>();
-//builder.Services.AddScoped<IService<AircraftDTO>, AircraftService>();
-//builder.Services.AddScoped<IService<UserDTO>, UserService>();
-//builder.Services.AddScoped<IService<RouteDTO>, RouteService>();
-//builder.Services.AddScoped<IService<FlightDTO>, FlightService>();
+builder.Services.AddScoped<AircraftRepository>();
+builder.Services.AddScoped<IAircraftService, AircraftService>();
+// Comentar por ahora hasta que existan bien estos servicios
+// builder.Services.AddScoped<IService<AirportDTO>, AirportService>();
+// builder.Services.AddScoped<IService<AircraftDTO>, AircraftService>();
+// builder.Services.AddScoped<IService<UserDTO>, UserService>();
+// builder.Services.AddScoped<IService<RouteDTO>, RouteService>();
+// builder.Services.AddScoped<IService<FlightDTO>, FlightService>();
 
+//builder.Services.AddScoped<AircraftRepository>();
+//builder.Services.AddScoped<AircraftService>();
 var app = builder.Build();
 
 if (app.Environment.IsDevelopment())

@@ -31,7 +31,6 @@ namespace AirDreams.API.Controllers
         }
 
         [HttpPost]
-        [HttpPost]
         public async Task<IActionResult> Create([FromBody] CreateAirportDto dto, [FromHeader(Name = "Admin-ID")] byte adminId)
         {
             if (!ModelState.IsValid) return BadRequest(ModelState);

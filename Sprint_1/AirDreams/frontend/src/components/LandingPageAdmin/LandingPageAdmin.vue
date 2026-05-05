@@ -36,7 +36,7 @@ const navigateTo = (path) => {
                 <span class="arrow">›</span>
             </div>
 
-            <div class="card" @click="navigateTo('/')">
+            <div class="card" @click="navigateTo('/admin/flightsRegister')">
                 <img :src="routeIcon" alt="Route" class="icon blue">
                 <div>
                 <h3>Crear ruta</h3>

@@ -1,5 +1,5 @@
 using AirDreams.API.DTOs;
-using AirDreams.API.Services.Interfaces;
+using AirDreams.API.Services;
 using Microsoft.AspNetCore.Mvc;
 
 namespace AirDreams.API.Controllers

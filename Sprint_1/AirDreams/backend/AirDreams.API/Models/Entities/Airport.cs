@@ -1,4 +1,5 @@
-﻿namespace AirDreams.API.Models.Entities
+namespace AirDreams.API.Models.Entities
+
 {
     public class Airport
     {
@@ -8,6 +9,6 @@
         public string NameAirport { get; set; } = string.Empty; 
         public string City { get; set; } = string.Empty;
         public string Country { get; set; } = string.Empty;
-        public string? TimeZone { get; set; }
+        public TimeSpan? TimeZone { get; set; }
     }
 }
