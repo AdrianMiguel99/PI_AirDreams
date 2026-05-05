@@ -245,7 +245,7 @@
 </template>
     <script>
     import axios from "axios";
-import AdminHeader from "./AdminHeader.vue";
+    import AdminHeader from "./AdminHeader.vue";
 
     export default {
     components: { AdminHeader },

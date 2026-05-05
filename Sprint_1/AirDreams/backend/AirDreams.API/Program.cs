@@ -44,7 +44,7 @@ builder.Services.AddScoped<IEmailService, EmailService>();
 // builder.Services.AddScoped<IService<FlightDTO>, FlightService>();
 
 builder.Services.AddScoped<AircraftRepository>(sp =>
-    new AircraftRepository(builder.Configuration.GetConnectionString("AirDreamsContext")));
+    new AircraftRepository(builder.Configuration.GetConnectionString("DefaultConnection")));
 builder.Services.AddScoped<AircraftService>();
 
 
