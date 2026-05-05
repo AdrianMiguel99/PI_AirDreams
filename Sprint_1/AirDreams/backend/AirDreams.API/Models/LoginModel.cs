@@ -6,7 +6,7 @@ namespace AirDreams.API.Models
     {
         [Required]
         [EmailAddress]
-        public string Correo { get; set; } = string.Empty;
+        public string Email { get; set; } = string.Empty;
         
         [Required]
         public string Password { get; set; } = string.Empty;
