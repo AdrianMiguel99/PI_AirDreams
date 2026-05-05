@@ -64,6 +64,10 @@ async fetchRoutes() {
     const response = await axios.get('/api/routes')
     const raw = response.data || []
 
+    console.log('RAW routes:', response.data);
+    console.log('Primer route:', response.data?.[0]);
+    console.log('Departure airport:', response.data?.[0]?.departureAirport);
+
     // Normalizar cada ruta a los campos que usa la UI
     this.routes = raw.map(r => {
     const routeID = r.idRoute || r.Id || r.RouteID || r.routeID || r.id || null

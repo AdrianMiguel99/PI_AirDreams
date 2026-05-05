@@ -22,12 +22,12 @@ public class RouteRepository : IRouteRepository
     r.stimatedTime AS Duration,
     r.firstClassPrice AS FirstClassPrice,
     r.turistClassPrice AS TouristPrice,
-    a1.codeAirport AS DepSplit,
+    a1.codeAirport AS Code,
     a1.nameAirport AS Name,
     a1.city AS City,
     a1.country AS Country,
     a1.timeZone AS TimeZone,
-    a2.codeAirport AS ArrSplit,
+    a2.codeAirport AS Code,
     a2.nameAirport AS Name,
     a2.city AS City,
     a2.country AS Country,
@@ -42,11 +42,11 @@ public class RouteRepository : IRouteRepository
         sql,
         (route, dep, arr) =>
         {
-            route.DepartureAirport = dep ?? new AirportDTO { Code = (route.DepartureAirport?.Code ?? ""), Name = (route.DepartureAirport?.Name ?? "") };
-            route.ArrivalAirport = arr ?? new AirportDTO { Code = (route.ArrivalAirport?.Code ?? ""), Name = (route.ArrivalAirport?.Name ?? "") };
+            route.DepartureAirport = dep;
+            route.ArrivalAirport = arr;
             return route;
         },
-        splitOn: "DepSplit,ArrSplit"
+        splitOn: "Code,Code"
     );
 
 
