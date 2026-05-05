@@ -18,8 +18,8 @@ namespace AirDreams.API.Controllers
         public async Task<IActionResult> SearchFlights(
             [FromQuery] string origin,
             [FromQuery] string destination,
-            [FromQuery] string earliestDeparture,
-            [FromQuery] string latestDeparture,
+            [FromQuery] DateTime earliestDeparture,
+            [FromQuery] DateTime latestDeparture,
             [FromQuery] int quantityOfPassengers,
             [FromQuery] string apiKey
         )

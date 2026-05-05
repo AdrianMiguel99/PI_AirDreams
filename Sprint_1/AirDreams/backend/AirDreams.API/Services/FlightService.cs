@@ -15,20 +15,18 @@ namespace AirDreams.API.Services.Interfaces
         public async Task<List<FlightDTO>> SearchFlightsAsync(
             string origin,
             string destination,
-            string earliestDeparture,
-            string latestDeparture,
+            DateTime earliestDeparture,
+            DateTime latestDeparture,
             int quantityOfPassengers
         )
         {
             ValidateParameters(origin, destination, earliestDeparture, latestDeparture, quantityOfPassengers);
 
-            var (parsedEarliest, parsedLatest) = ValidateAndParseDates(earliestDeparture, latestDeparture);
-
             var flights = await _flightRepository.SearchFlightsAsync(
                 origin.ToUpper(),
                 destination.ToUpper(),
-                parsedEarliest.TimeOfDay,
-                parsedLatest.TimeOfDay,
+                earliestDeparture.TimeOfDay,
+                latestDeparture.TimeOfDay,
                 quantityOfPassengers
             );
 
@@ -50,7 +48,7 @@ namespace AirDreams.API.Services.Interfaces
             }
         }
 
-        private void ValidateParameters(string origin, string destination, string earliestDeparture, string latestDeparture, int quantityOfPassengers)
+        private void ValidateParameters(string origin, string destination, DateTime earliestDeparture, DateTime latestDeparture, int quantityOfPassengers)
         {
             if (string.IsNullOrEmpty(origin) ||
                 string.IsNullOrEmpty(destination) ||
@@ -58,44 +56,23 @@ namespace AirDreams.API.Services.Interfaces
                 string.IsNullOrEmpty(latestDeparture) ||
                 quantityOfPassengers < 1)
             {
-                throw new ArgumentException(
-                    "INVALID_PARAMETERS: Parámetros inválidos o faltantes."
-                );
+                throw new ArgumentException("Los parámetros de búsqueda son inválidos o faltan.");
             }
 
             if (origin.Length != 3 || destination.Length != 3)
             {
-                throw new ArgumentException(
-                    "INVALID_AIRPORT_CODE: Los códigos de aeropuerto deben tener 3 caracteres."
-                );
+                throw new ArgumentException("Los códigos de aeropuerto deben tener exactamente 3 caracteres.");
             }
 
             if (origin.Equals(destination, StringComparison.OrdinalIgnoreCase))
             {
-                throw new ArgumentException(
-                    "SAME_AIRPORTS: El aeropuerto de origen y destino no pueden ser el mismo."
-                );
+                throw new ArgumentException("El aeropuerto de origen y destino no pueden ser el mismo.");
             }
-        }
 
-        private (DateTime earliest, DateTime latest) ValidateAndParseDates(string earliestDeparture, string latestDeparture)
-        {
-            if (!DateTime.TryParse(earliestDeparture, out DateTime parsedEarliest) ||
-                !DateTime.TryParse(latestDeparture, out DateTime parsedLatest))
+            if (earliestDeparture > latestDeparture)
             {
-                throw new ArgumentException(
-                    "INVALID_DATE_FORMAT: Las fechas deben estar en formato ISO (YYYY-MM-DDThh:mm)."
-                );
+                throw new ArgumentException("El rango de fechas es inválido.");
             }
-
-            if (parsedEarliest > parsedLatest)
-            {
-                throw new ArgumentException(
-                    "INVALID_DATE_RANGE: La fecha de salida más temprana debe ser antes o igual a la fecha de salida más tardía."
-                );
-            }
-
-            return (parsedEarliest, parsedLatest);
         }
 
         private FlightDTO MapToFlightDTO(dynamic flight)

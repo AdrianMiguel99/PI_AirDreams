@@ -7,8 +7,8 @@ namespace AirDreams.API.Services.Interfaces
         Task<List<FlightDTO>> SearchFlightsAsync(
             string origin,
             string destination,
-            string earliestDeparture,
-            string latestDeparture,
+            DateTime earliestDeparture,
+            DateTime latestDeparture,
             int quantityOfPassengers
         );
 
