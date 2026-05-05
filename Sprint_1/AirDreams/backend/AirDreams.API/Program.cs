@@ -1,8 +1,9 @@
 using System.Data;
-using Microsoft.Data.SqlClient;
+using Microsoft.Data.SqlClient; 
 using Dapper;
 using AirDreams.API.Repositories;
 using AirDreams.API.Repositories.Interfaces;
+
 using AirDreams.API.Services;
 using AirDreams.API.Services.Interfaces;
 using AirDreams.API.DTOs;
@@ -27,12 +28,12 @@ builder.Services.AddCors(options =>
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IDbConnection>(sp =>
-    new SqlConnection(builder.Configuration.GetConnectionString("AirDreamsContext")));
+    new SqlConnection(builder.Configuration.GetConnectionString("DefaultConnection")));
 
 builder.Services.AddScoped<IAirportRepository, AirportRepository>();
 builder.Services.AddScoped<IAirportService, AirportService>();
 builder.Services.AddScoped<IRouteRepository, RouteRepository>();
-builder.Services.AddScoped<IRouteRepository, RouteRepository>();
+builder.Services.AddScoped<IEmailService, EmailService>();
 
 
 // Comentar por ahora hasta que existan bien estos servicios
@@ -49,29 +50,6 @@ builder.Services.AddScoped<AircraftService>();
 
 var app = builder.Build();
 
-using (var scope = app.Services.CreateScope())
-{
-    var connection = scope.ServiceProvider.GetRequiredService<IDbConnection>();
-    connection.Open();
-
-    connection.Execute(@"
-        IF NOT EXISTS (
-            SELECT * 
-            FROM sys.tables 
-            WHERE name = 'Airport'
-        )
-        BEGIN
-            CREATE TABLE Airport (
-                codeAirport VARCHAR(10) PRIMARY KEY,
-                adminID TINYINT NOT NULL,
-                nameAirport VARCHAR(100) NOT NULL,
-                city VARCHAR(100) NOT NULL,
-                country VARCHAR(100) NOT NULL,
-                timeZone VARCHAR(100) NULL
-            );
-        END
-    ");
-}
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
