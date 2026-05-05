@@ -11,7 +11,7 @@ builder.Services.AddSwaggerGen();
 
 builder.Services.AddCors(options =>
 {
-    options.AddPolicy("AllowAngularApp", policy =>
+    options.AddPolicy("AllowVueApp", policy =>
     {
         policy.WithOrigins("http://localhost:5173")
               .AllowAnyHeader()
@@ -36,7 +36,7 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
-app.UseCors("AllowAngularApp");
+app.UseCors("AllowVueApp");
 app.UseAuthorization();
 app.MapControllers();
 
