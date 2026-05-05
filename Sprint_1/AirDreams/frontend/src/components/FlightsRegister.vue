@@ -308,7 +308,7 @@
     methods: {
         async loadAirports(){
             try {
-            const res = await axios.get('/api/Airport');
+            const res = await axios.get('/api/Airports4');
             // adapter según la forma del DTO que devuelva el backend
             this.airports = res.data.map((a, i) => ({ id: i+1, code: a.code || a.Code || a.CodeAirport, name: a.name || a.Name || a.NameAirport }));
             } catch (e) {
