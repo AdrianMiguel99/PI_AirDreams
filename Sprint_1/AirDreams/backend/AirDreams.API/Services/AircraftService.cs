@@ -1,5 +1,5 @@
 ﻿using AirDreams.API.Models;
-using AirDreams.API.Repository;
+using AirDreams.API.Repositories;
 
 namespace AirDreams.API.Services
 {
@@ -12,13 +12,12 @@ namespace AirDreams.API.Services
             this.aircraftRepository = aircraftRepository;
         }
 
-        // 🔹 Obtener aeronaves
         public List<AircraftModel> GetAircrafts()
         {
             return aircraftRepository.GetAircrafts();
         }
 
-        // 🔹 Registrar aeronave
+    
         public string AddAircraft(AircraftModel aircraft)
         {
 

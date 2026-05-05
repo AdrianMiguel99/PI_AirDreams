@@ -2,7 +2,8 @@
 using Dapper;
 using Microsoft.Data.SqlClient;
 
-namespace AirDreams.API.Repository
+namespace AirDreams.API.Repositories
+
 {
     public class AircraftRepository
     {
@@ -17,7 +18,7 @@ namespace AirDreams.API.Repository
         public List<AircraftModel> GetAircrafts()
         {
             using var connection = new SqlConnection(_connectionString);
-            string query = "SELECT * FROM Aircraftt";
+            string query = "SELECT * FROM Aircraft";
 
             return connection.Query<AircraftModel>(query).ToList();
         }
@@ -28,14 +29,14 @@ namespace AirDreams.API.Repository
             using var connection = new SqlConnection(_connectionString);
 
             string query = @"
-                INSERT INTO dbo.Aircraftt
+                INSERT INTO dbo.Aircraft
                     (plateNumber, maxWeight, cantPasajeros,
                     cant_Asientos_Fila_Firstclass, cant_Filas_Firstclass,
                     cant_Asientos_Fila_Turista, cant_Filas_Turista, modelo)
                 VALUES
                     (@plateNumber, @maxWeight, @cantPasajeros,
-                     @cant_Asientos_Fila_Firstclass, @cant_Filas_Firstclass,
-                     @cant_Asientos_Fila_Turista, @cant_Filas_Turista, @modelo)";
+                    @cant_Asientos_Fila_Firstclass, @cant_Filas_Firstclass,
+                    @cant_Asientos_Fila_Turista, @cant_Filas_Turista, @modelo)";
 
             var affectedRows = connection.Execute(query, aircraft);
             return affectedRows > 0;

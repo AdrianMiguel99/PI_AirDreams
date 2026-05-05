@@ -1,3 +1,4 @@
+using AirDreams.API.DTOs;
 using AirDreams.API.Models;
 using AirDreams.API.Repositories;
 using Microsoft.AspNetCore.Mvc;
@@ -36,5 +37,14 @@ namespace AirDreams.API.Controllers
 
             return CreatedAtAction(nameof(Create), new { id }, new { RouteID = id });
         }
+
+        [HttpGet]
+
+        public async Task<ActionResult<IEnumerable<RouteDTO>>> GetAllAsync()
+        {
+            var routes = await _routeRepository.GetAllAsync();
+            return Ok(routes);
+        }
+
     }
 }

@@ -29,7 +29,7 @@ export default {
     getAirplane() {
       const plateNumber = this.$route.params.plateNumber;
 
-      axios.get(`https://localhost:7136/api/Airplane/${plateNumber}`).then(response => {
+      axios.get(`http://localhost:5276/api/Airplane/${plateNumber}`).then(response => {
           this.airplane = response.data;
         })
         .catch(error => {
@@ -38,7 +38,7 @@ export default {
     },
 
     updateAirplane(updatedAirplane) {
-      axios.put(`https://localhost:7136/api/Airplane/${updatedAirplane.plateNumber}`, updatedAirplane).then(() => {
+      axios.put(`http://localhost:5276/api/Airplane/${updatedAirplane.plateNumber}`, updatedAirplane).then(() => {
         alert("Aeronave actualizada correctamente");
         this.getAirplane();
       })
