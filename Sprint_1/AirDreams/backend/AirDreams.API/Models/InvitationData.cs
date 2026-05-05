@@ -1,10 +1,15 @@
-public class InvitationData
+using System;
+
+namespace AirDreams.API.Models
 {
-    public string Email { get; set; } = string.Empty;
+    public class InvitationData
+    {
+        public string Email { get; set; } = string.Empty;
 
-    public string TipoUsuario { get; set; } = string.Empty;
+        public string Role { get; set; } = string.Empty;
 
-    public string Token { get; set; } = string.Empty;
-    
-    public DateTime ExpiryDate { get; set; }
+        public string Token { get; set; } = string.Empty;
+        
+        public DateTime ExpiryDate { get; set; }
+    }
 }
