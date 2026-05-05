@@ -9,8 +9,8 @@ namespace AirDreams.API.Repositories
         Task<IEnumerable<dynamic>> SearchFlightsAsync(
             string origin,
             string destination,
-            TimeSpan earliestTime,
-            TimeSpan latestTime,
+            DateTime earliestTime,
+            DateTime latestTime,
             int quantityOfPassengers
         );
 

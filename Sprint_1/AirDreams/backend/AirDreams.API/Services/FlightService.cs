@@ -1,7 +1,8 @@
 using AirDreams.API.DTOs;
-using AirDreams.API.Repositories.Interfaces;
+using AirDreams.API.Repositories;
+using AirDreams.API.Services.Interfaces;
 
-namespace AirDreams.API.Services.Interfaces
+namespace AirDreams.API.Services
 {
     public class FlightService : IFlightService
     {
@@ -22,20 +23,30 @@ namespace AirDreams.API.Services.Interfaces
         {
             ValidateParameters(origin, destination, earliestDeparture, latestDeparture, quantityOfPassengers);
 
-            var flights = await _flightRepository.SearchFlightsAsync(
-                origin.ToUpper(),
-                destination.ToUpper(),
-                earliestDeparture.TimeOfDay,
-                latestDeparture.TimeOfDay,
+            origin = origin.Trim().ToUpper();
+            destination = destination.Trim().ToUpper();
+
+            var flightsList = await _flightRepository.SearchFlightsAsync(
+                origin,
+                destination,
+                earliestDeparture,
+                latestDeparture,
                 quantityOfPassengers
             );
 
-            return flights.Select(MapToFlightDTO).ToList();
+            var result = new List<FlightDTO>();
+            foreach (var flight in flightsList)
+            {
+                var flightDto = MapToFlightDTO(flight, origin, destination);
+                result.Add(flightDto);
+            }
+
+            return result;
         }
 
         public async Task ValidateApiKeyAsync(string apiKey)
         {
-            if (string.IsNullOrEmpty(apiKey))
+            if (string.IsNullOrWhiteSpace(apiKey))
             {
                 throw new UnauthorizedAccessException("INVALID_API_KEY: La API key es requerida.");
             }
@@ -50,41 +61,39 @@ namespace AirDreams.API.Services.Interfaces
 
         private void ValidateParameters(string origin, string destination, DateTime earliestDeparture, DateTime latestDeparture, int quantityOfPassengers)
         {
-            if (string.IsNullOrEmpty(origin) ||
-                string.IsNullOrEmpty(destination) ||
-                string.IsNullOrEmpty(earliestDeparture) ||
-                string.IsNullOrEmpty(latestDeparture) ||
+            if (string.IsNullOrWhiteSpace(origin) ||
+                string.IsNullOrWhiteSpace(destination) ||
                 quantityOfPassengers < 1)
             {
-                throw new ArgumentException("Los parámetros de búsqueda son inválidos o faltan.");
+                throw new ArgumentException("INVALID_PARAMETERS: Parámetros inválidos o faltantes.");
             }
 
             if (origin.Length != 3 || destination.Length != 3)
             {
-                throw new ArgumentException("Los códigos de aeropuerto deben tener exactamente 3 caracteres.");
+                throw new ArgumentException("INVALID_AIRPORT_CODE: Los códigos de aeropuerto deben tener exactamente 3 caracteres.");
             }
 
             if (origin.Equals(destination, StringComparison.OrdinalIgnoreCase))
             {
-                throw new ArgumentException("El aeropuerto de origen y destino no pueden ser el mismo.");
+                throw new ArgumentException("SAME_AIRPORTS: El aeropuerto de origen y destino no pueden ser el mismo.");
             }
 
             if (earliestDeparture > latestDeparture)
             {
-                throw new ArgumentException("El rango de fechas es inválido.");
+                throw new ArgumentException("INVALID_DATE_RANGE: El rango de fechas es inválido.");
             }
         }
 
-        private FlightDTO MapToFlightDTO(dynamic flight)
+        private FlightDTO MapToFlightDTO(dynamic flight, string origin, string destination)
         {
             return new FlightDTO
             {
-                FlightGUID = flight.FlightGUID,
+                FlightGUID = $"{flight.FlightNumber}-{origin}-{destination}",
                 CarryOnPrice = flight.CarryOnPrice,
                 CheckedPrice = flight.CheckedPrice,
                 Route = new RouteDTO
                 {
-                    Id = flight.FlightNumber,
+                    Id = flight.RouteId,
                     DepartureTime = flight.DepartureTime,
                     ArrivalTime = flight.ArrivalTime,
                     Duration = flight.Duration,

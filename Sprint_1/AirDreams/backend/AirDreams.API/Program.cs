@@ -36,6 +36,9 @@ builder.Services.AddScoped<IEmailService, EmailService>();
 
 builder.Services.AddScoped<AircraftRepository>();
 builder.Services.AddScoped<IAircraftService, AircraftService>();
+
+builder.Services.AddScoped<IFlightRepository, FlightRepository>();
+builder.Services.AddScoped<IFlightService, FlightService>();
 // Comentar por ahora hasta que existan bien estos servicios
 // builder.Services.AddScoped<IService<AirportDTO>, AirportService>();
 // builder.Services.AddScoped<IService<AircraftDTO>, AircraftService>();
