@@ -1,5 +1,6 @@
 using AirDreams.API.Models;
 using AirDreams.API.Repositories;
+using AirDreams.API.DTOs;
 using System;
 using System.Security.Cryptography;
 using System.Text;
@@ -19,6 +20,16 @@ namespace AirDreams.API.Services
             _userRepository = userRepository;
             _emailService = emailService;
             _configuration = configuration;
+        }
+
+        public List<UserDTO> GetAll()
+        {
+            return _userRepository.GetAll();
+        }
+
+        public List<UserDTO> Search(string searchTerm)
+        {
+            return _userRepository.Search(searchTerm);
         }
 
         public async Task<(bool success, string message)> SendInvitation(InvitationModel model)

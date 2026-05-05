@@ -1,4 +1,5 @@
 using AirDreams.API.Models;
+using AirDreams.API.DTOs;
 using System.Threading.Tasks;
 
 namespace AirDreams.API.Services
@@ -16,6 +17,10 @@ namespace AirDreams.API.Services
         
         // Validar token de invitación
         Task<InvitationValidationResult?> ValidateInvitationToken(string token);
+
+        List<UserDTO> GetAll();
+
+        List<UserDTO> Search(string searchTerm);
     }
     
     public class InvitationValidationResult
