@@ -18,7 +18,7 @@ namespace AirDreams.API.Repositories
         public List<AircraftModel> GetAircrafts()
         {
             using var connection = new SqlConnection(_connectionString);
-            string query = "SELECT * FROM Aircraftt";
+            string query = "SELECT * FROM Aircraft";
 
             return connection.Query<AircraftModel>(query).ToList();
         }
@@ -29,7 +29,7 @@ namespace AirDreams.API.Repositories
             using var connection = new SqlConnection(_connectionString);
 
             string query = @"
-                INSERT INTO dbo.Aircraftt
+                INSERT INTO dbo.Aircraft
                     (plateNumber, maxWeight, cantPasajeros,
                     cant_Asientos_Fila_Firstclass, cant_Filas_Firstclass,
                     cant_Asientos_Fila_Turista, cant_Filas_Turista, modelo)
