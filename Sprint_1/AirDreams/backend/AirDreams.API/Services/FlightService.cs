@@ -88,7 +88,7 @@ namespace AirDreams.API.Services
         {
             return new FlightDTO
             {
-                FlightGUID = $"{flight.FlightNumber}-{origin}-{destination}",
+                FlightGUID = flight.FlightNumber,
                 CarryOnPrice = flight.CarryOnPrice,
                 CheckedPrice = flight.CheckedPrice,
                 Route = new RouteDTO
