@@ -106,7 +106,7 @@
 import axios from 'axios'
 import AdminHeader from './AdminHeader.vue'
 
-const API_BASE = import.meta.env.VITE_API_URL
+//const API_BASE = import.meta.env.VITE_API_URL
 
 export default {
   name: 'AirportManagement',
@@ -133,7 +133,7 @@ export default {
   methods: {
     async cargarPaises() {
       try {
-        const res = await axios.get(`${API_BASE}/api/locations/countries`)
+        const res = await axios.get(`http://localhost:5276/api/locations/countries`)
         this.paises = res.data
       } catch (e) {
         console.error('Error al cargar países:', e)
@@ -145,7 +145,7 @@ export default {
         return
       }
       try {
-        const res = await axios.get(`${API_BASE}/api/locations/cities`, {
+        const res = await axios.get(`http://localhost:5276/api/locations/cities`, {
           params: { country: this.form.country }
         })
         this.ciudades = res.data
@@ -157,7 +157,7 @@ export default {
     async obtenerAeropuertos() {
       this.cargando = true
       try {
-        const res = await axios.get(`${API_BASE}/api/airports`, {
+        const res = await axios.get(`http://localhost:5276/api/airports`, {
           headers: { 'Admin-ID': '1' } 
         })
         this.aeropuertos = res.data
@@ -176,7 +176,7 @@ export default {
         return
       }
       try {
-        const res = await axios.post(`${API_BASE}/api/airports`, this.form, {
+        const res = await axios.post(`http://localhost:5276/api/airports`, this.form, {
           headers: {
             'Content-Type': 'application/json',
             'Admin-ID': '1'

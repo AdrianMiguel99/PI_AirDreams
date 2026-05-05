@@ -43,10 +43,6 @@ builder.Services.AddScoped<IAircraftService, AircraftService>();
 // builder.Services.AddScoped<IService<RouteDTO>, RouteService>();
 // builder.Services.AddScoped<IService<FlightDTO>, FlightService>();
 
-builder.Services.AddScoped<AircraftRepository>(sp =>
-    new AircraftRepository(builder.Configuration.GetConnectionString("DefaultConnection")));
-builder.Services.AddScoped<AircraftService>();
-
 
 var app = builder.Build();
 

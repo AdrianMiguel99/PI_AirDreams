@@ -63,9 +63,9 @@ public class RouteRepository : IRouteRepository
         {
             var insertRoute = @"
                 INSERT INTO Route (adminID, codeAirportSalida, codeAirportLlegada, plateNumber,
-                    firstClassPrice, turistClassPrice, stimatedTime, distance)
+                    firstClassPrice, turistClassPrice, routeState, stimatedTime, distance)
                 VALUES (@AdminID,@CodeAirportSalida,@CodeAirportLlegada,@PlateNumber,
-                    @FirstClassPrice,@TuristClassPrice,@StimatedTime,@Distance);
+                    @FirstClassPrice,@TuristClassPrice, @RouteState, @StimatedTime,@Distance);
                 SELECT CAST(SCOPE_IDENTITY() AS int);
             ";
             var routeId = await _connection.ExecuteScalarAsync<int>(insertRoute, model, tran);

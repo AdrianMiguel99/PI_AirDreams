@@ -130,12 +130,13 @@
                 required
             >
                 <option value="" disabled>Seleccione un estado</option>
-                <option>A tiempo</option>
-                <option>Abordando</option>
-                <option>Retrasado</option>
-                <option>Cancelado</option>
-                <option>En vuelo</option>
-                <option>Aterrizó</option>
+                <option
+                    v-for="option in StatusOptions"
+                    :key="option.value"
+                    :value="option.value"
+                >
+                    {{ option.label }}
+                </option>
             </select>
             </div>
 
@@ -308,7 +309,7 @@
     methods: {
         async loadAirports(){
             try {
-            const res = await axios.get('/api/Airports4');
+            const res = await axios.get('/api/Airports');
             // adapter según la forma del DTO que devuelva el backend
             this.airports = res.data.map((a, i) => ({ id: i+1, code: a.code || a.Code || a.CodeAirport, name: a.name || a.Name || a.NameAirport }));
             } catch (e) {
@@ -369,7 +370,7 @@
                 firstClassPrice: parseFloat(this.formData.basePriceFirstClass),
                 turistClassPrice: parseFloat(this.formData.basePriceTurist),
                 stimatedTime: this.formData.flightDuration || toTime(new Date(0,0,0, dtArrive.getHours()-dtDepart.getHours(), dtArrive.getMinutes()-dtDepart.getMinutes())), // "HH:MM:SS"
-                routeState: this.StatusOptions[this.formData.status] || "On-Time",
+                routeState: this.formData.status,
                 maxWeightLuggage: parseFloat(this.formData.maxWeightLuggage),
                 priceLuggage: parseFloat(this.formData.priceLuggage),
                 distance: parseFloat(this.formData.flightDistance),
