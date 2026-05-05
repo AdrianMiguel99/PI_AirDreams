@@ -18,7 +18,7 @@ namespace AirDreams.API.Services
             _logger = logger;
         }
 
-        public async Task SendInvitationEmail(string email, string token, string tipoUsuario)
+        public async Task SendInvitationEmail(string email, string token, string Role)
         {
             var baseUrl = _configuration["AppSettings:BaseUrl"] ?? "https://localhost:5173";
             var link = $"{baseUrl}/completar-registro?token={token}";
@@ -26,7 +26,7 @@ namespace AirDreams.API.Services
             var subject = "Bienvenido al sistema de Air Dreams";
             var body = $@"
                 <h2>Bienvenido al sistema de Air Dreams</h2>
-                <p>Has sido invitado como <strong>{tipoUsuario}</strong> a la plataforma.</p>
+                <p>Has sido invitado como <strong>{Role}</strong> a la plataforma.</p>
                 <p>Utilice el siguiente link para completar su registro:</p>
                 <p><a href='{link}'>{link}</a></p>
                 <p>Este link expirará en 48 horas.</p>
@@ -37,13 +37,13 @@ namespace AirDreams.API.Services
             await SendEmailAsync(email, subject, body);
         }
 
-        public async Task SendWelcomeEmail(string email, string nombreCompleto)
+        public async Task SendWelcomeEmail(string email, string FullName)
         {
             var subject = "¡Bienvenido a Air Dreams!";
             var body = $@"
-                <h2>¡Bienvenido {nombreCompleto}!</h2>
+                <h2>¡Bienvenido {FullName}!</h2>
                 <p>Tu registro ha sido completado exitosamente.</p>
-                <p>Ya puedes iniciar sesión en la plataforma con tu correo y la contraseña que estableciste.</p>
+                <p>Ya puedes iniciar sesión en la plataforma con tu Email y la contraseña que estableciste.</p>
                 <br/>
                 <p>Saludos,<br/>Equipo de Air Dreams</p>
             ";
