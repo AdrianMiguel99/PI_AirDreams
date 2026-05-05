@@ -1,9 +1,10 @@
 ﻿using AirDreams.API.Models;
 using AirDreams.API.Repositories;
+using AirDreams.API.Services.Interfaces;
 
 namespace AirDreams.API.Services
 {
-    public class AircraftService
+    public class AircraftService : IAircraftService
     {
         private readonly AircraftRepository aircraftRepository;
 
@@ -17,23 +18,26 @@ namespace AirDreams.API.Services
             return aircraftRepository.GetAircrafts();
         }
 
-    
         public string AddAircraft(AircraftModel aircraft)
         {
-
             var result = string.Empty;
+
             try
             {
+                aircraft.adminId = GetCurrentUserId();
+
                 var isAdded = aircraftRepository.AddAircraft(aircraft);
+
                 if (!isAdded)
                 {
                     result = "Error al registrar la aeronave.";
                 }
-                
-            }catch (Exception ex)
+            }
+            catch (Exception ex)
             {
                 result = ex.Message;
             }
+
             return result;
         }
 
@@ -49,7 +53,6 @@ namespace AirDreams.API.Services
                 {
                     result = "No se pudo eliminar la aeronave";
                 }
- 
             }
             catch (Exception ex)
             {
@@ -83,6 +86,12 @@ namespace AirDreams.API.Services
             }
 
             return result;
+        }
+
+        private int GetCurrentUserId()
+        {
+            // TODO: reemplazar por JWT o contexto de autenticación
+            return 1;
         }
     }
 }

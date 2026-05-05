@@ -3,7 +3,6 @@ using Microsoft.Data.SqlClient;
 using Dapper;
 using AirDreams.API.Repositories;
 using AirDreams.API.Repositories.Interfaces;
-
 using AirDreams.API.Services;
 using AirDreams.API.Services.Interfaces;
 using AirDreams.API.DTOs;
@@ -35,7 +34,8 @@ builder.Services.AddScoped<IAirportService, AirportService>();
 builder.Services.AddScoped<IRouteRepository, RouteRepository>();
 builder.Services.AddScoped<IEmailService, EmailService>();
 
-
+builder.Services.AddScoped<AircraftRepository>();
+builder.Services.AddScoped<IAircraftService, AircraftService>();
 // Comentar por ahora hasta que existan bien estos servicios
 // builder.Services.AddScoped<IService<AirportDTO>, AirportService>();
 // builder.Services.AddScoped<IService<AircraftDTO>, AircraftService>();
