@@ -70,9 +70,9 @@ async fetchRoutes() {
 
     // Normalizar cada ruta a los campos que usa la UI
     this.routes = raw.map(r => {
-    const routeID = r.idRoute || r.Id || r.RouteID || r.routeID || r.id || null
-    const codeSalida = r.codeAirportLSalida || r.CodeAirportSalida || r.departureCode || r.DepartureCode || ''
-    const codeLlegada = r.codeAirportLlegada || r.CodeAirportLlegada || r.arrivalCode || r.ArrivalCode || ''
+    const routeID =  r.id || null
+    const codeSalida = r.departureAirport.code + ' - ' + r.departureAirport.name  || ''
+    const codeLlegada = r.arrivalAirport.code + ' - ' + r.arrivalAirport.name || ''
       // tomar duración desde stimatedTime (puede venir como "hh:mm:ss" o TimeSpan)
     let flightDuration = ''
     const st = r.stimatedTime || r.StimatedTime || r.duration || r.Duracion || ''
@@ -85,7 +85,7 @@ async fetchRoutes() {
         flightDuration = st
         }
     }
-    const basePrice = r.turistClassPrice || r.TouristPrice || r.basePrice || r.BasePrice || r.firstClassPrice || 0
+    const basePrice = r.turistClassPrice || r.touristPrice || r.basePrice || r.BasePrice || r.firstClassPrice || 0
 
     return {
         routeID,
