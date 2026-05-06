@@ -1,5 +1,6 @@
 <template>
   <div>
+
     <BarraNavegacion />
     <SeccionHero />
 
@@ -57,7 +58,11 @@ export default {
       const start = (this.currentPage - 1) * 10;
       return this.flights.slice(start, start + 10);
     }
+    
   },
+  
+      
+
 
   methods: {
     handleSearch(data) {

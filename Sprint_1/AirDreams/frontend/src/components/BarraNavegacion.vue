@@ -5,6 +5,17 @@
       <span class="logo-text">Air Dreams</span>
     </div>
 
+    <button
+      v-if="isLoggedIn"
+      type="button"
+      class="btn adminPanel-button" 
+      style = "font-size: 15px;"
+      @click="$router.push({ name: 'admin' })"
+      >
+        Ir al panel administrador
+    </button>
+    
+
     <div class="links">
       <a href="#">Buscar Vuelos</a>
       <a href="#">Consultar Vuelos</a>
@@ -26,12 +37,14 @@
 export default {
   data() {
     return {
-      usuario: null
+      usuario: null,
+      isLoggedIn: false
     }
   },
   mounted() {
     this.checkUser();
     window.addEventListener('storage', this.checkUser);
+    this.isLoggedIn = !!localStorage.getItem("token");
   },
   beforeDestroy() {
     window.removeEventListener('storage', this.checkUser);
@@ -112,4 +125,19 @@ export default {
 .user-menu span {
   color: #333;
 }
+
+.adminPanel-button {
+    border: 1px solid #032056;
+    background: white;
+    color: #032056;
+    border-radius: 6px;
+    padding: 10px 16px;
+    cursor: pointer;
+    font-weight: 400;
+}
+
+.adminPanel-button:hover {
+    background: #e0ecff;
+}
+
 </style>
