@@ -1,6 +1,8 @@
 ﻿using AirDreams.API.Models;
 using AirDreams.API.Services.Interfaces;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
 
 namespace AirDreams.API.Controllers
 {
@@ -22,6 +24,7 @@ namespace AirDreams.API.Controllers
         }
 
         [HttpPost]
+        [Authorize(Roles = "Admin")]
         public ActionResult<bool> AddAirplane([FromBody] AircraftModel aircraft)
         {
             if (aircraft == null)
@@ -29,9 +32,19 @@ namespace AirDreams.API.Controllers
                 return BadRequest("Datos inválidos.");
             }
 
+            var adminIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value; //variable claim
             var result = aircraftService.AddAircraft(aircraft);
 
-            if (string.IsNullOrEmpty(result))
+            // si es nula entonces NO es admin
+            if (adminIdClaim == null)
+            {
+                return Unauthorized("No se pudo identificar el administrador.");
+            }
+            aircraft.adminId = int.Parse(adminIdClaim);
+
+            var result2 = aircraftService.AddAircraft(aircraft);
+
+            if (string.IsNullOrEmpty(result2))
             {
                 return Ok(true);
             }

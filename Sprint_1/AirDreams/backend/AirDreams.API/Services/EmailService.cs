@@ -11,7 +11,9 @@ namespace AirDreams.API.Services
         private readonly EmailSettings _emailSettings;
         private readonly ILogger<EmailService> _logger;
 
-        public EmailService(IOptions<EmailSettings> emailSettings, ILogger<EmailService> logger)
+        public EmailService(
+            IOptions<EmailSettings> emailSettings,
+            ILogger<EmailService> logger)
         {
             _emailSettings = emailSettings.Value;
             _logger = logger;
@@ -54,10 +56,27 @@ namespace AirDreams.API.Services
 
         private async Task SendEmailAsync(string toEmail, string subject, string body)
         {
+            if (string.IsNullOrEmpty(_emailSettings.Username) ||
+                string.IsNullOrEmpty(_emailSettings.Password))
+            {
+                _logger.LogInformation(
+                    $"[EMAIL SIMULADO] Para: {toEmail} | Asunto: {subject} | Body: {body}"
+                );
+
+                return;
+            }
+
             try
             {
                 var message = new MimeMessage();
-                message.From.Add(new MailboxAddress(_emailSettings.FromName, _emailSettings.FromEmail));
+
+                message.From.Add(
+                    new MailboxAddress(
+                        _emailSettings.FromName,
+                        _emailSettings.FromEmail
+                    )
+                );
+
                 message.To.Add(new MailboxAddress("", toEmail));
                 message.Subject = subject;
 
@@ -85,7 +104,6 @@ namespace AirDreams.API.Services
                 );
 
                 await client.SendAsync(message);
-
                 await client.DisconnectAsync(true);
 
                 _logger.LogInformation($"Correo enviado exitosamente a {toEmail}");

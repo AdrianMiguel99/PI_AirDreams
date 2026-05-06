@@ -20,6 +20,7 @@ namespace AirDreams.API.Controllers
         }
 
         [HttpPost("invite")]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> SendInvitation([FromBody] InvitationModel model)
         {
             if (!ModelState.IsValid)
@@ -97,7 +98,7 @@ namespace AirDreams.API.Controllers
                 { 
                     success = true,
                     token = token,
-                    expiresAt = DateTime.UtcNow.AddMinutes(60),
+                    expiresAt = _jwtService.GetTokenExpiration(),
                     message = result.message,
                     user = new 
                     {
@@ -109,7 +110,7 @@ namespace AirDreams.API.Controllers
                 });
             }
 
-            return Unauthorized(new { message = "Email o contraseña incorrecta" });
+            return Unauthorized(new { message = result.message });
         }
     }
 }

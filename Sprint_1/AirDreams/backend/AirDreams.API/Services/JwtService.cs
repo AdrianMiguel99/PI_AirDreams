@@ -86,5 +86,10 @@ namespace AirDreams.API.Services
                 
             return int.Parse(userIdClaim.Value);
         }
+
+        public DateTime GetTokenExpiration()
+        {
+            return DateTime.UtcNow.AddMinutes(_jwtSettings.ExpirationMinutes);
+        }
     }
 }

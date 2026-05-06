@@ -20,7 +20,6 @@ namespace AirDreams.API.Controllers
         public async Task<IActionResult> Create([FromBody] CreateRouteModel model)
         {
 
-            // dentro de Create(...)
             Console.WriteLine($"CodeAirportSalida='{model.CodeAirportSalida}', CodeAirportLlegada='{model.CodeAirportLlegada}'");
 
             if (model == null)

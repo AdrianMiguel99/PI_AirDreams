@@ -14,8 +14,8 @@ namespace AirDreams.API.Models
 
         public bool EmailConfirmed { get; set; }
 
-        public bool MustChangePassword { get; set; } = true; // Nuevo: debe cambiar contraseña
+        public bool MustChangePassword { get; set; } = true; 
         
-        public string? TemporaryPassword { get; set; } // Contraseña temporal (no se guarda en BD)
+        public string? TemporaryPassword { get; set; } 
     }
 }
