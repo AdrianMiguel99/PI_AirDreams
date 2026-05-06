@@ -1,5 +1,21 @@
 <template>
     <div class="container">
+        <div v-if="showSuccessPopup" class="popup-overlay">
+            <div class="popup-card">
+                <h3>Ruta registrada exitosamente</h3>
+                <p>La ruta y sus vuelos fueron creados correctamente.</p>
+
+                <div class="popup-actions">
+                    <button type="button" class="btn boton_registrar" @click="showSuccessPopup = false">
+                        Registrar otra ruta
+                    </button>
+
+                    <button type="button" class="btn boton_listar" @click="irALista">
+                        Ver lista de rutas
+                    </button>
+                </div>
+            </div>
+        </div>
         <AdminHeader />
         <div class="page">
             <div class="content">
@@ -7,6 +23,15 @@
         <p class="page-subtitle mb-4">
             Registra nuevos vuelos y consulta los vuelos existentes.
         </p>
+
+
+        <div v-if="successMessage" class="alert alert-success">
+            {{ successMessage }}
+        </div>
+
+        <div v-if="errorMessage" class="alert alert-danger">
+            {{ errorMessage }}
+        </div>
 
         <div class="d-flex justify-content-between align-items-center mb-3">
             <button class="btn boton_listar" @click="volverAlPanel">
@@ -120,6 +145,7 @@
             <label for="basePriceTurist" class="form-label">
                 Precio clase turista
             </label>
+            <div class="input-group">
             <input
                 v-model="formData.basePriceTurist"
                 type="number"
@@ -130,12 +156,15 @@
                 step="0.01"
                 required
             />
+            <span class="input-group-text">$</span>
+            </div>
             </div>
 
             <div class="col-md-4 mb-3">
                 <label for="basePriceFirstClass" class="form-label">
                 Precio primera clase
                 </label>
+            <div class="input-group">
             <input
                 v-model="formData.basePriceFirstClass"
                 type="number"
@@ -146,6 +175,8 @@
                 step="0.01"
                 required
             />
+            <span class="input-group-text">$</span>
+            </div>
             </div>
 
             <div class="col-md-4 mb-3">
@@ -168,11 +199,13 @@
                 </option>
             </select>
             </div>
+            
 
             <div class="col-md-6 mb-3">
             <label for="maxWeightLuggage" class="form-label">
                 Peso máximo de equipaje, kg
             </label>
+            <div class="input-group">
             <input
                 v-model="formData.maxWeightLuggage"
                 type="number"
@@ -182,12 +215,14 @@
                 class="form-control"
                 required
             />
+            <span class="input-group-text">Kg</span>
             </div>
-
+            </div>
             <div class="col-md-6 mb-3">
             <label for="priceLuggage" class="form-label">
                 Precio por equipaje adicional
             </label>
+            <div class="input-group">
             <input
                 v-model="formData.priceLuggage"
                 type="number"
@@ -197,6 +232,8 @@
                 class="form-control"
                 required
             />
+                <span class="input-group-text">$</span>
+            </div>
             </div>
 
             <div class="col-12 mb-3">
@@ -303,6 +340,9 @@
     name: "FlightRegister",
     data() {
         return {
+        successMessage: "",
+        errorMessage: "",
+        showSuccessPopup: false,
         aircraftQuery: "",
         showAircraftResults: false,
         selectedAircraft: null,
@@ -534,10 +574,16 @@
                     }
                 });
                 console.log("Creada ruta:", res.data);
-                this.$router.push("/");
+                this.succesMessage = "Ruta creado exitosamente";
+                this.errorMessage = "";
+                this.showSuccessPopup = true;
+
             } catch (err) {
                 console.error(err);
-                alert("Error registrando vuelo (ver consola).");
+                this.errorMessage = "Error registrando vuelo. Revise los datos e inténtelo de nuevo.";
+                this.successMessage = "";
+                this.showSuccessPopup = false;
+                // alert("Error registrando vuelo (ver consola).");
             }
         }
     }
@@ -545,6 +591,42 @@
 </script>
 
 <style scoped>
+    .popup-overlay {
+        position: fixed;
+        inset: 0;
+        background: rgba(0, 0, 0, 0.45);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 2000;
+    }
+
+    .popup-card {
+        background: white;
+        width: min(420px, 90vw);
+        border-radius: 12px;
+        padding: 28px;
+        text-align: center;
+        box-shadow: 0 20px 50px rgba(0, 0, 0, 0.25);
+    }
+
+    .popup-card h3 {
+        color: #032056;
+        margin-bottom: 10px;
+    }
+
+    .popup-card p {
+        color: #5f6b7a;
+        margin-bottom: 24px;
+    }
+
+    .popup-actions {
+        display: flex;
+        justify-content: center;
+        gap: 12px;
+        flex-wrap: wrap;
+    }
+
 
     .boton_listar {
     font-family: 'Inter', sans-serif;

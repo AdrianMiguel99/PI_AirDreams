@@ -1,30 +1,56 @@
 <template>
   <div>
-
     <BarraNavegacion />
     <SeccionHero />
 
     <FormularioBusqueda @search="handleSearch" />
 
-    <div 
-      v-if="searchPerformed && flights.length === 0" 
+    <div
+      v-if="searchPerformed && outboundFlights.length === 0 && returnFlights.length === 0"
       class="no-results"
     >
       No hay vuelos disponibles para los filtros seleccionados
     </div>
 
-    <ListaVuelos 
-      v-if="searchPerformed && flights.length > 0"
-      :flights="paginatedFlights"
-      :departureDate="departureDate"
+    <ListaVuelos
+      v-if="searchPerformed && outboundFlights.length > 0"
+      title="Vuelos de ida"
+      :flights="paginatedOutboundFlights"
     />
 
-    <Paginacion 
-      v-if="searchPerformed && flights.length > 0"
-      :total="flights.length" 
-      :perPage="10"
-      @changePage="changePage"
+    <Paginacion
+      v-if="searchPerformed && outboundFlights.length > outboundPerPage"
+      :total="outboundFlights.length"
+      :perPage="outboundPerPage"
+      @changePage="changeOutboundPage"
     />
+
+    <ListaVuelos
+      v-if="searchPerformed && tripType === 'roundTrip' && returnFlights.length > 0"
+      title="Vuelos de regreso"
+      :flights="paginatedReturnFlights"
+    />
+
+    <Paginacion
+      v-if="searchPerformed && tripType === 'roundTrip' && returnFlights.length > returnPerPage"
+      :total="returnFlights.length"
+      :perPage="returnPerPage"
+      @changePage="changeReturnPage"
+    />
+
+    <div
+      v-if="searchPerformed && outboundFlights.length === 0 && returnFlights.length > 0"
+      class="no-results"
+    >
+      No hay vuelos de ida disponibles para los filtros seleccionados
+    </div>
+
+    <div
+      v-if="searchPerformed && tripType === 'roundTrip' && outboundFlights.length > 0 && returnFlights.length === 0"
+      class="no-results"
+    >
+      No hay vuelos de regreso disponibles para los filtros seleccionados
+    </div>
   </div>
 </template>
 
@@ -47,35 +73,44 @@ export default {
   data() {
     return {
       currentPage: 1,
-      flights: [],
+      outboundFlights: [],
+      returnFlights: [],
+      tripType: '',
+      outboundPage: 1,
+      returnPage: 1,
+      outboundPerPage: 10,
+      returnPerPage: 10,
       searchPerformed: false,
       departureDate: ''
     };
   },
 
   computed: {
-    paginatedFlights() {
-      const start = (this.currentPage - 1) * 10;
-      return this.flights.slice(start, start + 10);
-    }
-    
-  },
-  
-      
-
-
-  methods: {
-    handleSearch(data) {
-      this.flights = data.flights || [];
-      this.departureDate = data.departureDate;
-      this.searchPerformed = true;
-      this.currentPage = 1;
+    paginatedOutboundFlights() {
+      const start = (this.outboundPage - 1) * this.outboundPerPage;
+      return this.outboundFlights.slice(start, start + this.outboundPerPage);
     },
 
-    changePage(page) {
-      this.currentPage = page;
+    paginatedReturnFlights() {
+      const start = (this.returnPage - 1) * this.returnPerPage;
+      return this.returnFlights.slice(start, start + this.returnPerPage);
     }
-  }
+    },
+  
+    methods: {
+      handleSearch(data) {
+        this.tripType = data.type;
+        this.outboundFlights = data.outboundFlights || [];
+        this.returnFlights = data.returnFlights || [];
+        this.departureDate = data.departureDate;
+        this.searchPerformed = true;
+        this.currentPage = 1;
+      },
+
+      changePage(page) {
+        this.currentPage = page;
+      }
+    }
 };
 </script>
 

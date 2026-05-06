@@ -1,7 +1,6 @@
 <template>
   <div class="lista-container">
-    <h2 class="titulo">Vuelos disponibles</h2>
-
+    <h2 class="titulo">{{ title }}</h2>
     <div v-if="flights.length === 0" class="no-flights">
       No hay vuelos disponibles
     </div>
@@ -21,7 +20,16 @@
 import TarjetaVuelo from "./TarjetaVuelo.vue";
 
 export default {
-  props: ["flights", "departureDate"],
+  props: {
+  flights: {
+    type: Array,
+    default: () => []
+  },
+  title: {
+    type: String,
+    default: "Vuelos disponibles"
+  }
+  },
   components: {
     TarjetaVuelo
   }
