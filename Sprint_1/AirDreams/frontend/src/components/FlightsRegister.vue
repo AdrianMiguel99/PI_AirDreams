@@ -53,7 +53,7 @@
                 </label>
                 <input
                 v-model="destinationAirportQuery"
-                type="text"4
+                type="text"
                 id="destinationAirport"
                 @focus="showDestinationResults = true"
                 @input="onDestinationAirportInput"
@@ -354,10 +354,15 @@
         this.loadAirports();
     },
     methods: {
+        getToken() {
+            return localStorage.getItem("token");
+        },
+
         async loadAirports(){
             try {
+                const token = localStorage.getItem("token");
                 const res = await axios.get('/api/airports', {
-                headers: { 'Admin-ID': '1' } 
+                headers: { 'Authorization': `Bearer ${token}` }
             });
             // adapter según la forma del DTO que devuelva el backend
             this.airports = res.data.map((a, i) => ({ id: i+1, code: a.code || a.Code || a.CodeAirport, name: a.name || a.Name || a.NameAirport }));
@@ -367,7 +372,10 @@
         },
         async loadAircrafts(){
             try {
-            const res = await axios.get('/api/Airplane');
+            const token = localStorage.getItem("token");
+            const res = await axios.get('/api/Airplane', {
+                headers: { 'Authorization': `Bearer ${token}` }
+            });
             // adapter según la forma del DTO que devuelva el backend
             this.aircrafts = res.data.map((a, i) => ({
                 id: i+1,
@@ -375,7 +383,7 @@
                 modelo: a.aircraftModel || a.modelo || a.Model
             }));
             } catch (e) {
-            console.error('No se pudieron cargar los aviones', e);
+                console.error('No se pudieron cargar los aviones', e);
             }
         },
         filterAirports(queryValue) {
@@ -402,7 +410,7 @@
             );
         },
         onAircraftInput(){
-            this.showAircraftfResults = true;
+            this.showAircraftResults = true;
             this.formData.aircraftModel = "";
         },
         selectAircraft(aircraft) {
@@ -496,8 +504,19 @@
             };
 
             try {
-                // usa ruta relativa para aprovechar proxy Vite (/api -> backend)
-                const res = await axios.post("/api/routes", payload);
+                const token = this.getToken()
+                    if (!token) {
+                        this.mensaje = 'Debes iniciar sesión.'
+                        this.tipoMensaje = 'alert-danger'
+                        return
+                    }
+                
+                const res = await axios.post("/api/routes", payload, {
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
                 console.log("Creada ruta:", res.data);
                 this.$router.push("/");
             } catch (err) {

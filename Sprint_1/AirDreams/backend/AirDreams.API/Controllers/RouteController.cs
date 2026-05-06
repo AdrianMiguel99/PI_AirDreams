@@ -1,12 +1,15 @@
 using AirDreams.API.DTOs;
 using AirDreams.API.Models;
+using Microsoft.AspNetCore.Authorization;
 using AirDreams.API.Repositories;
 using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
 
 namespace AirDreams.API.Controllers
 {
     [Route("api/routes")]
     [ApiController]
+    [Authorize(Roles = "Admin")]     
     public class RouteController : ControllerBase
     {
         private readonly IRouteRepository _routeRepository;
@@ -19,6 +22,13 @@ namespace AirDreams.API.Controllers
         [HttpPost]
         public async Task<IActionResult> Create([FromBody] CreateRouteModel model)
         {
+            if (!ModelState.IsValid) return BadRequest(ModelState);
+
+            var adminIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (adminIdClaim == null)
+                return Unauthorized("No se pudo identificar al administrador.");
+            byte adminId = byte.Parse(adminIdClaim);
+
 
             Console.WriteLine($"CodeAirportSalida='{model.CodeAirportSalida}', CodeAirportLlegada='{model.CodeAirportLlegada}'");
 
