@@ -11,9 +11,9 @@ namespace AirDreams.API.Controllers
     public class AuthController : ControllerBase
     {
         private readonly IUserService _userService;
-        private readonly IJwtService _jwtService;  // ← NUEVO
+        private readonly IJwtService _jwtService;
 
-        public AuthController(IUserService userService, IJwtService jwtService)  // ← Inyectar JwtService
+        public AuthController(IUserService userService, IJwtService jwtService)
         {
             _userService = userService;
             _jwtService = jwtService;
@@ -21,6 +21,7 @@ namespace AirDreams.API.Controllers
 
         // Endpoint para administrador envíe invitación (solo Administradores)
         [HttpPost("invite")]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> SendInvitation([FromBody] InvitationModel model)
         {
             if (!ModelState.IsValid)
@@ -101,7 +102,7 @@ namespace AirDreams.API.Controllers
                 { 
                     success = true,
                     token = token,
-                    expiresAt = DateTime.UtcNow.AddMinutes(60),
+                    expiresAt = _jwtService.GetTokenExpiration(),
                     message = result.message,
                     user = new 
                     {
@@ -113,7 +114,7 @@ namespace AirDreams.API.Controllers
                 });
             }
 
-            return Unauthorized(new { message = "Email o contraseña incorrecta" });
+            return Unauthorized(new { message = result.message });
         }
     }
 }

@@ -122,7 +122,19 @@ namespace AirDreams.API.Services
             try
             {
                 var user = await _userRepository.GetUserByEmail(model.Email);
+                Console.WriteLine($"EMAIL RECIBIDO: {model.Email}");
 
+                if (user == null)
+                {
+                    Console.WriteLine("USUARIO NO ENCONTRADO");
+                }
+                else
+                {
+                    Console.WriteLine($"USUARIO ENCONTRADO: {user.Email}");
+                    Console.WriteLine($"IS ACTIVE: {user.IsActive}");
+                    Console.WriteLine($"HASH BD: {user.PasswordHash}");
+                    Console.WriteLine($"HASH INPUT: {HashPassword(model.Password)}");
+                }
                 if (user == null)
                 {
                     return (false, "Email o contraseña incorrecta", null);

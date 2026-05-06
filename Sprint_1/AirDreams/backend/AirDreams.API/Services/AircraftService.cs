@@ -24,8 +24,6 @@ namespace AirDreams.API.Services
 
             try
             {
-                aircraft.adminId = GetCurrentUserId();
-
                 var isAdded = aircraftRepository.AddAircraft(aircraft);
 
                 if (!isAdded)
@@ -86,12 +84,6 @@ namespace AirDreams.API.Services
             }
 
             return result;
-        }
-
-        private int GetCurrentUserId()
-        {
-            // TODO: reemplazar por JWT o contexto de autenticación
-            return 1;
         }
     }
 }
