@@ -90,7 +90,6 @@ namespace AirDreams.API.Services
 
         private int GetCurrentUserId()
         {
-            // TODO: reemplazar por JWT o contexto de autenticación
             return 1;
         }
     }

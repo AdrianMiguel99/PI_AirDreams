@@ -14,7 +14,6 @@ namespace AirDreams.API.Repositories
         
         Task<bool> CompleteRegistration(string token, string nombreCompleto, string cedula, string passwordHash);
         
-        // Login
         Task<UserModel?> GetUserByEmail(string email);
         
         Task<UserModel?> GetUserById(int id);

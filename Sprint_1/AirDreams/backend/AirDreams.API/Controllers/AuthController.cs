@@ -11,15 +11,14 @@ namespace AirDreams.API.Controllers
     public class AuthController : ControllerBase
     {
         private readonly IUserService _userService;
-        private readonly IJwtService _jwtService;  // ← NUEVO
+        private readonly IJwtService _jwtService;  
 
-        public AuthController(IUserService userService, IJwtService jwtService)  // ← Inyectar JwtService
+        public AuthController(IUserService userService, IJwtService jwtService) 
         {
             _userService = userService;
             _jwtService = jwtService;
         }
 
-        // Endpoint para administrador envíe invitación (solo Administradores)
         [HttpPost("invite")]
         public async Task<IActionResult> SendInvitation([FromBody] InvitationModel model)
         {
@@ -62,7 +61,6 @@ namespace AirDreams.API.Controllers
             });
         }
 
-        // Endpoint para completar registro (usuario invitado)
         [HttpPost("complete-registration")]
         public async Task<IActionResult> CompleteRegistration([FromBody] CompleteRegistrationModel model)
         {
@@ -93,10 +91,8 @@ namespace AirDreams.API.Controllers
 
             if (result.success && result.user != null)
             {
-                // Generar token JWT directamente con UserModel
                 var token = _jwtService.GenerateToken(result.user);
                 
-                // Respuesta con token
                 return Ok(new 
                 { 
                     success = true,

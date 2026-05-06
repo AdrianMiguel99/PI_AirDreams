@@ -10,7 +10,7 @@ namespace AirDreams.API.Services
         
         public EncryptionService(IConfiguration configuration)
         {
-            _key = configuration["Encryption:Key"] ?? "AirDreamsSecretKey1234567890123456"; // 32 chars
+            _key = configuration["Encryption:Key"] ?? "AirDreamsSecretKey1234567890123456"; 
         }
         
         public string Encrypt(string plainText)
