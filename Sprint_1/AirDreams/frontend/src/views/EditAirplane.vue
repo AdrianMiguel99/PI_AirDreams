@@ -1,14 +1,15 @@
 <template>
   <div class="container mt-5">
-    <h1 class="mb-4 text-center">Editar Aeronave</h1>
+    <h1 class="mb-4 text-center" style="color: #384467; font-family: 'Inter', sans-serif; font-weight: bold;">Editar Aeronave</h1>
 
     <AirplaneForm
       :aeronave="airplane"
       :onSubmit="updateAirplane"
     />
-    <a href="/listPlanes" class="btn btn-secondary mt-3">
-  Volver a lista
-</a>
+    <a href="/listPlanes" class="mt-3" style="background-color: #384467; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px; 
+                          font-family: 'Inter', sans-serif; font-weight: 400;"> 
+      Volver a lista
+    </a>
   </div>
 </template>
 

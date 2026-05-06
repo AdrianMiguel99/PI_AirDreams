@@ -14,19 +14,21 @@
 
   <!-- Título -->
   <div class="container mt-5">
+
+    <div class="d-flex justify-content-end align-items-center">
+      <a href="/listPlanes"class="btn-volver-lista me-3">
+        Listar Aeronaves
+      </a>
+
+      <a href="/admin"class="btn-volver-lista">
+        Regresar
+      </a>
+
+    </div>
+
     <h1 class="letra_bold text-center" style="font-size: 2.5rem;">
       Registro de Aeronave
     </h1>
-
-    <div class="row justify-content-end letra_bold">
-      <div class="col-2">
-        <a href="/listPlanes">
-            <button type="button" class="btn btn-outline-secondary boton_listar">
-              Listar Aeronaves
-            </button>
-        </a>
-      </div>
-    </div>
   </div>
 
  <!-- Formulario -->
@@ -117,5 +119,24 @@ export default {
 .boton_listar:hover {
   background-color: #384467;
   color: white;
+}
+
+.btn-volver-lista {
+
+  display: inline-block;
+
+  background-color: #384467;
+  color: white;
+
+  padding: 10px 20px;
+
+  text-decoration: none;
+
+  border-radius: 8px;
+
+  font-family: 'Inter', sans-serif;
+  font-weight: 500;
+
+  transition: 0.3s;
 }
 </style>
