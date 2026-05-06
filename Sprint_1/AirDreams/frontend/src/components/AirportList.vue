@@ -50,9 +50,7 @@ import AdminHeader from './AdminHeader.vue'
 
 export default {
   name: 'AirportList',
-  components: {
-    AdminHeader
-  },
+  components: { AdminHeader },
   data() {
     return {
       airports: [],
@@ -64,14 +62,24 @@ export default {
     async fetchAirports() {
       this.loading = true
       this.errorMessage = ''
+      const token = localStorage.getItem("token")
+      if (!token) {
+        this.errorMessage = 'Debes iniciar sesión.'
+        this.loading = false
+        return
+      }
       try {
         const res = await axios.get('http://localhost:5276/api/airports', {
-          headers: { 'Admin-ID': '1' }
+          headers: { 'Authorization': `Bearer ${token}` }
         })
         this.airports = res.data
       } catch (error) {
         console.error('Error al obtener aeropuertos:', error)
-        this.errorMessage = 'No se pudieron cargar los aeropuertos.'
+        if (error.response?.status === 401 || error.response?.status === 403) {
+          this.errorMessage = 'No tienes permisos o sesión expirada.'
+        } else {
+          this.errorMessage = 'No se pudieron cargar los aeropuertos.'
+        }
       } finally {
         this.loading = false
       }

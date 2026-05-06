@@ -104,6 +104,9 @@ export default {
     }
   },
   methods: {
+    getToken() {
+      return localStorage.getItem("token");
+    },
     async cargarPaises() {
       try {
         const res = await axios.get('http://localhost:5276/api/locations/countries')
@@ -135,10 +138,16 @@ export default {
         return
       }
       try {
+        const token = this.getToken()
+        if (!token) {
+          this.mensaje = 'Debes iniciar sesión.'
+          this.tipoMensaje = 'alert-danger'
+          return
+        }
         const res = await axios.post('http://localhost:5276/api/airports', this.form, {
           headers: {
             'Content-Type': 'application/json',
-            'Admin-ID': '1'
+            'Authorization': `Bearer ${token}`
           }
         })
         this.mensaje = `Aeropuerto ${res.data.code} registrado con éxito.`
@@ -150,8 +159,14 @@ export default {
         this.form.timeZone = ''
         this.ciudades = []
       } catch (e) {
-        const errMsg = e.response?.data?.error || 'Error al registrar.'
-        this.mensaje = errMsg
+        if (e.response?.status === 401) {
+          this.mensaje = 'Debes iniciar sesión.'
+        } else if (e.response?.status === 403) {
+          this.mensaje = 'No tienes permisos de administrador.'
+        } else {
+          const errMsg = e.response?.data?.error || 'Error al registrar.'
+          this.mensaje = errMsg
+        }
         this.tipoMensaje = 'alert-danger'
       }
     },
@@ -169,7 +184,7 @@ export default {
 </script>
 
 <style scoped>
-/* Sin cambios en los estilos */
+
 .letra_semibold {
   font-family: 'Inter', sans-serif;
   font-weight: 600;
