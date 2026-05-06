@@ -32,7 +32,7 @@ const navigateTo = (path) => {
         <section>
             <h2>Administración de vuelos</h2>
             <div class="cards">
-            <div class="card" @click="navigateTo('/listPlanes')">
+            <div class="card" @click="navigateTo('/addPlane')">
                 <img :src="airplaneIcon" alt="Airplane" class="icon blue">
                 <div>
                 <h3>Tipos de aeronave</h3>
