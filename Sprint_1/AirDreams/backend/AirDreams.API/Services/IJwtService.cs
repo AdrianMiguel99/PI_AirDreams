@@ -8,5 +8,6 @@ namespace AirDreams.API.Services
         string GenerateToken(UserModel user);
         ClaimsPrincipal? ValidateToken(string token);
         int? GetUserIdFromToken(string token);
+        DateTime GetTokenExpiration();
     }
 }
