@@ -1,0 +1,35 @@
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.5.2.0
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Sprint_1", "Sprint_1", "{3CEBA73B-29C9-B8E4-6FF4-896466A3176B}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "AirDreams", "AirDreams", "{EBB92D2C-AD31-9EC0-550B-04C89C5301A7}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "backend", "backend", "{6B7625B5-0D6A-CAC5-57D5-4691876448AB}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AirDreams.API", "Sprint_1\AirDreams\backend\AirDreams.API\AirDreams.API.csproj", "{24CCA27F-A4A5-B617-0C60-7CFE14BB83D8}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{24CCA27F-A4A5-B617-0C60-7CFE14BB83D8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{24CCA27F-A4A5-B617-0C60-7CFE14BB83D8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{24CCA27F-A4A5-B617-0C60-7CFE14BB83D8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{24CCA27F-A4A5-B617-0C60-7CFE14BB83D8}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{EBB92D2C-AD31-9EC0-550B-04C89C5301A7} = {3CEBA73B-29C9-B8E4-6FF4-896466A3176B}
+		{6B7625B5-0D6A-CAC5-57D5-4691876448AB} = {EBB92D2C-AD31-9EC0-550B-04C89C5301A7}
+		{24CCA27F-A4A5-B617-0C60-7CFE14BB83D8} = {6B7625B5-0D6A-CAC5-57D5-4691876448AB}
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {9E729E82-AA21-466C-8B19-D4FF603776E2}
+	EndGlobalSection
+EndGlobal

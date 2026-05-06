@@ -1,0 +1,81 @@
+using System.Data;
+using Microsoft.Data.SqlClient;
+using Dapper;
+using AirDreams.API.Repositories;
+using AirDreams.API.Repositories.Interfaces;
+using AirDreams.API.Services;
+using AirDreams.API.Services.Interfaces;
+using AirDreams.API.DTOs;
+
+var builder = WebApplication.CreateBuilder(args);
+
+builder.Services.AddControllers();
+builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddSwaggerGen();
+
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowVue",
+        policy =>
+        {
+            policy.WithOrigins("http://localhost:5173")
+                .AllowAnyHeader()
+                .AllowAnyMethod();
+        });
+});
+
+builder.Services.AddScoped<IUserRepository, UserRepository>();
+builder.Services.AddScoped<IUserService, UserService>();
+builder.Services.AddScoped<IDbConnection>(sp =>
+    new SqlConnection(builder.Configuration.GetConnectionString("AirDreamsContext")));
+
+builder.Services.AddScoped<IAirportRepository, AirportRepository>();
+builder.Services.AddScoped<IAirportService, AirportService>();
+builder.Services.AddScoped<IRouteRepository, RouteRepository>();
+
+
+// Comentar por ahora hasta que existan bien estos servicios
+// builder.Services.AddScoped<IService<AirportDTO>, AirportService>();
+// builder.Services.AddScoped<IService<AircraftDTO>, AircraftService>();
+// builder.Services.AddScoped<IService<UserDTO>, UserService>();
+// builder.Services.AddScoped<IService<RouteDTO>, RouteService>();
+// builder.Services.AddScoped<IService<FlightDTO>, FlightService>();
+
+builder.Services.AddScoped<AircraftRepository>();
+builder.Services.AddScoped<AircraftService>();
+var app = builder.Build();
+
+using (var scope = app.Services.CreateScope())
+{
+    var connection = scope.ServiceProvider.GetRequiredService<IDbConnection>();
+    connection.Open();
+
+    connection.Execute(@"
+        IF NOT EXISTS (
+            SELECT * 
+            FROM sys.tables 
+            WHERE name = 'Airport'
+        )
+        BEGIN
+            CREATE TABLE Airport (
+                codeAirport VARCHAR(10) PRIMARY KEY,
+                adminID TINYINT NOT NULL,
+                nameAirport VARCHAR(100) NOT NULL,
+                city VARCHAR(100) NOT NULL,
+                country VARCHAR(100) NOT NULL,
+                timeZone VARCHAR(100) NULL
+            );
+        END
+    ");
+}
+if (app.Environment.IsDevelopment())
+{
+    app.UseSwagger();
+    app.UseSwaggerUI();
+}
+
+app.UseRouting();
+app.UseCors("AllowVue");
+app.UseAuthorization();
+app.MapControllers();
+app.Run();
