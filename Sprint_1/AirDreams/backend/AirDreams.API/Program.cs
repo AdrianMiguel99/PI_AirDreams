@@ -76,6 +76,9 @@ builder.Services.AddScoped<IEmailService, EmailService>();
 builder.Services.AddScoped<AircraftRepository>();
 builder.Services.AddScoped<IAircraftService, AircraftService>();
 
+builder.Services.AddScoped<IFlightRepository, FlightRepository>();
+builder.Services.AddScoped<IFlightService, FlightService>();
+
 var app = builder.Build();
 
 if (app.Environment.IsDevelopment())

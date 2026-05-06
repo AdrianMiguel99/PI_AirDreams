@@ -63,7 +63,6 @@ namespace AirDreams.API.Services
 
             if (string.IsNullOrEmpty(username) || string.IsNullOrEmpty(password))
             {
-                // Si no hay configuración SMTP, solo logueamos (modo desarrollo)
                 _logger.LogInformation($"[EMAIL SIMULADO] Para: {to} | Asunto: {subject} | Body: {body}");
                 return;
             }

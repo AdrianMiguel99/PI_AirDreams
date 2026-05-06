@@ -27,7 +27,7 @@ const navigateTo = (path) => {
         <section>
             <h2>Administración de vuelos</h2>
             <div class="cards">
-            <div class="card" @click="navigateTo('/')">
+            <div class="card" @click="navigateTo('/listPlanes')">
                 <img :src="airplaneIcon" alt="Airplane" class="icon blue">
                 <div>
                 <h3>Tipos de aeronave</h3>
@@ -45,7 +45,7 @@ const navigateTo = (path) => {
                 <span class="arrow">›</span>
             </div>
 
-            <div class="card" @click="navigateTo('/admin/airports')">
+            <div class="card" @click="navigateTo('/admin/airports/register')">
                 <img :src="airportIcon" alt="Airport" class="icon blue">
                 <div>
                 <h3>Aeropuertos</h3>

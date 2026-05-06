@@ -31,7 +31,7 @@ namespace AirDreams.API.Repositories
             const string sql = @"INSERT INTO Airport (codeAirport, adminID, nameAirport, city, country, timeZone)
                                 VALUES (@CodeAirport, @AdminID, @NameAirport, @City, @Country, @TimeZone)";
             await _connection.ExecuteAsync(sql, airport);
-            return airport; // no hay identidad, la PK es el código
+            return airport; 
         }
 
         public async Task<bool> ExistsAsync(string code)
