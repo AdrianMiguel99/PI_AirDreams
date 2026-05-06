@@ -14,4 +14,5 @@ namespace AirDreams.API.Models
         public string Message { get; set; } = string.Empty;
         
         public UserDTO? User { get; set; } 
+    }
 }
