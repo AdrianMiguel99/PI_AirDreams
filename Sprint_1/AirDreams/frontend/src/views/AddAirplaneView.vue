@@ -1,6 +1,6 @@
 <template>
   <!-- Icono -->
-  <div class="align-items-center">
+  <div class="d-flex align-items-center">
     <img 
       src="https://i.ibb.co/MxwJ1Y9m/Chat-GPT-Image-7-abr-2026-01-52-40.png"
       class="img-fluid"

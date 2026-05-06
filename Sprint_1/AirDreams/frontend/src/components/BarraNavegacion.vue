@@ -1,20 +1,6 @@
 <template>
   <nav class="navbar">
-    <div class="logo-section">
-      <img src="../assets/logo.png" alt="Air Dreams Logo" class="logo-img" />
-      <span class="logo-text">Air Dreams</span>
-    </div>
-
-    <button
-      v-if="isLoggedIn"
-      type="button"
-      class="btn adminPanel-button" 
-      style = "font-size: 15px;"
-      @click="$router.push({ name: 'admin' })"
-      >
-        Ir al panel administrador
-    </button>
-    
+    <div class="logo">Air Dreams</div>
 
     <div class="links">
       <a href="#">Buscar Vuelos</a>
@@ -37,14 +23,12 @@
 export default {
   data() {
     return {
-      usuario: null,
-      isLoggedIn: false
+      usuario: null
     }
   },
   mounted() {
     this.checkUser();
     window.addEventListener('storage', this.checkUser);
-    this.isLoggedIn = !!localStorage.getItem("token");
   },
   beforeDestroy() {
     window.removeEventListener('storage', this.checkUser);
@@ -79,23 +63,6 @@ export default {
   font-size: 20px;
 }
 
-.logo-section {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
-
-.logo-img {
-  height: 40px;
-  width: auto;
-}
-
-.logo-text {
-  font-weight: bold;
-  font-size: 20px;
-  color: #2f3e5c;
-}
-
 .links {
   display: flex;
   align-items: center;
@@ -125,19 +92,4 @@ export default {
 .user-menu span {
   color: #333;
 }
-
-.adminPanel-button {
-    border: 1px solid #032056;
-    background: white;
-    color: #032056;
-    border-radius: 6px;
-    padding: 10px 16px;
-    cursor: pointer;
-    font-weight: 400;
-}
-
-.adminPanel-button:hover {
-    background: #e0ecff;
-}
-
 </style>

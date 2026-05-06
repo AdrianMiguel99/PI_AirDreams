@@ -1,5 +1,5 @@
 <template>
-  <form @submit.prevent="onSubmit(aeronave)" class="d-flex form-container">
+  <form @submit.prevent="onSubmit(aeronave)" class="form-container">
     <div class="form-subcontainer">
 
       <div class="form-column">

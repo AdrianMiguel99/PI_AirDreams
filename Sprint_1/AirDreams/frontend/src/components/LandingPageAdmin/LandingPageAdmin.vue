@@ -24,11 +24,6 @@ const navigateTo = (path) => {
             Seleccione una opción para gestionar el sistema
         </p>
 
-        <button class="back-button" type="button" @click="navigateTo('/')">
-            Volver al inicio
-        </button>
-
-
         <section>
             <h2>Administración de vuelos</h2>
             <div class="cards">
@@ -94,21 +89,6 @@ const navigateTo = (path) => {
 </template>
 
 <style scoped>
-
-.back-button {
-    border: 1px solid #032056;
-    background: white;
-    color: #032056;
-    border-radius: 8px;
-    padding: 10px 16px;
-    cursor: pointer;
-    font-weight: 600;
-}
-
-.back-button:hover {
-    background: #e0ecff;
-}
-
 .container {
     width: 100%;
     display: flex;
