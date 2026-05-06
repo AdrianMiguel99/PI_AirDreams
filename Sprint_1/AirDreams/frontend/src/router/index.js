@@ -29,8 +29,8 @@ const routes = [
   { path: '/adminHome', name: 'adminHome', component: LandingPageAdmin },
 
   { path: '/admin/flightsRegister', name: 'flightsRegister', component: FlightsRegister },
-  {path: '/admin/routesList', name: 'routesList', component: ListaRutas},
-  //Visualizar usuarios
+  { path: '/admin/routesList', name: 'routesList', component: ListaRutas },
+
   { path: '/admin/usuarios', name: 'adminUsuarios', component: ListaUsuarios },
 
   { path: '/addPlane', name: 'addPlane', component: AddAirplaneView },
