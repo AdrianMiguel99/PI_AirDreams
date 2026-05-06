@@ -141,8 +141,9 @@ export default {
           body: JSON.stringify({
             token: this.token,
             fullName: this.nombreCompleto,
-            documentId: this.cedula,
-            password: this.password
+            id: this.cedula,
+            password: this.password,
+            confirmPassword: this.confirmPassword
           })
         });
 
