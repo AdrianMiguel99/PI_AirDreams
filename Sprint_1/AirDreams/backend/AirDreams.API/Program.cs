@@ -13,6 +13,11 @@ using AirDreams.API.Models;
 
 var builder = WebApplication.CreateBuilder(args);
 
+var emailSettings = builder.Configuration.GetSection("EmailSettings");
+builder.Services.Configure<EmailSettings>(emailSettings);
+
+builder.Services.AddScoped<IEmailService, EmailService>();
+
 var jwtSettingsSection = builder.Configuration.GetSection("JwtSettings");
 builder.Services.Configure<JwtSettings>(jwtSettingsSection);
 var jwtSettings = jwtSettingsSection.Get<JwtSettings>();
@@ -80,6 +85,7 @@ builder.Services.AddScoped<IFlightRepository, FlightRepository>();
 builder.Services.AddScoped<IFlightService, FlightService>();
 
 var app = builder.Build();
+
 
 if (app.Environment.IsDevelopment())
 {

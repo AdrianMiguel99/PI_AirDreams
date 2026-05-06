@@ -1,10 +1,9 @@
-using System.Threading.Tasks;
-
 namespace AirDreams.API.Services
 {
     public interface IEmailService
     {
-        Task SendInvitationEmail(string email, string token, string Role);
-        Task SendWelcomeEmail(string email, string FullName);
+        Task SendInvitationEmail(string toEmail, string token, string role);
+        
+        Task SendWelcomeEmail(string toEmail, string fullName);
     }
 }
