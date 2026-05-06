@@ -36,11 +36,11 @@ namespace AirDreams.API.Services
         {
             try
             {
-                // Validar que el correo no exista ya (ni como invitación pendiente ni como usuario activo)
-                var exists = await _userRepository.ExistsByEmail(model.Correo);
+                // Validar que el Email no exista ya (ni como invitación pendiente ni como usuario activo)
+                var exists = await _userRepository.ExistsByEmail(model.Email);
                 if (exists)
                 {
-                    return (false, "El correo ya tiene una invitación pendiente o ya está registrado");
+                    return (false, "El Email ya tiene una invitación pendiente o ya está registrado");
                 }
 
                 var token = GenerateUniqueToken();
@@ -48,11 +48,11 @@ namespace AirDreams.API.Services
                 var expiryDate = DateTime.UtcNow.AddHours(expiryHours);
 
                 // Crear invitación en BD
-                var userId = await _userRepository.CreateInvitation(model.Correo, model.TipoUsuario, token, expiryDate);
+                var userId = await _userRepository.CreateInvitation(model.Email, model.Role, token, expiryDate);
 
                 if (userId > 0)
                 {
-                    await _emailService.SendInvitationEmail(model.Correo, token, model.TipoUsuario);
+                    await _emailService.SendInvitationEmail(model.Email, token, model.Role);
                     return (true, "Invitación enviada exitosamente");
                 }
 
@@ -79,12 +79,12 @@ namespace AirDreams.API.Services
                     return (false, "La invitación ha expirado. Solicita una nueva invitación");
                 }
 
-                if (!IsValidCostaRicanId(model.Cedula))
+                if (!IsValidCostaRicanId(model.id))
                 {
                     return (false, "Formato de cédula inválido. Debe ser 0-0000-0000");
                 }
 
-                if (!IsValidName(model.NombreCompleto))
+                if (!IsValidName(model.FullName))
                 {
                     return (false, "El nombre no puede contener números");
                 }
@@ -94,19 +94,18 @@ namespace AirDreams.API.Services
                     return (false, "La contraseña debe tener al menos 8 caracteres, una mayúscula, un número y un carácter especial");
                 }
 
-                // Encriptar contraseña
                 var passwordHash = HashPassword(model.Password);
 
                 var success = await _userRepository.CompleteRegistration(
                     model.Token, 
-                    model.NombreCompleto, 
-                    model.Cedula, 
+                    model.FullName, 
+                    model.id, 
                     passwordHash
                 );
 
                 if (success)
                 {
-                    await _emailService.SendWelcomeEmail(invitation.Email, model.NombreCompleto);
+                    await _emailService.SendWelcomeEmail(invitation.Email, model.FullName);
                     return (true, "Registro completado exitosamente. Ya puedes iniciar sesión");
                 }
 
@@ -122,16 +121,16 @@ namespace AirDreams.API.Services
         {
             try
             {
-                var user = await _userRepository.GetUserByEmail(model.Correo);
+                var user = await _userRepository.GetUserByEmail(model.Email);
 
                 if (user == null)
                 {
-                    return (false, "Correo o contraseña incorrecta", null);
+                    return (false, "Email o contraseña incorrecta", null);
                 }
 
                 if (!user.IsActive)
                 {
-                    return (false, "Debes completar tu registro usando el link que recibiste por correo", null);
+                    return (false, "Debes completar tu registro usando el link que recibiste por Email", null);
                 }
 
                 if (string.IsNullOrEmpty(user.PasswordHash))
@@ -141,7 +140,7 @@ namespace AirDreams.API.Services
 
                 if (!VerifyPassword(model.Password, user.PasswordHash))
                 {
-                    return (false, "Correo o contraseña incorrecta", null);
+                    return (false, "Email o contraseña incorrecta", null);
                 }
 
                 return (true, "Login exitoso", user);
@@ -176,11 +175,18 @@ namespace AirDreams.API.Services
                     };
                 }
 
+                string role = "";
+                var prop = invitation.GetType().GetProperty("Role");
+                if (prop != null)
+                    role = prop.GetValue(invitation)?.ToString() ?? "";
+                else
+                    role = "Employee";
+
                 return new InvitationValidationResult
                 {
                     IsValid = true,
                     Email = invitation.Email,
-                    TipoUsuario = invitation.TipoUsuario,
+                    Role = role,
                     Message = "Token válido"
                 };
             }
@@ -205,16 +211,14 @@ namespace AirDreams.API.Services
                 .Replace("=", "");
         }
 
-        private bool IsValidCostaRicanId(string cedula)
+        private bool IsValidCostaRicanId(string id)
         {
-            // Formato: 0-0000-0000
             var regex = new System.Text.RegularExpressions.Regex(@"^\d{1}-\d{4}-\d{4}$");
-            return regex.IsMatch(cedula);
+            return regex.IsMatch(id);
         }
 
         private bool IsValidName(string nombre)
         {
-            // Solo letras, espacios, acentos y ñ
             var regex = new System.Text.RegularExpressions.Regex(@"^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]+$");
             return regex.IsMatch(nombre) && nombre.Length <= 50;
         }

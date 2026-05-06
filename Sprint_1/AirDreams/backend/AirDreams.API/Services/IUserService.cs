@@ -6,16 +6,12 @@ namespace AirDreams.API.Services
 {
     public interface IUserService
     {
-        // Administrador envía invitación
         Task<(bool success, string message)> SendInvitation(InvitationModel model);
         
-        // Usuario completa registro
         Task<(bool success, string message)> CompleteRegistration(CompleteRegistrationModel model);
         
-        // Login
         Task<(bool success, string message, UserModel? user)> Login(LoginModel model);
         
-        // Validar token de invitación
         Task<InvitationValidationResult?> ValidateInvitationToken(string token);
 
         List<UserDTO> GetAll();
@@ -29,7 +25,7 @@ namespace AirDreams.API.Services
 
         public string Email { get; set; } = string.Empty;
 
-        public string TipoUsuario { get; set; } = string.Empty;
+        public string Role { get; set; } = string.Empty;
         
         public string Message { get; set; } = string.Empty;
     }

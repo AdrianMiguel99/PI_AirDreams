@@ -2,13 +2,13 @@ namespace AirDreams.API.Models
 {
     public class RegisterUserModel
     {
-        public string NombreCompleto { get; set; } = string.Empty;
+        public string FullName { get; set; } = string.Empty;
 
-        public string TipoUsuario { get; set; } = string.Empty;
+        public string Role { get; set; } = string.Empty;
 
-        public string Correo { get; set; } = string.Empty;
+        public string Email { get; set; } = string.Empty;
 
-        public string Cedula { get; set; } = string.Empty;
+        public string id { get; set; } = string.Empty;
 
         public string PasswordHash { get; set; } = string.Empty;
 
