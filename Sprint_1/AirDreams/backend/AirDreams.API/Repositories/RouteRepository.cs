@@ -7,6 +7,15 @@ public class RouteRepository : IRouteRepository
 {
     private readonly IDbConnection _connection;
 
+    private static DateTime GetNextDateForDay(DateTime startDate, string dayOfWeek)
+    {
+        var targetDay = Enum.Parse<DayOfWeek>(dayOfWeek, true);
+
+        var daysToAdd = ((int)targetDay - (int)startDate.DayOfWeek + 7) % 7;
+
+        return startDate.AddDays(daysToAdd);
+    }
+
     public RouteRepository(IDbConnection connection)
     {
         _connection = connection;
@@ -75,6 +84,25 @@ public class RouteRepository : IRouteRepository
                 VALUES (@IdRoute, @DayOfWeek, @DepartureTime, @EstimatedArrivalTime, @StartingDate, @EndingDate, @Active);
             ";
 
+            var insertFlight = @"
+                INSERT INTO Flight (
+                    numberFlight,
+                    routeId,
+                    boardingGate,
+                    priceLuggage,
+                    departureDate
+                    )
+                VALUES (
+                    @NumberFlight,
+                    @RouteId,
+                    @BoardingGate,
+                    @PriceLuggage,
+                    @DepartureDate
+                );
+            ";
+
+            int index = 1;
+
             foreach (var f in model.Frequencies)
             {
                 var p = new {
@@ -87,6 +115,18 @@ public class RouteRepository : IRouteRepository
                     Active = f.Active ? 1 : 0
                 };
                 await _connection.ExecuteAsync(insertFreq, p, tran);
+
+                var flight = new {
+                    NumberFlight = $"F{routeId:D3}{index:D2}",
+                    RouteId = routeId,
+                    BoardingGate = 1,
+                    PriceLuggage = model.PriceLuggage,
+                    DepartureDate = GetNextDateForDay(f.StartingDate.Date, f.DayOfWeek)
+                };
+
+                await _connection.ExecuteAsync(insertFlight, flight, tran);
+
+                index++;
             }
 
             tran.Commit();
