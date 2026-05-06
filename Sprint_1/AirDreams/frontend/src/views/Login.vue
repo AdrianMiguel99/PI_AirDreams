@@ -76,7 +76,7 @@ export default {
           localStorage.setItem("role", data.user.role);
           localStorage.setItem("employeeID", data.user.id);
 
-          this.$router.push("/");
+          this.$router.push({name: "admin"});
         } else {
           this.mensaje = data.message || "Correo o contraseña incorrecta";
           this.errorCorreo = true;

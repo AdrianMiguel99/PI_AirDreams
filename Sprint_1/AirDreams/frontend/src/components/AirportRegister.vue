@@ -1,7 +1,7 @@
 <template>
   <div class="container">
     <AdminHeader />
-    <div class="page">
+    <div class="d-flex page">
       <div class="content">
         <h1>Gestión de Aeropuertos</h1>
         <p class="subtitle">Registra un nuevo aeropuerto.</p>

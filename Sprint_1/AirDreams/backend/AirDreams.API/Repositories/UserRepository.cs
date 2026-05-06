@@ -92,56 +92,53 @@ namespace AirDreams.API.Repositories
         }
 
         public async Task<int> CreateInvitation(
-    string email,
-    string role,
-    string token,
-    DateTime expiryDate)
+            string email,
+            string role,
+            string token,
+            DateTime expiryDate)
         {
-            var userIdSql = @"
-        SELECT ISNULL(MAX(userID), 0) + 1
-        FROM SystemUser;
-    ";
+    
 
-            var newUserId = await _dbConnection.ExecuteScalarAsync<int>(userIdSql);
+            var newUserId = await _dbConnection.ExecuteScalarAsync<int>( 
+                "INSERT INTO SystemUser DEFAULT VALUES; SELECT CAST(SCOPE_IDENTITY() AS TINYINT);"
+                );
 
             var sql = @"
 
-        INSERT INTO SystemUser (userID)
-        VALUES (@UserID);
 
-        INSERT INTO InternalUser (
-            emailUser,
-            userID,
-            hashPasswordUser,
-            isActive,
-            invitationToken,
-            invitationExpiryDate
-        )
-        VALUES (
-            @Email,
-            @UserID,
-            '',
-            0,
-            @Token,
-            @ExpiryDate
-        );
+            INSERT INTO InternalUser (
+                emailUser,
+                userID,
+                hashPasswordUser,
+                isActive,
+                invitationToken,
+                invitationExpiryDate
+            )
+            VALUES (
+                @Email,
+                @UserID,
+                '',
+                0,
+                @Token,
+                @ExpiryDate
+            );
 
-        INSERT INTO AirlineEmployee (
-            employeeID,
-            emailInternalUser,
-            nameEmployee,
-            lastnames,
-            isAdmin,
-            isOperator
-        )
-        VALUES (
-            @UserID,
-            @Email,
-            '',
-            '',
-            @IsAdmin,
-            @IsOperator
-        );
+            INSERT INTO AirlineEmployee (
+                employeeID,
+                emailInternalUser,
+                nameEmployee,
+                lastnames,
+                isAdmin,
+                isOperator
+            )
+            VALUES (
+                @UserID,
+                @Email,
+                '',
+                '',
+                @IsAdmin,
+                @IsOperator
+            );
     ";
 
             await _dbConnection.ExecuteAsync(sql, new

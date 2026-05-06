@@ -1,9 +1,12 @@
 <template>
-    <div class="container">
+    <div class="d-flex container">
     <AdminHeader />
 
     <div class="header-section">
-    <h2>Rutas registradas</h2>
+        <h2>Rutas registradas</h2>
+        <button class="btn btn_listar" @click="irARegistro">
+            Registrar vuelo
+        </button>
     </div>
 
     <div v-if="loading" class="state-message">Cargando rutas...</div>
@@ -58,48 +61,59 @@ data() {
 async fetchRoutes() {
     this.loading = true
     this.errorMessage = ''
-
-    try {
-    // usa la URL relativa para aprovechar proxy Vite si lo tienes: '/api/routes'
-    const response = await axios.get('/api/routes')
-    const raw = response.data || []
-
-    console.log('RAW routes:', response.data);
-    console.log('Primer route:', response.data?.[0]);
-    console.log('Departure airport:', response.data?.[0]?.departureAirport);
-
-    // Normalizar cada ruta a los campos que usa la UI
-    this.routes = raw.map(r => {
-    const routeID =  r.id || null
-    const codeSalida = r.departureAirport.code + ' - ' + r.departureAirport.name  || ''
-    const codeLlegada = r.arrivalAirport.code + ' - ' + r.arrivalAirport.name || ''
-      // tomar duración desde stimatedTime (puede venir como "hh:mm:ss" o TimeSpan)
-    let flightDuration = ''
-    const st = r.stimatedTime || r.StimatedTime || r.duration || r.Duracion || ''
-    if (st && typeof st === 'string') {
-        const parts = st.split(':')
-        if (parts.length >= 2) {
-          const minutes = Number(parts[0]) * 60 + Number(parts[1])
-        flightDuration = minutes
-        } else {
-        flightDuration = st
+    const token = localStorage.getItem("token")
+        if (!token) {
+            this.errorMessage = 'Debes iniciar sesión.'
+            this.loading = false
+            return
         }
-    }
-    const basePrice = r.turistClassPrice || r.touristPrice || r.basePrice || r.BasePrice || r.firstClassPrice || 0
+        try {
+        // usa la URL relativa para aprovechar proxy Vite si lo tienes: '/api/routes'
+        const res = await axios.get('http://localhost:5276/api/routes', {
+            headers: { Authorization: `Bearer ${token}` }
+        })
+        const raw = res.data || []
 
-    return {
-        routeID,
-        codeAirportSalida: codeSalida,
-        codeAirportLlegada: codeLlegada,
-        flightDuration,
-        basePrice
-    }
-    })
-    } catch (error) {
-    console.error('Error fetching routes:', error)
-    this.errorMessage = 'No se pudieron cargar las rutas.'
-    } finally {
-    this.loading = false
+        console.log('RAW routes:', res.data);
+        console.log('Primer route:', res.data?.[0]);
+        console.log('Departure airport:', res.data?.[0]?.departureAirport);
+
+        // Normalizar cada ruta a los campos que usa la UI
+        this.routes = raw.map(r => {
+        const routeID =  r.id || null
+        const codeSalida = r.departureAirport.code + ' - ' + r.departureAirport.name  || ''
+        const codeLlegada = r.arrivalAirport.code + ' - ' + r.arrivalAirport.name || ''
+        // tomar duración desde stimatedTime (puede venir como "hh:mm:ss" o TimeSpan)
+        let flightDuration = ''
+        const st = r.stimatedTime || r.StimatedTime || r.duration || r.Duracion || ''
+        if (st && typeof st === 'string') {
+            const parts = st.split(':')
+            if (parts.length >= 2) {
+            const minutes = Number(parts[0]) * 60 + Number(parts[1])
+            flightDuration = minutes
+            } else {
+            flightDuration = st
+            }
+        }
+        const basePrice = r.turistClassPrice || r.touristPrice || r.basePrice || r.BasePrice || r.firstClassPrice || 0
+
+        return {
+            routeID,
+            codeAirportSalida: codeSalida,
+            codeAirportLlegada: codeLlegada,
+            flightDuration,
+            basePrice
+        }
+        })
+        } catch (error) {
+            console.error('Error al obtener rutas:', error)
+            if (error.response?.status === 401 || error.response?.status === 403) {
+            this.errorMessage = 'No tienes permisos o sesión expirada.'
+            } else {
+            this.errorMessage = 'No se pudieron cargar las rutas.'
+            }
+        } finally {
+        this.loading = false
     }
 }
     },
