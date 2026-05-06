@@ -6,5 +6,7 @@ namespace AirDreams.API.DTOs
         public decimal CarryOnPrice { get; set; }
         public decimal CheckedPrice { get; set; }
         public RouteDTO Route { get; set; }
+
+        public DateTime DepartureDate { get; set; }
     }
 }

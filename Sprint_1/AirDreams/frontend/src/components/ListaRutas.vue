@@ -1,5 +1,5 @@
 <template>
-    <div class="d-flex container">
+    <div class=" container">
     <AdminHeader />
 
     <div class="header-section">
@@ -16,7 +16,7 @@
         No hay rutas registradas.
     </div>
 
-    <div v-else class="table-wrapper">
+    <div v-else class="d-flex table-wrapper">
         <table>
         <thead>
             <tr>
@@ -58,6 +58,9 @@ data() {
     }
 },
     methods: {
+        irARegistro(){
+            this.$router.push({ name: 'flightsRegister' });
+        },
 async fetchRoutes() {
     this.loading = true
     this.errorMessage = ''

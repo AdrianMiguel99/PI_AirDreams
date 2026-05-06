@@ -192,54 +192,85 @@ export default {
       return `${date}T${timeType === 'start' ? '00:00' : '23:59'}`;
     },
     async searchFlights() {
-      if (!this.validateForm()) {
+  if (!this.validateForm()) {
+    return;
+  }
+
+  const data = this.tripType === 'roundTrip' ? this.roundTrip : this.oneWay;
+
+  try {
+    if (this.tripType === 'oneWay') {
+      const params = new URLSearchParams({
+        origin: data.origin,
+        destination: data.destination,
+        departureDate: this.formatDateWithTime(data.departureDate, 'start'),
+        returnDate: this.formatDateWithTime(data.departureDate, 'end'),
+        passengers: data.passengers
+      });
+
+      const response = await fetch(`http://localhost:5276/api/flights/search?${params.toString()}`);
+      const result = await response.json();
+
+      if (!response.ok) {
+        alert(result.description || 'Error al buscar vuelos');
         return;
       }
-      const data = this.tripType === 'roundTrip' ? this.roundTrip : this.oneWay;
-      
-      let departureDate, returnDate;
-      
-      if (this.tripType === 'roundTrip') {
-        departureDate = this.formatDateWithTime(data.departureDate, 'start');
-        returnDate = this.formatDateWithTime(data.returnDate, 'end');
-      } else {
-        departureDate = this.formatDateWithTime(data.departureDate, 'start');
-        returnDate = this.formatDateWithTime(data.departureDate, 'end');
-      }
-      
-      try {
-        const params = new URLSearchParams({
-          origin: data.origin,
-          destination: data.destination,
-          departureDate: departureDate,
-          returnDate: returnDate,
-          passengers: data.passengers
-        });
-        
-        const response = await fetch(`http://localhost:5276/api/flights/search?${params.toString()}`, {
-          method: 'GET',
-          headers: {
-            'Content-Type': 'application/json'
-          }
-        });
-        
-        if (response.ok) {
-          const result = await response.json();
-          this.$emit('search', {
-            type: this.tripType,
-            ...data,
-            flights: result.flights,
-            departureDate: data.departureDate
-          });
-        } else {
-          const error = await response.json();
-          alert(error.description || 'Error al buscar vuelos');
-        }
-      } catch (error) {
-        console.error('Error:', error);
-        alert('Error de conexión al buscar vuelos');
-      }
+
+      this.$emit('search', {
+        type: 'oneWay',
+        outboundFlights: result.flights || [],
+        returnFlights: [],
+        departureDate: data.departureDate
+      });
+
+      return;
     }
+
+    const outboundParams = new URLSearchParams({
+      origin: data.origin,
+      destination: data.destination,
+      departureDate: this.formatDateWithTime(data.departureDate, 'start'),
+      returnDate: this.formatDateWithTime(data.departureDate, 'end'),
+      passengers: data.passengers
+    });
+
+    const returnParams = new URLSearchParams({
+      origin: data.destination,
+      destination: data.origin,
+      departureDate: this.formatDateWithTime(data.returnDate, 'start'),
+      returnDate: this.formatDateWithTime(data.returnDate, 'end'),
+      passengers: data.passengers
+    });
+
+    const outboundResponse = await fetch(`http://localhost:5276/api/flights/search?${outboundParams.toString()}`);
+    const returnResponse = await fetch(`http://localhost:5276/api/flights/search?${returnParams.toString()}`);
+
+    const outboundResult = await outboundResponse.json();
+    const returnResult = await returnResponse.json();
+
+    if (!outboundResponse.ok) {
+      alert(outboundResult.description || 'Error al buscar vuelos de ida');
+      return;
+    }
+
+    if (!returnResponse.ok) {
+      alert(returnResult.description || 'Error al buscar vuelos de regreso');
+      return;
+    }
+
+    this.$emit('search', {
+      type: 'roundTrip',
+      outboundFlights: outboundResult.flights || [],
+      returnFlights: returnResult.flights || [],
+      departureDate: data.departureDate,
+      returnDate: data.returnDate
+    });
+
+  } catch (error) {
+    console.error('Error:', error);
+    alert('Error de conexión al buscar vuelos');
+  }
+  }
   }
 };
 </script>

@@ -33,11 +33,10 @@ namespace AirDreams.API.Repositories
         )
         {
             const string sql = @"
-                SELECT 
+            SELECT
                     f.numberFlight AS FlightNumber,
                     r.idRoute AS RouteId,
-                    ff.dayOfWeek AS DayOfWeek,
-                    CAST(ff.startingDate AS DATE) AS OperatingDate,
+                    f.departureDate AS DepartureDate,
                     CONVERT(VARCHAR(8), ff.departureTime, 108) AS DepartureTime,
                     CONVERT(VARCHAR(8), ff.estimatedArrivalTime, 108) AS ArrivalTime,
                     r.stimatedTime AS Duration,
@@ -50,7 +49,8 @@ namespace AirDreams.API.Repositories
                     a1.city AS DepartureCity,
                     a2.codeAirport AS ArrivalAirportCode,
                     a2.nameAirport AS ArrivalAirportName,
-                    a2.city AS ArrivalCity
+                    a2.city AS ArrivalCity,
+                    (ac.cantPasajeros - ISNULL((SELECT COUNT(*) FROM CheckIn WHERE flightNumber = f.numberFlight), 0)) AS AvailableSeats
 
                 FROM Flight f
                 INNER JOIN Route r ON f.routeId = r.idRoute
@@ -60,13 +60,15 @@ namespace AirDreams.API.Repositories
                 INNER JOIN Aircraft ac ON r.plateNumber = ac.plateNumber
 
                 WHERE r.codeAirportSalida = @origin
-                  AND r.codeAirportLlegada = @destination
-                  AND ac.cantPasajeros >= @quantityOfPassengers
-                  AND ff.active = 1
-                  AND ff.startingDate <= CAST(@searchEndDate AS DATE)
-                  AND ff.endingDate >= CAST(@searchStartDate AS DATE)
-                  AND ff.departureTime >= CAST(@searchStartTime AS TIME)
-                  AND ff.departureTime <= CAST(@searchEndTime AS TIME)
+                AND r.codeAirportLlegada = @destination
+                AND ac.cantPasajeros >= @quantityOfPassengers
+                AND ff.active = 1
+                AND r.routeState NOT IN ('Canceled')
+                AND f.departureDate >= CAST(@searchStartDate AS DATE)
+                AND f.departureDate <= CAST(@searchEndDate AS DATE)
+                AND ff.departureTime >= CAST(@searchStartTime AS TIME)
+                AND ff.departureTime <= CAST(@searchEndTime AS TIME)
+                AND (ac.cantPasajeros - ISNULL((SELECT COUNT(*) FROM CheckIn WHERE flightNumber = f.numberFlight), 0)) >= @quantityOfPassengers
             ";
 
             var searchStartDate = earliestDeparture.Date;

@@ -15,7 +15,7 @@
             </div>
             <div class="time-item">
               <span class="time">{{ flight.route.arrivalTime }}</span>
-              <span class="date">{{ formatDate(departureDate) }}</span>
+              <span class="date">{{ formatDate(flight.departureDate) }}</span>
             </div>
           </div>
 
