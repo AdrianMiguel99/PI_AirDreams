@@ -4,19 +4,26 @@
     <BarraNavegacion />
     <SeccionHero />
 
+    <FormularioBusqueda @search="handleSearch" />
 
-    <FormularioBusqueda />
+    <div 
+      v-if="searchPerformed && flights.length === 0" 
+      class="no-results"
+    >
+      No hay vuelos disponibles para los filtros seleccionados
+    </div>
 
     <ListaVuelos 
-      v-if="busquedaRealizada"
-      :vuelos="vuelosPaginados" 
+      v-if="searchPerformed && flights.length > 0"
+      :flights="paginatedFlights"
+      :departureDate="departureDate"
     />
 
     <Paginacion 
-      v-if="busquedaRealizada"
-      :total="vuelos.length" 
-      :porPagina="10"
-      @cambiarPagina="cambiarPagina"
+      v-if="searchPerformed && flights.length > 0"
+      :total="flights.length" 
+      :perPage="10"
+      @changePage="changePage"
     />
   </div>
 </template>
@@ -39,16 +46,17 @@ export default {
 
   data() {
     return {
-      paginaActual: 1,
-      vuelos: [],
-      busquedaRealizada: false,
+      currentPage: 1,
+      flights: [],
+      searchPerformed: false,
+      departureDate: ''
     };
   },
 
   computed: {
-    vuelosPaginados() {
-      const inicio = (this.paginaActual - 1) * 10;
-      return this.vuelos.slice(inicio, inicio + 10);
+    paginatedFlights() {
+      const start = (this.currentPage - 1) * 10;
+      return this.flights.slice(start, start + 10);
     }
     
   },
@@ -57,17 +65,30 @@ export default {
 
 
   methods: {
-    buscarVuelos() {
-      this.busquedaRealizada = true;
-      // Aquí iría la llamada a la API de vuelos
+    handleSearch(data) {
+      this.flights = data.flights || [];
+      this.departureDate = data.departureDate;
+      this.searchPerformed = true;
+      this.currentPage = 1;
     },
 
-    cambiarPagina(pagina) {
-      this.paginaActual = pagina;
-    },
-
-    
+    changePage(page) {
+      this.currentPage = page;
+    }
   }
 };
 </script>
 
+<style scoped>
+.no-results {
+  width: 80%;
+  margin: 20px auto;
+  padding: 20px;
+  text-align: center;
+  background: #f4f6fb;
+  border-radius: 10px;
+  color: #032056;
+  font-weight: 600;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+}
+</style>

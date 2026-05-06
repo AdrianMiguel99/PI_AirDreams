@@ -1,6 +1,9 @@
 <template>
   <nav class="navbar">
-    <div class="logo">Air Dreams</div>
+    <div class="logo-section">
+      <img src="../assets/logo.png" alt="Air Dreams Logo" class="logo-img" />
+      <span class="logo-text">Air Dreams</span>
+    </div>
 
     <button
       v-if="isLoggedIn"
@@ -74,6 +77,23 @@ export default {
 .logo {
   font-weight: bold;
   font-size: 20px;
+}
+
+.logo-section {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.logo-img {
+  height: 40px;
+  width: auto;
+}
+
+.logo-text {
+  font-weight: bold;
+  font-size: 20px;
+  color: #2f3e5c;
 }
 
 .links {
