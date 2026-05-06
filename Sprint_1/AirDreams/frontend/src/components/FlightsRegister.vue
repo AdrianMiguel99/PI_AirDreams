@@ -356,7 +356,7 @@
     methods: {
         async loadAirports(){
             try {
-                const res = await axios.get('/api/airports', {
+                const res = await axios.get('/api/Airports', {
                 headers: { 'Admin-ID': '1' } 
             });
             // adapter según la forma del DTO que devuelva el backend
