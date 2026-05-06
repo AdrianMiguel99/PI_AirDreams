@@ -65,13 +65,31 @@ export default {
 
   methods: {
     saveAirplane(aeronave) {
-      axios.post('http://localhost:5276/api/Airplane', aeronave).then(() => {
-          alert('Aeronave registrada correctamente');
-        })
-        .catch(() => {
-          alert('Error al registrar aeronave');
-        });
-    },
+
+      const token = localStorage.getItem("token");
+      axios.post('http://localhost:5276/api/Airplane',aeronave,
+      {
+        headers: {Authorization: `Bearer ${token}`}
+      })
+      .then(() => {
+        alert('Aeronave registrada correctamente');
+      })
+      .catch((error) => {
+        console.error(error);
+
+        if (error.response?.status === 401) {
+          alert('Debes iniciar sesión');
+        return;
+        }
+
+        if (error.response?.status === 403) {
+          alert('No tienes permisos');
+          return;
+        }
+
+        alert('Error al registrar aeronave');
+      });
+    }
   }
 }
 </script>
