@@ -19,7 +19,7 @@
       No hay aeropuertos registrados.
     </div>
 
-    <div v-else class="table-wrapper">
+    <div v-else class="d-flex table-wrapper">
       <table>
         <thead>
           <tr>

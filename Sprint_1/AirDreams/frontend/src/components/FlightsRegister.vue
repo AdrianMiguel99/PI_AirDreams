@@ -3,13 +3,23 @@
         <AdminHeader />
         <div class="page">
             <div class="content">
-        <h1 class="page-title mb-2">Gestión de Vuelos</h1>
+        <h1 class="page-title m3b-2">Gestión de Vuelos</h1>
         <p class="page-subtitle mb-4">
             Registra nuevos vuelos y consulta los vuelos existentes.
         </p>
 
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <button class="btn boton_listar" @click="volverAlPanel">
+                ← Volver al panel
+            </button>
+            <button class="btn boton_listar" @click="irALista">
+                Listar Rutas
+            </button>
+        </div>
+
+
         <div class="card flight-card p-4 shadow-sm mb-5">
-        <h3 class="section-title mb-3">Registrar Vuelo</h3>
+        <h3 class="d-flex section-title mb-3">Registrar Vuelo</h3>
 
         <form @submit.prevent="saveFlight">
             <div class="row">
@@ -439,6 +449,12 @@
             this.formData.destinationAirport = airport.code;
             this.showDestinationResults = false;
         },
+        irALista() {
+        this.$router.push('/admin/routesList')
+        },
+        volverAlPanel() {
+        this.$router.push('/admin')
+        },
         async saveFlight() {
             console.log("Formulario a guardar:", this.formData);
 
@@ -529,6 +545,19 @@
 </script>
 
 <style scoped>
+
+    .boton_listar {
+    font-family: 'Inter', sans-serif;
+    color: #384467;
+    font-weight: 600;
+    border: 2px solid #384467;
+    background: transparent;
+    }
+    .boton_listar:hover {
+    background-color: #384467;
+    color: white;
+    }
+
     .frequency-box {
         display: flex;
         flex-wrap: wrap;

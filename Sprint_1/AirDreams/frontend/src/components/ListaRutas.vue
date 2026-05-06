@@ -1,9 +1,12 @@
 <template>
-    <div class="container">
+    <div class="d-flex container">
     <AdminHeader />
 
     <div class="header-section">
-    <h2>Rutas registradas</h2>
+        <h2>Rutas registradas</h2>
+        <button class="btn btn_listar" @click="irARegistro">
+            Registrar vuelo
+        </button>
     </div>
 
     <div v-if="loading" class="state-message">Cargando rutas...</div>
@@ -64,16 +67,16 @@ async fetchRoutes() {
             this.loading = false
             return
         }
-    try {
+        try {
         // usa la URL relativa para aprovechar proxy Vite si lo tienes: '/api/routes'
         const res = await axios.get('http://localhost:5276/api/routes', {
-            headers: { 'Authorization': `Bearer ${token}` }
+            headers: { Authorization: `Bearer ${token}` }
         })
-        const raw = response.data || []
+        const raw = res.data || []
 
-        console.log('RAW routes:', response.data);
-        console.log('Primer route:', response.data?.[0]);
-        console.log('Departure airport:', response.data?.[0]?.departureAirport);
+        console.log('RAW routes:', res.data);
+        console.log('Primer route:', res.data?.[0]);
+        console.log('Departure airport:', res.data?.[0]?.departureAirport);
 
         // Normalizar cada ruta a los campos que usa la UI
         this.routes = raw.map(r => {
