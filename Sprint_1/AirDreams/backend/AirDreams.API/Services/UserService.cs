@@ -36,7 +36,6 @@ namespace AirDreams.API.Services
         {
             try
             {
-                // Validar que el Email no exista ya (ni como invitación pendiente ni como usuario activo)
                 var exists = await _userRepository.ExistsByEmail(model.Email);
                 if (exists)
                 {
@@ -47,7 +46,6 @@ namespace AirDreams.API.Services
                 var expiryHours = _configuration.GetValue<int>("AppSettings:InvitationExpiryHours", 48);
                 var expiryDate = DateTime.UtcNow.AddHours(expiryHours);
 
-                // Crear invitación en BD
                 var userId = await _userRepository.CreateInvitation(model.Email, model.Role, token, expiryDate);
 
                 if (userId > 0)
