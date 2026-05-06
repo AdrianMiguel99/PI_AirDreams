@@ -1,88 +1,98 @@
-using System;
-using System.Net;
-using System.Net.Mail;
-using System.Threading.Tasks;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Logging;
+using MailKit.Net.Smtp;
+using MailKit.Security;
+using Microsoft.Extensions.Options;
+using MimeKit;
+using AirDreams.API.Models;
 
 namespace AirDreams.API.Services
 {
     public class EmailService : IEmailService
     {
-        private readonly IConfiguration _configuration;
+        private readonly EmailSettings _emailSettings;
         private readonly ILogger<EmailService> _logger;
 
-        public EmailService(IConfiguration configuration, ILogger<EmailService> logger)
+        public EmailService(IOptions<EmailSettings> emailSettings, ILogger<EmailService> logger)
         {
-            _configuration = configuration;
+            _emailSettings = emailSettings.Value;
             _logger = logger;
         }
 
-        public async Task SendInvitationEmail(string email, string token, string Role)
+        public async Task SendInvitationEmail(string toEmail, string token, string role)
         {
-            var baseUrl = _configuration["AppSettings:BaseUrl"] ?? "https://localhost:5173";
-            var link = $"{baseUrl}/completar-registro?token={token}";
+            var frontendUrl = "http://localhost:5173";
+            var registerLink = $"{frontendUrl}/completar-registro?token={token}";
 
-            var subject = "Bienvenido al sistema de Air Dreams";
+            var subject = "Invitación a AirDreams";
             var body = $@"
-                <h2>Bienvenido al sistema de Air Dreams</h2>
-                <p>Has sido invitado como <strong>{Role}</strong> a la plataforma.</p>
-                <p>Utilice el siguiente link para completar su registro:</p>
-                <p><a href='{link}'>{link}</a></p>
-                <p>Este link expirará en 48 horas.</p>
-                <br/>
-                <p>Saludos,<br/>Equipo de Air Dreams</p>
+                <h1>¡Bienvenido a AirDreams!</h1>
+                <p>Has sido invitado como <strong>{role}</strong>.</p>
+                <p>Haz clic en el siguiente enlace para completar tu registro:</p>
+                <a href='{registerLink}' style='background-color:#4CAF50;color:white;padding:10px 20px;text-decoration:none;border-radius:5px;'>
+                    Completar registro
+                </a>
+                <p>El enlace expirará en 48 horas.</p>
+                <p>Si no solicitaste esta invitación, ignora este correo.</p>
             ";
 
-            await SendEmailAsync(email, subject, body);
+            await SendEmailAsync(toEmail, subject, body);
         }
 
-        public async Task SendWelcomeEmail(string email, string FullName)
+        public async Task SendWelcomeEmail(string toEmail, string fullName)
         {
-            var subject = "¡Bienvenido a Air Dreams!";
+            var subject = "Bienvenido a AirDreams";
             var body = $@"
-                <h2>¡Bienvenido {FullName}!</h2>
-                <p>Tu registro ha sido completado exitosamente.</p>
-                <p>Ya puedes iniciar sesión en la plataforma con tu Email y la contraseña que estableciste.</p>
-                <br/>
-                <p>Saludos,<br/>Equipo de Air Dreams</p>
+                <h1>¡Bienvenido {fullName}!</h1>
+                <p>Tu registro se ha completado exitosamente.</p>
+                <p>Ya puedes iniciar sesión en nuestra plataforma con tu correo y contraseña.</p>
+                <a href='http://localhost:5173/login' style='background-color:#4CAF50;color:white;padding:10px 20px;text-decoration:none;border-radius:5px;'>
+                    Iniciar sesión
+                </a>
             ";
 
-            await SendEmailAsync(email, subject, body);
+            await SendEmailAsync(toEmail, subject, body);
         }
 
-        private async Task SendEmailAsync(string to, string subject, string body)
+        private async Task SendEmailAsync(string toEmail, string subject, string body)
         {
-            var smtpSettings = _configuration.GetSection("SmtpSettings");
-            var host = smtpSettings["Host"] ?? "smtp.gmail.com";
-            var port = int.Parse(smtpSettings["Port"] ?? "587");
-            var enableSsl = bool.Parse(smtpSettings["EnableSsl"] ?? "true");
-            var username = smtpSettings["Username"];
-            var password = smtpSettings["Password"];
-            var fromEmail = smtpSettings["FromEmail"] ?? username;
-
-            if (string.IsNullOrEmpty(username) || string.IsNullOrEmpty(password))
-            {
-                // Si no hay configuración SMTP, solo logueamos (modo desarrollo)
-                _logger.LogInformation($"[EMAIL SIMULADO] Para: {to} | Asunto: {subject} | Body: {body}");
-                return;
-            }
-
             try
             {
-                using var client = new SmtpClient(host, port);
-                client.EnableSsl = enableSsl;
-                client.Credentials = new NetworkCredential(username, password);
+                var message = new MimeMessage();
+                message.From.Add(new MailboxAddress(_emailSettings.FromName, _emailSettings.FromEmail));
+                message.To.Add(new MailboxAddress("", toEmail));
+                message.Subject = subject;
 
-                var message = new MailMessage(fromEmail, to, subject, body);
-                message.IsBodyHtml = true;
+                var bodyBuilder = new BodyBuilder
+                {
+                    HtmlBody = body,
+                    TextBody = "Versión en texto plano del mensaje"
+                };
 
-                await client.SendMailAsync(message);
-                _logger.LogInformation($"Email enviado exitosamente a {to}");
+                message.Body = bodyBuilder.ToMessageBody();
+
+                using var client = new SmtpClient();
+
+                await client.ConnectAsync(
+                    _emailSettings.SmtpServer,
+                    _emailSettings.Port,
+                    _emailSettings.EnableSsl
+                        ? SecureSocketOptions.SslOnConnect
+                        : SecureSocketOptions.StartTls
+                );
+
+                await client.AuthenticateAsync(
+                    _emailSettings.Username,
+                    _emailSettings.Password
+                );
+
+                await client.SendAsync(message);
+
+                await client.DisconnectAsync(true);
+
+                _logger.LogInformation($"Correo enviado exitosamente a {toEmail}");
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, $"Error al enviar email a {to}");
+                _logger.LogError(ex, $"Error al enviar correo a {toEmail}");
                 throw;
             }
         }
