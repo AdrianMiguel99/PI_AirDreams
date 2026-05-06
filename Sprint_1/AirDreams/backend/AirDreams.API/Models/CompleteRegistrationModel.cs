@@ -19,10 +19,10 @@ namespace AirDreams.API.Models
         [Required]
         [MaxLength(50, ErrorMessage = "Máximo 50 caracteres")]
         [RegularExpression(@"^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]+$", ErrorMessage = "El nombre no puede contener números")]
-        public string NombreCompleto { get; set; } = string.Empty;
+        public string FullName { get; set; } = string.Empty;
         
         [Required]
         [RegularExpression(@"^\d{1}-\d{4}-\d{4}$", ErrorMessage = "Formato de cédula inválido (ej: 0-0000-0000)")]
-        public string Cedula { get; set; } = string.Empty;
+        public string id { get; set; } = string.Empty;
     }
 }

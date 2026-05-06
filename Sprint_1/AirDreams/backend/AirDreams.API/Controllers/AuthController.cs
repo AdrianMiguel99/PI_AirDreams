@@ -1,5 +1,6 @@
 using AirDreams.API.Models;
 using AirDreams.API.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Threading.Tasks;
 
@@ -10,10 +11,12 @@ namespace AirDreams.API.Controllers
     public class AuthController : ControllerBase
     {
         private readonly IUserService _userService;
+        private readonly IJwtService _jwtService;  // ← NUEVO
 
-        public AuthController(IUserService userService)
+        public AuthController(IUserService userService, IJwtService jwtService)  // ← Inyectar JwtService
         {
             _userService = userService;
+            _jwtService = jwtService;
         }
 
         // Endpoint para administrador envíe invitación (solo Administradores)
@@ -50,10 +53,11 @@ namespace AirDreams.API.Controllers
                 return BadRequest(new { message = result?.Message ?? "Token inválido" });
             }
 
-            return Ok(new { 
+            return Ok(new 
+            { 
                 isValid = true, 
                 email = result.Email,
-                tipoUsuario = result.TipoUsuario,
+                Role = result.Role,
                 message = result.Message 
             });
         }
@@ -87,22 +91,29 @@ namespace AirDreams.API.Controllers
 
             var result = await _userService.Login(model);
 
-            if (result.success)
+            if (result.success && result.user != null)
             {
-                // Aquí JWT token para mantener la sesión, pero por ahora solo devolvemos datos básicos
-                return Ok(new { 
+                // Generar token JWT directamente con UserModel
+                var token = _jwtService.GenerateToken(result.user);
+                
+                // Respuesta con token
+                return Ok(new 
+                { 
+                    success = true,
+                    token = token,
+                    expiresAt = DateTime.UtcNow.AddMinutes(60),
                     message = result.message,
                     user = new 
                     {
                         result.user.Id,
-                        result.user.NombreCompleto,
-                        result.user.Correo,
-                        result.user.TipoUsuario
+                        result.user.FullName,
+                        result.user.Email,
+                        result.user.Role
                     }
                 });
             }
 
-            return Unauthorized(new { message = "Correo o contraseña incorrecta" });
+            return Unauthorized(new { message = "Email o contraseña incorrecta" });
         }
     }
 }
