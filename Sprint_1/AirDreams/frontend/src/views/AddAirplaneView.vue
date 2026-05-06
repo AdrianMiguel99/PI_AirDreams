@@ -1,6 +1,6 @@
 <template>
   <!-- Icono -->
-  <div class="align-items-center">
+  <div class="d-flex align-items-center">
     <img 
       src="https://i.ibb.co/MxwJ1Y9m/Chat-GPT-Image-7-abr-2026-01-52-40.png"
       class="img-fluid"
@@ -26,7 +26,7 @@
 
     </div>
 
-    <h1 class="letra_bold text-center" style="font-size: 2.5rem;">
+    <h1 class="letra_bold text-center" style="font-size: 2.5rem; margin-top: 20px; margin-bottom: 50px;">
       Registro de Aeronave
     </h1>
   </div>

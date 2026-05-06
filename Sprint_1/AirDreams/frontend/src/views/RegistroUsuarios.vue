@@ -14,8 +14,8 @@
 
       <select v-model="tipoUsuario" :class="{ errorInput: errorTipo }">
         <option disabled value="">Seleccione tipo de usuario</option>
-        <option value="Admin">Administrador</option>
-        <option value="Operator">Operario</option>
+        <option value="Admin">Admin</option>
+        <option value="Operator">Operator</option>
       </select>
 
       <button @click="enviarInvitacion" :disabled="cargando">
