@@ -1,11 +1,11 @@
 <template>
   <div class="pagination">
     <button 
-      v-for="pagina in totalPaginas" 
-      :key="pagina"
-      @click="$emit('cambiarPagina', pagina)"
+      v-for="page in totalPages" 
+      :key="page"
+      @click="$emit('changePage', page)"
     >
-      {{ pagina }}
+      {{ page }}
     </button>
   </div>
 </template>
@@ -14,29 +14,37 @@
 export default {
   props: {
     total: Number,
-    porPagina: Number
+    perPage: Number
   },
 
   computed: {
-    totalPaginas() {
-      return Math.ceil(this.total / this.porPagina);
+    totalPages() {
+      return Math.ceil(this.total / this.perPage);
     }
   }
 };
 </script>
 
-<style>
+<style scoped>
 .pagination {
-  text-align: center;
-  margin: 20px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: 30px 0;
+  gap: 8px;
 }
 
 .pagination button {
-  margin: 5px;
   padding: 8px 12px;
   border-radius: 8px;
   border: none;
   background: #2f3e5c;
   color: white;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.pagination button:hover {
+  background: #032056;
 }
 </style>
