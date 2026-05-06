@@ -1,9 +1,12 @@
 <template>
   <div>
+
     <BarraNavegacion />
     <SeccionHero />
+
+
     <FormularioBusqueda />
-    
+
     <ListaVuelos 
       v-if="busquedaRealizada"
       :vuelos="vuelosPaginados" 
@@ -38,7 +41,7 @@ export default {
     return {
       paginaActual: 1,
       vuelos: [],
-      busquedaRealizada: false
+      busquedaRealizada: false,
     };
   },
 
@@ -47,7 +50,11 @@ export default {
       const inicio = (this.paginaActual - 1) * 10;
       return this.vuelos.slice(inicio, inicio + 10);
     }
+    
   },
+  
+      
+
 
   methods: {
     buscarVuelos() {
@@ -57,7 +64,10 @@ export default {
 
     cambiarPagina(pagina) {
       this.paginaActual = pagina;
-    }
+    },
+
+    
   }
 };
 </script>
+

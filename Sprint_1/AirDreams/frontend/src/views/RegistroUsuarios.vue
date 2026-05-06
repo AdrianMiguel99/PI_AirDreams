@@ -14,8 +14,8 @@
 
       <select v-model="tipoUsuario" :class="{ errorInput: errorTipo }">
         <option disabled value="">Seleccione tipo de usuario</option>
-        <option>Administrador</option>
-        <option>Operario</option>
+        <option value="Admin">Administrador</option>
+        <option value="Operator">Operario</option>
       </select>
 
       <button @click="enviarInvitacion" :disabled="cargando">
@@ -65,14 +65,16 @@ export default {
       this.cargando = true;
 
       try {
+        const token = localStorage.getItem("token");
         const response = await fetch("http://localhost:5276/api/auth/invite", {
           method: "POST",
           headers: {
+            'Authorization': `Bearer ${token}`,
             "Content-Type": "application/json"
           },
           body: JSON.stringify({
-            correo: this.correo,
-            tipoUsuario: this.tipoUsuario
+            email: this.correo,
+            role: this.tipoUsuario
           })
         });
 
