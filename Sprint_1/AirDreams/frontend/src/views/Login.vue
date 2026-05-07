@@ -63,7 +63,7 @@ export default {
             "Content-Type": "application/json"
           },
           body: JSON.stringify({
-            correo: this.correo,
+            email: this.correo,
             password: this.password
           })
         });
@@ -71,8 +71,12 @@ export default {
         const data = await response.json();
 
         if (response.ok) {
+          localStorage.setItem("token", data.token);
           localStorage.setItem("user", JSON.stringify(data.user));
-          this.$router.push("/");
+          localStorage.setItem("role", data.user.role);
+          localStorage.setItem("employeeID", data.user.id);
+
+          this.$router.push({name: "admin"});
         } else {
           this.mensaje = data.message || "Correo o contraseña incorrecta";
           this.errorCorreo = true;

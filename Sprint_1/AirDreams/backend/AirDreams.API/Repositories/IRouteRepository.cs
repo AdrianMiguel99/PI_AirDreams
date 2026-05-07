@@ -1,7 +1,8 @@
 using AirDreams.API.Models;
+using AirDreams.API.DTOs;
 
-public interface IRouteRepository
+public  interface IRouteRepository
 {
     Task<int> CreateRouteWithFrequenciesAsync(CreateRouteModel model);
-    // Task<IEnumerable<RouteModel>> GetAllAsync(); etc.
+    Task<IEnumerable<RouteDTO>> GetAllAsync(); 
 }

@@ -24,10 +24,15 @@ const navigateTo = (path) => {
             Seleccione una opción para gestionar el sistema
         </p>
 
+        <button class="back-button" type="button" @click="navigateTo('/')">
+            Volver al inicio
+        </button>
+
+
         <section>
             <h2>Administración de vuelos</h2>
             <div class="cards">
-            <div class="card" @click="navigateTo('/')">
+            <div class="card" @click="navigateTo('/addPlane')">
                 <img :src="airplaneIcon" alt="Airplane" class="icon blue">
                 <div>
                 <h3>Tipos de aeronave</h3>
@@ -45,7 +50,7 @@ const navigateTo = (path) => {
                 <span class="arrow">›</span>
             </div>
 
-            <div class="card" @click="navigateTo('/admin/airports')">
+            <div class="card" @click="navigateTo('/admin/airports/register')">
                 <img :src="airportIcon" alt="Airport" class="icon blue">
                 <div>
                 <h3>Aeropuertos</h3>
@@ -89,6 +94,21 @@ const navigateTo = (path) => {
 </template>
 
 <style scoped>
+
+.back-button {
+    border: 1px solid #032056;
+    background: white;
+    color: #032056;
+    border-radius: 8px;
+    padding: 10px 16px;
+    cursor: pointer;
+    font-weight: 600;
+}
+
+.back-button:hover {
+    background: #e0ecff;
+}
+
 .container {
     width: 100%;
     display: flex;

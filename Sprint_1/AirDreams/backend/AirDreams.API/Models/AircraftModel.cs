@@ -3,7 +3,11 @@
     public class AircraftModel
     {
         public string plateNumber { get; set; }
+        
+        public int adminId { get; set; }
+
         public int maxWeight { get; set; }
+
         public int cantPasajeros { get; set; }
 
         public int cant_Asientos_Fila_Firstclass { get; set; }

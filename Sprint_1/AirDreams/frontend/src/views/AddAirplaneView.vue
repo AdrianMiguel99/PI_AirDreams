@@ -14,19 +14,21 @@
 
   <!-- Título -->
   <div class="container mt-5">
-    <h1 class="letra_bold text-center" style="font-size: 2.5rem;">
+
+    <div class="d-flex justify-content-end align-items-center">
+      <a href="/listPlanes"class="btn-volver-lista me-3">
+        Listar Aeronaves
+      </a>
+
+      <a href="/admin"class="btn-volver-lista">
+        Regresar
+      </a>
+
+    </div>
+
+    <h1 class="letra_bold text-center" style="font-size: 2.5rem; margin-top: 20px; margin-bottom: 50px;">
       Registro de Aeronave
     </h1>
-
-    <div class="row justify-content-end letra_bold">
-      <div class="col-2">
-        <a href="/listPlanes">
-            <button type="button" class="btn btn-outline-secondary boton_listar">
-              Listar Aeronaves
-            </button>
-        </a>
-      </div>
-    </div>
   </div>
 
  <!-- Formulario -->
@@ -65,13 +67,31 @@ export default {
 
   methods: {
     saveAirplane(aeronave) {
-      axios.post('https://localhost:7136/api/Airplane', aeronave).then(() => {
-          alert('Aeronave registrada correctamente');
-        })
-        .catch(() => {
-          alert('Error al registrar aeronave');
-        });
-    },
+
+      const token = localStorage.getItem("token");
+      axios.post('http://localhost:5276/api/Airplane',aeronave,
+      {
+        headers: {Authorization: `Bearer ${token}`}
+      })
+      .then(() => {
+        alert('Aeronave registrada correctamente');
+      })
+      .catch((error) => {
+        console.error(error);
+
+        if (error.response?.status === 401) {
+          alert('Debes iniciar sesión');
+        return;
+        }
+
+        if (error.response?.status === 403) {
+          alert('No tienes permisos');
+          return;
+        }
+
+        alert('Error al registrar aeronave');
+      });
+    }
   }
 }
 </script>
@@ -99,5 +119,24 @@ export default {
 .boton_listar:hover {
   background-color: #384467;
   color: white;
+}
+
+.btn-volver-lista {
+
+  display: inline-block;
+
+  background-color: #384467;
+  color: white;
+
+  padding: 10px 20px;
+
+  text-decoration: none;
+
+  border-radius: 8px;
+
+  font-family: 'Inter', sans-serif;
+  font-weight: 500;
+
+  transition: 0.3s;
 }
 </style>

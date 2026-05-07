@@ -1,5 +1,6 @@
 using AirDreams.API.Models;
 using AirDreams.API.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Threading.Tasks;
 
@@ -10,14 +11,16 @@ namespace AirDreams.API.Controllers
     public class AuthController : ControllerBase
     {
         private readonly IUserService _userService;
+        private readonly IJwtService _jwtService;
 
-        public AuthController(IUserService userService)
+        public AuthController(IUserService userService, IJwtService jwtService)
         {
             _userService = userService;
+            _jwtService = jwtService;
         }
 
-        // Endpoint para administrador envíe invitación (solo Administradores)
         [HttpPost("invite")]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> SendInvitation([FromBody] InvitationModel model)
         {
             if (!ModelState.IsValid)
@@ -50,15 +53,15 @@ namespace AirDreams.API.Controllers
                 return BadRequest(new { message = result?.Message ?? "Token inválido" });
             }
 
-            return Ok(new { 
+            return Ok(new 
+            { 
                 isValid = true, 
                 email = result.Email,
-                tipoUsuario = result.TipoUsuario,
+                Role = result.Role,
                 message = result.Message 
             });
         }
 
-        // Endpoint para completar registro (usuario invitado)
         [HttpPost("complete-registration")]
         public async Task<IActionResult> CompleteRegistration([FromBody] CompleteRegistrationModel model)
         {
@@ -87,22 +90,27 @@ namespace AirDreams.API.Controllers
 
             var result = await _userService.Login(model);
 
-            if (result.success)
+            if (result.success && result.user != null)
             {
-                // Aquí JWT token para mantener la sesión, pero por ahora solo devolvemos datos básicos
-                return Ok(new { 
+                var token = _jwtService.GenerateToken(result.user);
+                
+                return Ok(new 
+                { 
+                    success = true,
+                    token = token,
+                    expiresAt = _jwtService.GetTokenExpiration(),
                     message = result.message,
                     user = new 
                     {
                         result.user.Id,
-                        result.user.NombreCompleto,
-                        result.user.Correo,
-                        result.user.TipoUsuario
+                        result.user.FullName,
+                        result.user.Email,
+                        result.user.Role
                     }
                 });
             }
 
-            return Unauthorized(new { message = "Correo o contraseña incorrecta" });
+            return Unauthorized(new { message = result.message });
         }
     }
 }

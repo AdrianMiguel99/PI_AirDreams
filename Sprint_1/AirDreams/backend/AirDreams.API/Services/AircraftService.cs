@@ -1,9 +1,10 @@
 ﻿using AirDreams.API.Models;
-using AirDreams.API.Repository;
+using AirDreams.API.Repositories;
+using AirDreams.API.Services.Interfaces;
 
 namespace AirDreams.API.Services
 {
-    public class AircraftService
+    public class AircraftService : IAircraftService
     {
         private readonly AircraftRepository aircraftRepository;
 
@@ -12,29 +13,29 @@ namespace AirDreams.API.Services
             this.aircraftRepository = aircraftRepository;
         }
 
-        // 🔹 Obtener aeronaves
         public List<AircraftModel> GetAircrafts()
         {
             return aircraftRepository.GetAircrafts();
         }
 
-        // 🔹 Registrar aeronave
         public string AddAircraft(AircraftModel aircraft)
         {
-
             var result = string.Empty;
+
             try
             {
                 var isAdded = aircraftRepository.AddAircraft(aircraft);
+
                 if (!isAdded)
                 {
                     result = "Error al registrar la aeronave.";
                 }
-                
-            }catch (Exception ex)
+            }
+            catch (Exception ex)
             {
                 result = ex.Message;
             }
+
             return result;
         }
 
@@ -50,7 +51,6 @@ namespace AirDreams.API.Services
                 {
                     result = "No se pudo eliminar la aeronave";
                 }
- 
             }
             catch (Exception ex)
             {

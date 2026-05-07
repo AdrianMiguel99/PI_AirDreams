@@ -53,6 +53,7 @@
 
 <script>
 export default {
+  name: 'CompleteRegistration',
   data() {
     return {
       token: null,
@@ -96,7 +97,7 @@ export default {
 
         if (response.ok && data.isValid) {
           this.email = data.email;
-          this.tipoUsuario = data.tipoUsuario;
+          this.tipoUsuario = data.role;
           this.tokenInvalido = false;
         } else {
           this.tokenInvalido = true;
@@ -139,8 +140,8 @@ export default {
           },
           body: JSON.stringify({
             token: this.token,
-            nombreCompleto: this.nombreCompleto,
-            cedula: this.cedula,
+            fullName: this.nombreCompleto,
+            id: this.cedula,
             password: this.password,
             confirmPassword: this.confirmPassword
           })

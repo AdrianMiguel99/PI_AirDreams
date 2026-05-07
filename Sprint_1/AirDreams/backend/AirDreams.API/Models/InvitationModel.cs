@@ -5,10 +5,10 @@ namespace AirDreams.API.Models
     public class InvitationModel
     {
         [Required]
-        [EmailAddress(ErrorMessage = "Formato de correo inválido")]
-        public string Correo { get; set; } = string.Empty;
+        [EmailAddress(ErrorMessage = "Formato de Email inválido")]
+        public string Email { get; set; } = string.Empty;
         
         [Required]
-        public string TipoUsuario { get; set; } = string.Empty; // Administrador u Operario
+        public string Role { get; set; } = string.Empty;
     }
 }

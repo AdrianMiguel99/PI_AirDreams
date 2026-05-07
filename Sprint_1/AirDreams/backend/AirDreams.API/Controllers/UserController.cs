@@ -1,5 +1,5 @@
 using AirDreams.API.DTOs;
-using AirDreams.API.Services.Interfaces;
+using AirDreams.API.Services;
 using Microsoft.AspNetCore.Mvc;
 
 namespace AirDreams.API.Controllers
@@ -15,7 +15,6 @@ namespace AirDreams.API.Controllers
             this.userService = userService;
         }
 
-        // GET: api/User
         [HttpGet]
         public ActionResult<List<UserDTO>> GetAll()
         {
@@ -23,7 +22,6 @@ namespace AirDreams.API.Controllers
             return Ok(users);
         }
 
-        // GET: api/User/search?searchTerm=value
         [HttpGet("search")]
         public ActionResult<List<UserDTO>> Search([FromQuery] string searchTerm)
         {

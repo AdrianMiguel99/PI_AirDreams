@@ -6,13 +6,11 @@ namespace AirDreams.API.Models
     {
         public int Id { get; set; }
 
-        public string NombreCompleto { get; set; } = string.Empty;
+        public string FullName { get; set; } = string.Empty;
 
-        public string Correo { get; set; } = string.Empty;
+        public string Email { get; set; } = string.Empty;
 
-        public string Cedula { get; set; } = string.Empty;
-
-        public string TipoUsuario { get; set; } = string.Empty;
+        public string Role { get; set; } = string.Empty;
 
         public bool IsActive { get; set; }
 
