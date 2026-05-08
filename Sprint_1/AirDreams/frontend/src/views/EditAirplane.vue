@@ -6,16 +6,16 @@
       :aeronave="airplane"
       :onSubmit="updateAirplane"
     />
-    <a href="/listPlanes" class="mt-3" style="background-color: #384467; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px; 
+    <a href="/pruebas" class="mt-3" style="background-color: #384467; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px; 
                           font-family: 'Inter', sans-serif; font-weight: 400;"> 
-      Volver a lista
+      Regresar
     </a>
   </div>
 </template>
 
 <script>
 import axios from 'axios';
-import AirplaneForm from '../components/AirplaneForm.vue';
+import AirplaneForm from '../components/Airplane/AirplaneForm.vue';
 
 export default {
   components: { AirplaneForm },
