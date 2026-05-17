@@ -65,8 +65,7 @@ namespace AirDreams.API.Services
                 if (string.IsNullOrWhiteSpace(frequency.DayOfWeek))
                     throw new ArgumentException("Cada frecuencia debe tener un día.");
 
-                if (frequency.EndingDate.Date < frequency.StartingDate.Date)
-                    throw new ArgumentException("La fecha final de frecuencia no puede ser anterior a la fecha inicial.");
+            
             }
         }
     }

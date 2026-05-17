@@ -80,26 +80,23 @@ public class RouteRepository : IRouteRepository
             var routeId = await _connection.ExecuteScalarAsync<int>(insertRoute, model, tran);
 
             var insertFreq = @"
-                INSERT INTO FlightFrequency (idRoute, dayOfWeek, departureTime, estimatedArrivalTime, startingDate, endingDate, active)
-                VALUES (@IdRoute, @DayOfWeek, @DepartureTime, @EstimatedArrivalTime, @StartingDate, @EndingDate, @Active);
+                INSERT INTO FlightFrequency (
+                idRoute,
+                dayOfWeek,
+                departureTime,
+                estimatedArrivalTime,
+                endingDate,
+                active)
+
+                VALUES (
+                @IdRoute,
+                @DayOfWeek,
+                @DepartureTime,
+                @EstimatedArrivalTime,
+                @EndingDate,
+                @Active);
             ";
 
-            var insertFlight = @"
-                INSERT INTO Flight (
-                    numberFlight,
-                    routeId,
-                    boardingGate,
-                    priceLuggage,
-                    departureDate
-                    )
-                VALUES (
-                    @NumberFlight,
-                    @RouteId,
-                    @BoardingGate,
-                    @PriceLuggage,
-                    @DepartureDate
-                );
-            ";
 
             int index = 1;
 
@@ -110,22 +107,14 @@ public class RouteRepository : IRouteRepository
                     DayOfWeek = f.DayOfWeek,
                     DepartureTime = f.DepartureTime,
                     EstimatedArrivalTime = f.EstimatedArrivalTime,
-                    StartingDate = f.StartingDate.Date,
                     EndingDate = f.EndingDate.Date,
                     Active = f.Active ? 1 : 0
                 };
                 await _connection.ExecuteAsync(insertFreq, p, tran);
 
-                var flight = new {
-                    NumberFlight = $"F{routeId:D3}{index:D2}",
-                    RouteId = routeId,
-                    BoardingGate = 1,
-                    PriceLuggage = model.PriceLuggage,
-                    DepartureDate = GetNextDateForDay(f.StartingDate.Date, f.DayOfWeek)
-                };
+            
 
-                await _connection.ExecuteAsync(insertFlight, flight, tran);
-
+            
                 index++;
             }
 
