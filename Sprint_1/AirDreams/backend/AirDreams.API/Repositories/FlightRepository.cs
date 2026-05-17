@@ -33,48 +33,67 @@ namespace AirDreams.API.Repositories
         )
         {
             const string sql = @"
+            WITH SearchDates AS (
+                SELECT CAST(@searchStartDate AS DATE) AS SearchDate
+                UNION ALL
+                SELECT DATEADD(DAY, 1, SearchDate)
+                FROM SearchDates
+                WHERE SearchDate < CAST(@searchEndDate AS DATE)
+            )
             SELECT
-                    f.numberFlight AS FlightNumber,
+                    CONCAT('R', r.idRoute, 'F', ff.idFrequency, '-', CONVERT(CHAR(8), sd.SearchDate, 112)) AS FlightNumber,
                     r.idRoute AS RouteId,
-                    f.departureDate AS DepartureDate,
+                    sd.SearchDate AS DepartureDate,
                     CONVERT(VARCHAR(8), ff.departureTime, 108) AS DepartureTime,
                     CONVERT(VARCHAR(8), ff.estimatedArrivalTime, 108) AS ArrivalTime,
                     r.stimatedTime AS Duration,
                     r.turistClassPrice AS TouristPrice,
                     r.firstClassPrice AS FirstClassPrice,
-                    f.priceLuggage AS CarryOnPrice,
-                    f.priceLuggage AS CheckedPrice,
+                    CAST(0 AS DECIMAL(10, 2)) AS CarryOnPrice,
+                    CAST(0 AS DECIMAL(10, 2)) AS CheckedPrice,
                     a1.codeAirport AS DepartureAirportCode,
                     a1.nameAirport AS DepartureAirportName,
                     a1.city AS DepartureCity,
                     a2.codeAirport AS ArrivalAirportCode,
                     a2.nameAirport AS ArrivalAirportName,
                     a2.city AS ArrivalCity,
-                    (ac.cantPasajeros - ISNULL((SELECT COUNT(*) FROM CheckIn WHERE flightNumber = f.numberFlight), 0)) AS AvailableSeats
+                    ac.cantPasajeros AS AvailableSeats
 
-                FROM Flight f
-                INNER JOIN Route r ON f.routeId = r.idRoute
+                FROM SearchDates sd
+                INNER JOIN Route r ON r.codeAirportSalida = @origin
                 INNER JOIN FlightFrequency ff ON r.idRoute = ff.idRoute
                 INNER JOIN Airport a1 ON r.codeAirportSalida = a1.codeAirport
                 INNER JOIN Airport a2 ON r.codeAirportLlegada = a2.codeAirport
                 INNER JOIN Aircraft ac ON r.plateNumber = ac.plateNumber
+                CROSS APPLY (
+                    SELECT DATEADD(
+                        SECOND,
+                        DATEDIFF(SECOND, CAST('00:00:00' AS TIME), ff.departureTime),
+                        CAST(sd.SearchDate AS DATETIME)
+                    ) AS DepartureDateTime
+                ) searchedFlight
 
-                WHERE r.codeAirportSalida = @origin
-                AND r.codeAirportLlegada = @destination
+                WHERE r.codeAirportLlegada = @destination
                 AND ac.cantPasajeros >= @quantityOfPassengers
                 AND ff.active = 1
-                AND r.routeState NOT IN ('Canceled')
-                AND f.departureDate >= CAST(@searchStartDate AS DATE)
-                AND f.departureDate <= CAST(@searchEndDate AS DATE)
-                AND ff.departureTime >= CAST(@searchStartTime AS TIME)
-                AND ff.departureTime <= CAST(@searchEndTime AS TIME)
-                AND (ac.cantPasajeros - ISNULL((SELECT COUNT(*) FROM CheckIn WHERE flightNumber = f.numberFlight), 0)) >= @quantityOfPassengers
+                AND sd.SearchDate >= ff.startingDate
+                AND sd.SearchDate <= ff.endingDate
+                AND ff.dayOfWeek = CASE DATEDIFF(DAY, '19000101', sd.SearchDate) % 7
+                    WHEN 0 THEN 'Monday'
+                    WHEN 1 THEN 'Tuesday'
+                    WHEN 2 THEN 'Wednesday'
+                    WHEN 3 THEN 'Thursday'
+                    WHEN 4 THEN 'Friday'
+                    WHEN 5 THEN 'Saturday'
+                    WHEN 6 THEN 'Sunday'
+                END
+                AND searchedFlight.DepartureDateTime >= @earliestDeparture
+                AND searchedFlight.DepartureDateTime <= @latestDeparture
+                OPTION (MAXRECURSION 366)
             ";
 
             var searchStartDate = earliestDeparture.Date;
             var searchEndDate = latestDeparture.Date;
-            var searchStartTime = earliestDeparture.TimeOfDay;
-            var searchEndTime = latestDeparture.TimeOfDay;
 
             return await _connection.QueryAsync<dynamic>(sql, new
             {
@@ -83,8 +102,8 @@ namespace AirDreams.API.Repositories
                 quantityOfPassengers,
                 searchStartDate,
                 searchEndDate,
-                searchStartTime,
-                searchEndTime
+                earliestDeparture,
+                latestDeparture
             });
         }
     }

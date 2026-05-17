@@ -101,6 +101,7 @@ public class RouteRepository : IRouteRepository
                 dayOfWeek,
                 departureTime,
                 estimatedArrivalTime,
+                startingDate,
                 endingDate,
                 active)
 
@@ -109,6 +110,7 @@ public class RouteRepository : IRouteRepository
                 @DayOfWeek,
                 @DepartureTime,
                 @EstimatedArrivalTime,
+                CAST(GETDATE() AS DATE),
                 @EndingDate,
                 @Active);
             ";

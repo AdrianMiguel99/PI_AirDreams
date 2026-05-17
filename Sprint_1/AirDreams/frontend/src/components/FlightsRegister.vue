@@ -486,7 +486,11 @@
             };
 
             // formato HH:MM:SS
-            const toTime = (date) => date.toTimeString().split(" ")[0]; 
+            const toTime = (timeValue) => {
+                if (!timeValue) return "";
+                return timeValue.length === 5 ? `${timeValue}:00` : timeValue;
+            };
+
             // YYYY-MM-DD
             const toDate = (date) => date.toISOString().split("T")[0];
 
@@ -521,14 +525,13 @@
                 firstClassPrice: parseFloat(this.formData.basePriceFirstClass),
                 turistClassPrice: parseFloat(this.formData.basePriceTurist),
                 stimatedTime: stimatedTime,
-                routeState: this.formData.status,
                 maxWeightLuggage: parseFloat(this.formData.maxWeightLuggage),
                 priceLuggage: parseFloat(this.formData.priceLuggage),
                 distance: parseFloat(this.formData.flightDistance),
                 Frequencies: this.formData.frequency.map(day => ({
                 dayOfWeek: day,
-                departureTime: toTime(dtDepart),
-                estimatedArrivalTime: toTime(dtArrive),
+                departureTime: toTime(this.formData.departureTime),
+                estimatedArrivalTime: toTime(this.formData.arrivalTime),
                 startingDate: toDate(routeCreationDate),
                 endingDate: toDate(routeFrequencyEndDate),
                 active: true
@@ -555,7 +558,10 @@
                 this.showSuccessPopup = true;
 
             } catch (err) {
-                console.error(err);
+                console.error("Status:", err.response?.status);
+                console.error("Backend response:", err.response?.data);
+                console.error("Payload enviado:", payload);
+
                 this.errorMessage = "Error registrando vuelo. Revise los datos e inténtelo de nuevo.";
                 this.successMessage = "";
                 this.showSuccessPopup = false;

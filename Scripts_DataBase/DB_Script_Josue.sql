@@ -16,3 +16,7 @@ ADD flightState VARCHAR(30) NOT NULL
 CHECK (flightState IN ('On-time', 'Boarding', 'Delayed', 'Canceled', 'In-Flight', 'Landed'))
 Default 'On-time';
 
+
+
+Select * FROM Route;
+Select * FROM FlightFrequency;
