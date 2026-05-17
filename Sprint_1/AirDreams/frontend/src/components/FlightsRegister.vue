@@ -121,7 +121,7 @@
             </label>
             <input
                 v-model="formData.departureTime"
-                type="datetime-local"
+                type="time"
                 id="departureTime"
                 class="form-control"
                 required
@@ -134,7 +134,7 @@
             </label>
             <input
                 v-model="formData.arrivalTime"
-                type="datetime-local"
+                type="time"
                 id="arrivalTime"
                 class="form-control"
                 required
@@ -178,29 +178,7 @@
             <span class="input-group-text">$</span>
             </div>
             </div>
-
-            <div class="col-md-4 mb-3">
-            <label for="status" class="form-label">
-                Estado
-            </label>
-            <select
-                v-model="formData.status"
-                id="status"
-                class="form-control"
-                required
-            >
-                <option value="" disabled>Seleccione un estado</option>
-                <option
-                    v-for="option in StatusOptions"
-                    :key="option.value"
-                    :value="option.value"
-                >
-                    {{ option.label }}
-                </option>
-            </select>
-            </div>
             
-
             <div class="col-md-6 mb-3">
             <label for="maxWeightLuggage" class="form-label">
                 Peso máximo de equipaje, kg
@@ -262,13 +240,13 @@
             <div class="col-12 mb-3">
                 <label class="form-label">Duración del vuelo</label>
                 <input
-                v-model="formData.flightDuration"
-                type="Time"
-                id="flightDuration"
-                min="00:00"
-                step="0.01"
-                class="form-control"
-                required
+                    v-model="formData.flightDuration"
+                    type="text"
+                    id="flightDuration"
+                    placeholder="HH:MM"
+                    pattern="^([0-9]{1,2}):([0-5][0-9])$"
+                    class="form-control"
+                    required
                 />
             </div>
 
@@ -369,14 +347,6 @@
             status: "",
                 frequency: []
         },
-        StatusOptions: [
-            { label: "A tiempo", value: "On-Time" },
-            { label: "Abordando", value: "Boarding" },
-            { label: "Retrasado", value: "Delayed" },
-            { label: "Cancelado", value: "Cancelled" },
-            { label: "En vuelo", value: "In-Flight" },
-            { label: "Aterrizó", value: "Landed" }
-        ],
         weekDays: [
             { value: "Monday", label: "Lunes" },
             { value: "Tuesday", label: "Martes" },
@@ -538,10 +508,10 @@
             }
 
             const payload = {
-                adminID: 1, // cambiar según admin real
+                adminID: 1,
                 codeAirportSalida: codeSalida,
                 codeAirportLlegada: codeLlegada,
-                plateNumber: this.formData.aircraftModel || 'TEST123', // debe existir en Aircraft
+                plateNumber: this.formData.aircraftModel,
                 firstClassPrice: parseFloat(this.formData.basePriceFirstClass),
                 turistClassPrice: parseFloat(this.formData.basePriceTurist),
                 stimatedTime: stimatedTime,

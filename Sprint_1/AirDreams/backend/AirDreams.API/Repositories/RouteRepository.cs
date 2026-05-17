@@ -26,24 +26,24 @@ public class RouteRepository : IRouteRepository
     if (_connection.State == ConnectionState.Closed) _connection.Open();
 
     var sql = @"
-    SELECT
-    r.idRoute AS Id,
-    r.stimatedTime AS Duration,
-    r.firstClassPrice AS FirstClassPrice,
-    r.turistClassPrice AS TouristPrice,
-    a1.codeAirport AS Code,
-    a1.nameAirport AS Name,
-    a1.city AS City,
-    a1.country AS Country,
-    a1.timeZone AS TimeZone,
-    a2.codeAirport AS Code,
-    a2.nameAirport AS Name,
-    a2.city AS City,
-    a2.country AS Country,
-    a2.timeZone AS TimeZone
-    FROM Route r
-    LEFT JOIN Airport a1 ON r.codeAirportSalida = a1.codeAirport
-    LEFT JOIN Airport a2 ON r.codeAirportLlegada = a2.codeAirport;
+        SELECT
+            r.idRoute AS Id,
+            r.stimatedTime AS Duration,
+            r.firstClassPrice AS FirstClassPrice,
+            r.turistClassPrice AS TouristPrice,
+            a1.codeAirport AS Code,
+            a1.nameAirport AS Name,
+            a1.city AS City,
+            a1.country AS Country,
+            a1.timeZone AS TimeZone,
+            a2.codeAirport AS Code,
+            a2.nameAirport AS Name,
+            a2.city AS City,
+            a2.country AS Country,
+            a2.timeZone AS TimeZone
+        FROM Route r
+        LEFT JOIN Airport a1 ON r.codeAirportSalida = a1.codeAirport
+        LEFT JOIN Airport a2 ON r.codeAirportLlegada = a2.codeAirport;
     ";
 
     
@@ -71,10 +71,26 @@ public class RouteRepository : IRouteRepository
         try
         {
             var insertRoute = @"
-                INSERT INTO Route (adminID, codeAirportSalida, codeAirportLlegada, plateNumber,
-                    firstClassPrice, turistClassPrice, routeState, stimatedTime, distance)
-                VALUES (@AdminID,@CodeAirportSalida,@CodeAirportLlegada,@PlateNumber,
-                    @FirstClassPrice,@TuristClassPrice, @RouteState, @StimatedTime,@Distance);
+                INSERT INTO Route (
+                adminID,
+                codeAirportSalida, 
+                codeAirportLlegada, 
+                plateNumber,
+                firstClassPrice, 
+                turistClassPrice,
+                stimatedTime,
+                distance)
+
+                VALUES (
+                @AdminID,
+                @CodeAirportSalida,
+                @CodeAirportLlegada,
+                @PlateNumber,
+                @FirstClassPrice,
+                @TuristClassPrice,
+                @StimatedTime,
+                @Distance);
+
                 SELECT CAST(SCOPE_IDENTITY() AS int);
             ";
             var routeId = await _connection.ExecuteScalarAsync<int>(insertRoute, model, tran);

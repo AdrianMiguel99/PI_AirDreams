@@ -8,13 +8,9 @@ namespace AirDreams.API.Models
         public string PlateNumber { get; set; } = string.Empty;
         public decimal FirstClassPrice { get; set; }
         public decimal TuristClassPrice { get; set; }
-
         public decimal PriceLuggage {get; set; }
-
-        public string RouteState { get; set; } = "On-time";
         public TimeSpan StimatedTime { get; set; }
         public decimal Distance { get; set; }
-
         public List<FlightFrequencyModel> Frequencies { get; set; } = new();
     }
 }
