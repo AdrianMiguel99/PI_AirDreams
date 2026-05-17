@@ -117,7 +117,7 @@
 
             <div class="col-md-6 mb-3">
             <label for="departureTime" class="form-label">
-                Fecha y hora de salida
+                Hora de salida
             </label>
             <input
                 v-model="formData.departureTime"
@@ -130,7 +130,7 @@
 
             <div class="col-md-6 mb-3">
             <label for="arrivalTime" class="form-label">
-                Fecha y hora de llegada
+                Hora de llegada
             </label>
             <input
                 v-model="formData.arrivalTime"
@@ -344,8 +344,7 @@
             aircraftModel: "",
             maxWeightLuggage: 0,
             priceLuggage: 0,
-            status: "",
-                frequency: []
+            frequency: []
         },
         weekDays: [
             { value: "Monday", label: "Lunes" },
@@ -507,6 +506,13 @@
                 stimatedTime = stimatedTime + ":00";
             }
 
+            const routeCreationDate = new Date();
+            const routeFrequencyEndDate = new Date(
+                routeCreationDate.getFullYear(),
+                routeCreationDate.getMonth() + 6,
+                routeCreationDate.getDate()
+            );
+
             const payload = {
                 adminID: 1,
                 codeAirportSalida: codeSalida,
@@ -523,8 +529,8 @@
                 dayOfWeek: day,
                 departureTime: toTime(dtDepart),
                 estimatedArrivalTime: toTime(dtArrive),
-                startingDate: toDate(dtDepart),
-                endingDate: toDate(new Date(dtDepart.getFullYear(), dtDepart.getMonth()+6, dtDepart.getDate())), // 6 meses por defecto
+                startingDate: toDate(routeCreationDate),
+                endingDate: toDate(routeFrequencyEndDate),
                 active: true
                 }))
             };
