@@ -12,46 +12,46 @@ namespace AirDreams.API.Controllers
     [Authorize(Roles = "Admin")]     
     public class RouteController : ControllerBase
     {
-        private readonly IRouteRepository _routeRepository;
+        private readonly IRouteService _routeService;
 
-        public RouteController(IRouteRepository routeRepository)
+        public RouteController(IRouteService routeService)
         {
-            _routeRepository = routeRepository;
+            _routeService = routeService;
         }
 
         [HttpPost]
         public async Task<IActionResult> Create([FromBody] CreateRouteModel model)
         {
-            if (!ModelState.IsValid) return BadRequest(ModelState);
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
 
             var adminIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+
             if (adminIdClaim == null)
                 return Unauthorized("No se pudo identificar al administrador.");
+            
             byte adminId = byte.Parse(adminIdClaim);
 
 
-            Console.WriteLine($"CodeAirportSalida='{model.CodeAirportSalida}', CodeAirportLlegada='{model.CodeAirportLlegada}'");
+            try{
 
-            if (model == null)
+                var id = await _routeService.CreateRouteWithFrequenciesAsync(model, adminId);
+
+                return CreatedAtAction(nameof(Create), new { id }, new { RouteID = id });
+            }
+            catch (ArgumentException ex)
             {
-                return BadRequest(new { message = "Route data is required" });
+                return BadRequest(new {message = ex.Message});
             }
 
-            if (model.CodeAirportSalida == model.CodeAirportLlegada)
-            {
-                return BadRequest(new { message = "Origin and destination must differ" });
-            }
-
-            var id = await _routeRepository.CreateRouteWithFrequenciesAsync(model);
-
-            return CreatedAtAction(nameof(Create), new { id }, new { RouteID = id });
+            
         }
 
         [HttpGet]
 
         public async Task<ActionResult<IEnumerable<RouteDTO>>> GetAllAsync()
         {
-            var routes = await _routeRepository.GetAllAsync();
+            var routes = await _routeService.GetAllAsync();
             return Ok(routes);
         }
 

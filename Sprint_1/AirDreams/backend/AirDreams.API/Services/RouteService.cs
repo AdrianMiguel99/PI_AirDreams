@@ -1,0 +1,73 @@
+using AirDreams.API.DTOs;
+using AirDreams.API.Models;
+using AirDreams.API.Repositories;
+
+namespace AirDreams.API.Services
+{
+    public class RouteService : IRouteService
+    {
+        private readonly IRouteRepository _routeRepository;
+
+        public RouteService(IRouteRepository routeRepository)
+        {
+            _routeRepository = routeRepository;
+        }
+
+        public async Task<int> CreateRouteWithFrequenciesAsync(CreateRouteModel model, byte adminId)
+        {
+            ValidateRoute(model);
+
+            model.AdminID = adminId;
+
+            model.CodeAirportSalida = model.CodeAirportSalida.Trim().ToUpper();
+            model.CodeAirportLlegada = model.CodeAirportLlegada.Trim().ToUpper();
+            model.PlateNumber = model.PlateNumber.Trim().ToUpper();
+
+            return await _routeRepository.CreateRouteWithFrequenciesAsync(model);
+        }
+
+        public async Task<IEnumerable<RouteDTO>> GetAllAsync()
+        {
+            return await _routeRepository.GetAllAsync();
+        }
+
+        private void ValidateRoute(CreateRouteModel model)
+        {
+            if (model == null)
+                throw new ArgumentException("Los datos de la ruta son requeridos.");
+
+            if (string.IsNullOrWhiteSpace(model.CodeAirportSalida))
+                throw new ArgumentException("El aeropuerto de salida es requerido.");
+
+            if (string.IsNullOrWhiteSpace(model.CodeAirportLlegada))
+                throw new ArgumentException("El aeropuerto de llegada es requerido.");
+
+            if (model.CodeAirportSalida.Equals(model.CodeAirportLlegada, StringComparison.OrdinalIgnoreCase))
+                throw new ArgumentException("El aeropuerto de origen y destino no pueden ser el mismo.");
+
+            if (string.IsNullOrWhiteSpace(model.PlateNumber))
+                throw new ArgumentException("La aeronave es requerida.");
+
+            if (model.FirstClassPrice < 0 || model.TuristClassPrice < 0)
+                throw new ArgumentException("Los precios no pueden ser negativos.");
+
+            if (model.PriceLuggage < 0)
+                throw new ArgumentException("El precio de equipaje no puede ser negativo.");
+
+            if (model.Distance <= 0)
+                throw new ArgumentException("La distancia debe ser mayor a cero.");
+
+            if (model.Frequencies == null || !model.Frequencies.Any())
+                throw new ArgumentException("Debe registrar al menos una frecuencia.");
+
+            foreach (var frequency in model.Frequencies)
+            {
+                if (string.IsNullOrWhiteSpace(frequency.DayOfWeek))
+                    throw new ArgumentException("Cada frecuencia debe tener un día.");
+
+                if (frequency.EndingDate.Date < frequency.StartingDate.Date)
+                    throw new ArgumentException("La fecha final de frecuencia no puede ser anterior a la fecha inicial.");
+            }
+        }
+    }
+}
