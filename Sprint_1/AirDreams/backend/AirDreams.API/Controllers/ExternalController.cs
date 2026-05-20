@@ -8,10 +8,12 @@ namespace AirDreams.API.Controllers
     public class ExternalController : ControllerBase
     {
         private readonly IFlightService _flightService;
+        private readonly ISecurityService _securityService;
 
-        public ExternalController(IFlightService flightService)
+        public ExternalController(IFlightService flightService, ISecurityService securityService)
         {
             _flightService = flightService;
+            _securityService = securityService;
         }
 
         [HttpGet]
@@ -26,7 +28,7 @@ namespace AirDreams.API.Controllers
         {
             try
             {
-                await _flightService.ValidateApiKeyAsync(apiKey);
+                await _securityService.ValidateApiKeyAsync(apiKey);
                 var flights = await _flightService.SearchFlightsAsync(origin, destination, earliestDeparture, latestDeparture, quantityOfPassengers);
                 var response = new { flights };
                 return Ok(response);

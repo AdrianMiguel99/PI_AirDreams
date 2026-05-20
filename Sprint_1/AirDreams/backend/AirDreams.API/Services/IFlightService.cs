@@ -11,7 +11,5 @@ namespace AirDreams.API.Services.Interfaces
             DateTime latestDeparture,
             int quantityOfPassengers
         );
-
-        Task ValidateApiKeyAsync(string apiKey);
     }
 }

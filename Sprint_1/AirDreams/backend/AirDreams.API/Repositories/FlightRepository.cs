@@ -13,17 +13,6 @@ namespace AirDreams.API.Repositories
             _connection = connection;
         }
 
-        public async Task<string?> ValidateApiKeyAsync(string apiKey)
-        {
-            const string sql = @"
-                SELECT eu.airlineName
-                FROM ExternalUser eu
-                WHERE eu.secretKey = @apiKey
-            ";
-
-            return await _connection.QueryFirstOrDefaultAsync<string>(sql, new { apiKey });
-        }
-
         public async Task<IEnumerable<dynamic>> SearchFlightsAsync(
             string origin,
             string destination,

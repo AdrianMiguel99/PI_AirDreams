@@ -4,8 +4,6 @@ namespace AirDreams.API.Repositories
 {
     public interface IFlightRepository
     {
-        Task<string?> ValidateApiKeyAsync(string apiKey);
-
         Task<IEnumerable<dynamic>> SearchFlightsAsync(
             string origin,
             string destination,
@@ -13,6 +11,5 @@ namespace AirDreams.API.Repositories
             DateTime latestTime,
             int quantityOfPassengers
         );
-
     }
 }

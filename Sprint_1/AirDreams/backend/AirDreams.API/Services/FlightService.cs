@@ -44,21 +44,6 @@ namespace AirDreams.API.Services
             return result;
         }
 
-        public async Task ValidateApiKeyAsync(string apiKey)
-        {
-            if (string.IsNullOrWhiteSpace(apiKey))
-            {
-                throw new UnauthorizedAccessException("INVALID_API_KEY: La API key es requerida.");
-            }
-
-            var airline = await _flightRepository.ValidateApiKeyAsync(apiKey);
-
-            if (string.IsNullOrEmpty(airline))
-            {
-                throw new UnauthorizedAccessException("INVALID_API_KEY: La API key proporcionada no es válida.");
-            }
-        }
-
         private void ValidateParameters(string origin, string destination, DateTime earliestDeparture, DateTime latestDeparture, int quantityOfPassengers)
         {
             if (string.IsNullOrWhiteSpace(origin) ||
