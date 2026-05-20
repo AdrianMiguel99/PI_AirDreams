@@ -5,7 +5,10 @@
     <ButtomNavigationAirplanes @change-view="currentView = $event" />
 
     <div class="mt-4">
-      <AddAirplaneView v-if="currentView === 'register'" />
+      <AddAirplaneView
+        v-if="currentView === 'register'"
+        @change-view="currentView = $event"
+      />
       <ListAirplaneView v-if="currentView === 'list'" />
     </div>
   </div>

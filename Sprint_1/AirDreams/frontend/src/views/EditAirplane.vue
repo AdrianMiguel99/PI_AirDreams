@@ -6,6 +6,17 @@
       :aeronave="airplane"
       :onSubmit="updateAirplane"
     />
+
+    <PopupMessage
+      :show="showPopup"
+      :type="popupType"
+      :title="popupTitle"
+      :message="popupMessage"
+      :actionText="popupActionText"
+      @close="showPopup = false"
+      @action="goBack"
+    />
+
     <a href="/pruebas" class="mt-3" style="background-color: #384467; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px; 
                           font-family: 'Inter', sans-serif; font-weight: 400;"> 
       Regresar
@@ -16,13 +27,19 @@
 <script>
 import axios from 'axios';
 import AirplaneForm from '../components/Airplane/AirplaneForm.vue';
+import PopupMessage from '../components/PopupMessage.vue'
 
 export default {
-  components: { AirplaneForm },
+  components: { AirplaneForm, PopupMessage },
 
   data() {
     return {
-      airplane: null
+      airplane: null,
+      showPopup: false,
+      popupType: 'success',
+      popupTitle: '',
+      popupMessage: '',
+      popupActionText: 'Volver a la lista'
     };
   },
 
@@ -40,12 +57,18 @@ export default {
 
     updateAirplane(updatedAirplane) {
       axios.put(`http://localhost:5276/api/Airplane/${updatedAirplane.plateNumber}`, updatedAirplane).then(() => {
-        alert("Aeronave actualizada correctamente");
+        this.showPopup = true;
+        this.popupType = 'success';
+        this.popupTitle = 'Éxito';
+        this.popupMessage = 'Aeronave actualizada correctamente';
         this.getAirplane();
       })
       .catch(error => {
         console.error(error.response?.data);
-        alert("Error al actualizar");
+        this.showPopup = true;
+        this.popupType = 'error';
+        this.popupTitle = 'Error';
+        this.popupMessage = 'Error al actualizar la aeronave';
       });
     }
   },
