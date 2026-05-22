@@ -7,8 +7,7 @@ using System.Security.Claims;
 namespace AirDreams.API.Controllers
 {
     [ApiController]
-    [Route("api/airports")]             
-    [Authorize(Roles = "Admin")]          
+    [Route("api/airports")]   
     public class AirportsController : ControllerBase
     {
         private readonly IAirportService _airportService;
@@ -18,14 +17,14 @@ namespace AirDreams.API.Controllers
             _airportService = airportService;
         }
 
-        [HttpGet]
+        [HttpGet]   
         public async Task<ActionResult<List<AirportDto>>> GetAll()
         {
             var airports = await _airportService.GetAllAsync();
             return Ok(airports);
         }
 
-        [HttpGet("{code}")]
+        [HttpGet("{code}")]   
         public async Task<ActionResult<AirportDto>> GetByCode(string code)
         {
             var airport = await _airportService.GetByCodeAsync(code.ToUpperInvariant());
@@ -35,6 +34,7 @@ namespace AirDreams.API.Controllers
         }
 
         [HttpPost]
+        [Authorize(Roles = "Admin")]   
         public async Task<IActionResult> Create([FromBody] CreateAirportDto dto)
         {
             if (!ModelState.IsValid) return BadRequest(ModelState);
