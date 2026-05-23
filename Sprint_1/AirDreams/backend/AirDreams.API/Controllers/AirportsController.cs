@@ -54,5 +54,25 @@ namespace AirDreams.API.Controllers
                 return Conflict(new { error = ex.Message });
             }
         }
+
+        [HttpPut("{code}")]
+        [Authorize(Roles = "Admin")]
+        public async Task<IActionResult> Update(string code, [FromBody] UpdateAirportDto dto)
+        {
+            if (!ModelState.IsValid) return BadRequest(ModelState);
+            try
+            {
+                await _airportService.UpdateAsync(code.ToUpperInvariant(), dto);
+                return NoContent();
+            }
+            catch (KeyNotFoundException ex)
+            {
+                return NotFound(new { error = ex.Message });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { error = ex.Message });
+            }
+        }
     }
 }

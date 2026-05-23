@@ -6,7 +6,6 @@
       <h2>Aeropuertos registrados</h2>
     </div>
 
-    <!-- Barra de navegación unificada (igual que en aeronaves) -->
     <ButtomNavigationAirports currentView="list" />
 
     <div v-if="loading" class="state-message">Cargando aeropuertos...</div>
@@ -25,6 +24,7 @@
             <th>Ciudad</th>
             <th>País</th>
             <th>Zona horaria</th>
+            <th>Acciones</th>
           </tr>
         </thead>
         <tbody>
@@ -34,6 +34,19 @@
             <td>{{ airport.city }}</td>
             <td>{{ airport.country }}</td>
             <td>{{ airport.timeZone || '-' }}</td>
+            <td>
+              <a
+                href="javascript:void(0)"
+                class="btn-editar"
+                @click="editar(airport.code)"
+              >
+                <img
+                  src="https://i.postimg.cc/FKTG53Hn/Chat-GPT-Image-5-may-2026-05-10-07-(1).png"
+                  alt="editar"
+                />
+                <span>Editar</span>
+              </a>
+            </td>
           </tr>
         </tbody>
       </table>
@@ -61,7 +74,6 @@ export default {
       this.loading = true
       this.errorMessage = ''
       try {
-        // GET público, sin token
         const res = await axios.get('http://localhost:5276/api/airports')
         this.airports = res.data
       } catch (error) {
@@ -70,6 +82,9 @@ export default {
       } finally {
         this.loading = false
       }
+    },
+    editar(code) {
+      this.$router.push(`/admin/airports/edit/${code}`)
     }
   },
   created() {
@@ -118,5 +133,31 @@ th {
   background: #f8fafc;
   color: #334155;
   font-weight: 600;
+}
+
+.btn-editar {
+  background-color: #3E4B78;
+  color: white;
+  border: none;
+  border-radius: 999px;          
+  padding: 6px 16px;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  text-decoration: none;
+  font-family: 'Inter', sans-serif;
+  font-size: 14px;
+  font-weight: 400;
+  transition: 0.3s;
+  cursor: pointer;
+}
+
+.btn-editar:hover {
+  filter: brightness(1.1);
+}
+
+.btn-editar img {
+  width: 22px;
+  height: 22px;
 }
 </style>
