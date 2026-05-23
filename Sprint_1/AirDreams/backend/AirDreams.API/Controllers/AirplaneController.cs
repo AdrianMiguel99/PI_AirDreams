@@ -40,7 +40,7 @@ namespace AirDreams.API.Controllers
             {
                 return Unauthorized("No se pudo identificar el administrador.");
             }
-            aircraft.adminId = int.Parse(adminIdClaim);
+            aircraft.AdminID = int.Parse(adminIdClaim);
 
             var result2 = aircraftService.AddAircraft(aircraft);
 
@@ -52,10 +52,10 @@ namespace AirDreams.API.Controllers
             return BadRequest(result);
         }
 
-        [HttpDelete("{plateNumber}")]
-        public IActionResult Delete(string plateNumber)
+        [HttpDelete("{modelo}")]
+        public IActionResult Delete(string modelo)
         {
-            var result = aircraftService.DeleteAircraft(plateNumber);
+            var result = aircraftService.DeleteAircraft(modelo);
 
             if (string.IsNullOrEmpty(result))
             {
@@ -65,10 +65,10 @@ namespace AirDreams.API.Controllers
             return BadRequest(result);
         }
 
-        [HttpGet("{plateNumber}")]
-        public ActionResult<AircraftModel> GetByPlateNumber(string plateNumber)
+        [HttpGet("{modelo}")]
+        public ActionResult<AircraftModel> GetAircraftByModel(string modelo)
         {
-            var aircraft = aircraftService.GetAircraftByPlateNumber(plateNumber);
+            var aircraft = aircraftService.GetAircraftByModel(modelo);
 
             if (aircraft == null)
             {
@@ -78,10 +78,10 @@ namespace AirDreams.API.Controllers
             return Ok(aircraft);
         }
 
-        [HttpPut("{plateNumber}")]
-        public IActionResult Update(string plateNumber, [FromBody] AircraftModel aircraft)
+        [HttpPut("{modelo}")]
+        public IActionResult Update(string modelo, [FromBody] AircraftModel aircraft)
         {
-            if (aircraft == null || plateNumber != aircraft.plateNumber)
+            if (aircraft == null || modelo != aircraft.Modelo   )
             {
                 return BadRequest("Datos inválidos.");
             }

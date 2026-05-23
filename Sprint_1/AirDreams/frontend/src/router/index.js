@@ -38,7 +38,7 @@ const routes = [
 
   { path: '/addPlane', name: 'addPlane', component: AddAirplaneView },
   { path: '/listPlanes', name: 'listPlanes', component: ListAirplaneView },
-  { path: '/editPlane/:plateNumber', name: 'editPlane', component: EditAirplane },
+  { path: '/editPlane/:modelo', name: 'editPlane', component: EditAirplane },
 
   { path: '/admin/airports/register', name: 'airportRegister', component: AirportRegister },
   { path: '/admin/airports/list', name: 'airportList', component: AirportList },

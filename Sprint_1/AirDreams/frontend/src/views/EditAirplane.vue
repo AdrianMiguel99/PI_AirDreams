@@ -45,10 +45,10 @@ export default {
 
   methods: {
     getAirplane() {
-      const plateNumber = this.$route.params.plateNumber;
-
-      axios.get(`http://localhost:5276/api/Airplane/${plateNumber}`).then(response => {
+      const modelo = this.$route.params.modelo;
+      axios.get(`http://localhost:5276/api/Airplane/${modelo}`).then(response => {
           this.airplane = response.data;
+          delete this.airplane.cantPasajeros;
         })
         .catch(error => {
           console.error(error.response?.data);
@@ -56,7 +56,7 @@ export default {
     },
 
     updateAirplane(updatedAirplane) {
-      axios.put(`http://localhost:5276/api/Airplane/${updatedAirplane.plateNumber}`, updatedAirplane).then(() => {
+      axios.put(`http://localhost:5276/api/Airplane/${updatedAirplane.modelo}`, updatedAirplane).then(() => {
         this.showPopup = true;
         this.popupType = 'success';
         this.popupTitle = 'Éxito';

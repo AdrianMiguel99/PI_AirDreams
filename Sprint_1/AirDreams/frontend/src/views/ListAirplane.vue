@@ -10,8 +10,8 @@
     <table class="table-wrapper" v-if="airplanes.length > 0">
       <thead>
         <tr>
-          <th class="letra_semibold">MATRÍCULA</th>
           <th class="letra_semibold">MODELO</th>
+          <th class="letra_semibold">TIPO DE AERONAVE</th>
           <th class="letra_semibold">CANTIDAD DE PASAJEROS</th>
           <th class="letra_semibold">PESO MÁXIMO</th>
           <th class="letra_semibold">ACCIONES</th>
@@ -19,15 +19,15 @@
       </thead>
 
       <tbody>
-        <tr v-for="airplane in airplanes" :key="airplane.plateNumber">
-          <td>{{ airplane.plateNumber }}</td>
+        <tr v-for="airplane in airplanes" :key="airplane.modelo">
           <td>{{ airplane.modelo }}</td>
+          <td>{{ airplane.aircraftSize  }}</td>
           <td>{{ airplane.cantPasajeros }}</td>
           <td>{{ airplane.maxWeight }}</td>
 
           <td>
             <a 
-              :href="`/editPlane/${airplane.plateNumber}`" 
+              :href="`/editPlane/${airplane.modelo}`" 
               class="btn-editar me-4"
               style="background-color: #3E4B78;"
             >
@@ -39,7 +39,7 @@
             </a>
 
             <button 
-              @click="deleteAirplane(airplane.plateNumber)"
+              @click="deleteAirplane(airplane.modelo)"
               class="btn-editar"
               style="background-color: #ff0000;"
             >
@@ -86,8 +86,8 @@ export default {
         });
     },
 
-    deleteAirplane(plateNumber) {
-      axios.delete(`http://localhost:5276/api/Airplane/${plateNumber}`)
+    deleteAirplane(modelo) {
+      axios.delete(`http://localhost:5276/api/Airplane/${modelo}`)
         .then(() => {
           alert('Aeronave eliminada con éxito');
           this.getAirplanes();

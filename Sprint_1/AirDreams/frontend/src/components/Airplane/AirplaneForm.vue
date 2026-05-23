@@ -4,37 +4,6 @@
 
       <div class="form-column">
         <div class="mb-3">
-          <label class="form-label">Matrícula (10 caracteres max)</label>
-          <input
-            v-model="aeronave.plateNumber"
-            type="text"
-            maxlength="10"
-            class="form-control"
-            placeholder="Ejm: TI-BFJ"
-          >
-        </div>
-
-        <div class="mb-3">
-          <label class="form-label">Peso Max (kg)</label>
-          <input
-            v-model="aeronave.maxWeight"
-            type="number"
-            class="form-control"
-            placeholder="Ejm: 1000"
-          >
-        </div>
-
-        <div class="mb-3">
-          <label class="form-label">Cantidad de Pasajeros</label>
-          <input
-            v-model="aeronave.cantPasajeros"
-            type="number"
-            class="form-control"
-            placeholder="Ejm: 400"
-          >
-        </div>
-
-        <div class="mb-3">
           <label class="form-label">Modelo</label>
           <input
             v-model="aeronave.modelo"
@@ -43,9 +12,7 @@
             placeholder="Ejm: Boeing-747"
           >
         </div>
-      </div>
 
-      <div class="form-column">
         <div class="mb-3">
           <label class="form-label">Asientos por Fila (FirstClass)</label>
           <input
@@ -53,6 +20,28 @@
             type="number"
             class="form-control"
             placeholder="Ejm: 5"
+          >
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label">Asientos por Fila (Turista)</label>
+          <input
+            v-model="aeronave.cant_Asientos_Fila_Turista"
+            type="number"
+            class="form-control"
+            placeholder="Ejm: 5"
+          >
+        </div>
+      </div>
+
+      <div class="form-column">
+        <div class="mb-3">
+          <label class="form-label">Peso Max (kg)</label>
+          <input
+            v-model="aeronave.maxWeight"
+            type="number"
+            class="form-control"
+            placeholder="Ejm: 1000"
           >
         </div>
 
@@ -67,16 +56,6 @@
         </div>
 
         <div class="mb-3">
-          <label class="form-label">Asientos por Fila (Turista)</label>
-          <input
-            v-model="aeronave.cant_Asientos_Fila_Turista"
-            type="number"
-            class="form-control"
-            placeholder="Ejm: 5"
-          >
-        </div>
-
-        <div class="mb-3">
           <label class="form-label">Cantidad de Filas (Turista)</label>
           <input
             v-model="aeronave.cant_Filas_Turista"
@@ -87,7 +66,39 @@
         </div>
       </div>
 
-      <button type="submit" class="btn boton-submit">
+      <div class="tamano-container">
+
+        <label class="form-label">
+          Tamaño de Aeronave
+        </label>
+
+        <select
+          v-model="aeronave.aircraftSize"
+          class="form-control select-tamano"
+        >
+          <option value="No definido">
+            No definido
+          </option>
+
+          <option value="Pequena">
+            Pequeña
+          </option>
+
+          <option value="Mediana">
+            Mediana
+          </option>
+
+          <option value="Grande">
+            Grande
+          </option>
+
+        </select>
+
+      </div>
+
+      <button
+        type="submit" class="btn boton-submit"
+      >
         Guardar Aeronave
       </button>
 
@@ -100,8 +111,15 @@ export default {
   name: 'AirplaneForm',
 
   props: {
-    aeronave: Object,
-    onSubmit: Function
+    aeronave: {
+      type: Object,
+      required: true
+    },
+
+    onSubmit: {
+      type: Function,
+      required: true
+    }
   }
 }
 </script>
@@ -139,8 +157,22 @@ export default {
   text-align: left;
 }
 
-.form-control {
+.form-control,
+.form-control option {
+  font-family: 'Inter', sans-serif;
   color: #384467;
+}
+
+.tamano-container {
+  grid-column: 1 / 3;
+  margin-top: 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.select-tamano {
+  width: 45%;
 }
 
 .boton-submit {

@@ -13,7 +13,7 @@ namespace AirDreams.API.Services
             this.aircraftRepository = aircraftRepository;
         }
 
-        public List<AircraftModel> GetAircrafts()
+        public List<AircraftViewModel> GetAircrafts()
         {
             return aircraftRepository.GetAircrafts();
         }
@@ -39,13 +39,13 @@ namespace AirDreams.API.Services
             return result;
         }
 
-        public string DeleteAircraft(string plateNumber)
+        public string DeleteAircraft(string modelo)
         {
             var result = string.Empty;
 
             try
             {
-                var isDeleted = aircraftRepository.DeleteAircraft(plateNumber);
+                var isDeleted = aircraftRepository.DeleteAircraft(modelo);
 
                 if (!isDeleted)
                 {
@@ -60,9 +60,9 @@ namespace AirDreams.API.Services
             return result;
         }
 
-        public AircraftModel? GetAircraftByPlateNumber(string plateNumber)
+        public AircraftViewModel? GetAircraftByModel(string modelo)
         {
-            return aircraftRepository.GetAircraftByPlateNumber(plateNumber);
+            return aircraftRepository.GetAircraftByModel(modelo);
         }
 
         public string UpdateAircraft(AircraftModel aircraft)
