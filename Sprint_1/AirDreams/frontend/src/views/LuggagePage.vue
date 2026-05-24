@@ -14,21 +14,32 @@
 
     <div class="footer-actions">
       <button class="btn-back" @click="$router.push({ name: 'home' })">← Volver</button>
-      <button class="btn-continue" @click="$router.push({ name: 'home' })">Continuar al pago</button>
+      <button class="btn-continue" @click="continueToPay" :disabled="loading">
+        {{ loading ? 'Registrando equipaje...' : 'Continuar al pago' }}
+      </button>
     </div>
+
+    <PopupMessage
+      v-if="showPopup"
+      :message="popupMessage"
+      :type="popupType"
+      @close="showPopup = false"
+    />
   </StepperLayout>
 </template>
 
 <script>
 import StepperLayout from '../components/StepperLayout.vue';
 import LuggagePassenger from '../components/LuggagePassenger.vue';
+import PopupMessage from '../components/PopupMessage.vue';
 
 export default {
   name: 'LuggagePage',
 
   components: {
     StepperLayout,
-    LuggagePassenger
+    LuggagePassenger,
+    PopupMessage
   },
 
   data() {
@@ -43,13 +54,90 @@ export default {
         { index: 4, fullName: 'Nombre Apellidos' }
       ],
 
-      luggageSelections: {}
+      luggageSelections: {},
+      loading: false,
+      showPopup: false,
+      popupMessage: '',
+      popupType: 'success'
     };
+  },
+
+  computed: {
+    transactionIdItinerary() {
+      return this.$route.query.transactionId || sessionStorage.getItem('transactionId') || 'TXN-DEFAULT';
+    }
   },
 
   methods: {
     handleLuggageChange({ passengerIndex, checkedCount, carryOnCount }) {
       this.luggageSelections[passengerIndex] = { checkedCount, carryOnCount };
+    },
+
+    buildLuggageItems(passengerIndex) {
+      const selection = this.luggageSelections[passengerIndex];
+      const items = [];
+      
+      if (!selection) return items;
+
+      if (selection.checkedCount > 0) {
+        items.push({
+          type: 'checked',
+          quantity: selection.checkedCount
+        });
+      }
+
+      if (selection.carryOnCount > 0) {
+        items.push({
+          type: 'carryOn',
+          quantity: selection.carryOnCount
+        });
+      }
+
+      return items;
+    },
+
+    async continueToPay() {
+      this.loading = true;
+      
+      try {
+        for (let passenger of this.passengers) {
+          const luggageItems = this.buildLuggageItems(passenger.index);
+
+          if (luggageItems.length === 0) continue;
+
+          const response = await fetch('http://localhost:5276/api/luggage/register', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+              fullName: passenger.fullName,
+              transactionIdItinerary: this.transactionIdItinerary,
+              luggageItems: luggageItems
+            })
+          });
+
+          const data = await response.json();
+
+          if (!response.ok) {
+            throw new Error(data.message || 'Error al registrar equipaje');
+          }
+        }
+
+        this.popupType = 'success';
+        this.popupMessage = 'Equipaje registrado exitosamente. Continuando al pago...';
+        this.showPopup = true;
+
+        setTimeout(() => {
+          this.$router.push({ name: 'home' });
+        }, 2000);
+      } catch (error) {
+        this.popupType = 'error';
+        this.popupMessage = error.message || 'Error de conexión al registrar equipaje';
+        this.showPopup = true;
+      } finally {
+        this.loading = false;
+      }
     }
   }
 };
