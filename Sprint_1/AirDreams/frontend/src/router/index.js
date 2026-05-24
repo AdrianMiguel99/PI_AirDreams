@@ -16,6 +16,7 @@ import ListaRutas from '../components/ListaRutas.vue'
 import AirplaneManagement from '../views/AirplaneManagement.vue'
 import AddAirplaneView from '../views/AddAirplaneView.vue'
 import AirportEdit from '../components/AirportEdit.vue'
+import LuggagePage from '../views/LuggagePage.vue'
 
 const routes = [
   
@@ -46,7 +47,9 @@ const routes = [
   { path: '/admin/airports', redirect: '/admin/airports/register' },
 
   { path: '/pruebas', name: 'pruebas', component: AirplaneManagement },
-  { path: '/admin/airports/edit/:code', name: 'airportEdit', component: AirportEdit }
+  { path: '/admin/airports/edit/:code', name: 'airportEdit', component: AirportEdit },
+
+  { path: '/luggage', name: 'luggage', component: LuggagePage }
 ]
 
 const router = createRouter({
