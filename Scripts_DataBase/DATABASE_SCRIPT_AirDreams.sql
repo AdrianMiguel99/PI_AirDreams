@@ -208,9 +208,9 @@ CREATE TABLE BoardingPass(
 	qrCode varchar(150) NOT NULL,
 	seatNumber INT NOT NULL,
 
-	 CONSTRAINT fk_boardingpass_checkin
-     FOREIGN KEY (checkInNumber)
-     REFERENCES CheckIn(checkInNumber),
+	CONSTRAINT fk_boardingpass_checkin
+    FOREIGN KEY (checkInNumber)
+    REFERENCES CheckIn(checkInNumber),
 );
 GO
 

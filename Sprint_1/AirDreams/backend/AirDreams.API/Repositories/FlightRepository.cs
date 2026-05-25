@@ -44,6 +44,7 @@ namespace AirDreams.API.Repositories
                     CONCAT('R', r.idRoute, 'F', ff.idFrequency, '-', CONVERT(CHAR(8), sd.SearchDate, 112)) AS FlightNumber,
                     r.idRoute AS RouteId,
                     sd.SearchDate AS DepartureDate,
+                    CAST(searchedFlight.ArrivalDateTime AS DATE) AS ArrivalDate,
                     CONVERT(VARCHAR(8), ff.departureTime, 108) AS DepartureTime,
                     CONVERT(VARCHAR(8), ff.estimatedArrivalTime, 108) AS ArrivalTime,
                     r.stimatedTime AS Duration,
@@ -70,7 +71,13 @@ namespace AirDreams.API.Repositories
                         SECOND,
                         DATEDIFF(SECOND, CAST('00:00:00' AS TIME), ff.departureTime),
                         CAST(sd.SearchDate AS DATETIME)
-                    ) AS DepartureDateTime
+                    ) AS DepartureDateTime,
+                    DATEADD(
+                        SECOND,
+                        DATEDIFF(SECOND, CAST('00:00:00' AS TIME), ff.departureTime) + 
+                        DATEDIFF(SECOND, CAST('00:00:00' AS TIME), CAST(r.stimatedTime AS TIME)),
+                        CAST(sd.SearchDate AS DATETIME)
+                    ) AS ArrivalDateTime
                 ) searchedFlight
 
                 WHERE r.codeAirportLlegada = @destination
@@ -128,119 +135,128 @@ namespace AirDreams.API.Repositories
                 WHERE SearchDate < CAST(@searchEndDate AS DATE)
             )
             SELECT
-                    CONCAT(
-                    'R', r1.idRoute,
-                    'F', ff1.idFrequency,
-                    '-',
-                    CONVERT(CHAR(8),
-                    'R', r2.idRoute,
-                    'F', ff2.idFrequency,
-                    '-',
-                    CONVERT(CHAR(8),
-                    sd.SearchDate, 112)
-                    ) AS FlightNumber,
+                CONCAT(
+                'R', r1.idRoute,
+                'F', ff1.idFrequency,
+                '-R', r2.idRoute,
+                'F', ff2.idFrequency,
+                '-',
+                CONVERT(CHAR(8),
+                sd.SearchDate, 112)
+                ) AS FlightNumber,
 
-                    r1.idRoute AS FirstRouteID,
-                    r2.idRoute AS SecondRouteID,
+                r1.idRoute AS FirstRouteID,
+                r2.idRoute AS SecondRouteID,
 
-                    a1.codeAirport AS FirstDepartureAirportCode,
-                    a1.nameAirport AS FirstDepartureAirportName,
-                    a1.city AS FirstDepartureCity,
+                a1.codeAirport AS FirstDepartureAirportCode,
+                a1.nameAirport AS FirstDepartureAirportName,
+                a1.city AS FirstDepartureCity,
 
-                    a2.codeAirport AS FirstArrivalAirportCode,
-                    a2.nameAirport AS FirstArrivalAirportName,
-                    a2.city AS FirstArrivalCity,
+                a2.codeAirport AS FirstArrivalAirportCode,
+                a2.nameAirport AS FirstArrivalAirportName,
+                a2.city AS FirstArrivalCity,
 
-                    a3.codeAirport AS FinalArrivalAirportCode,
-                    a3.nameAirport AS FinalArrivalAirportName,
-                    a3.city AS FinalArrivalCity,
+                a3.codeAirport AS FinalArrivalAirportCode,
+                a3.nameAirport AS FinalArrivalAirportName,
+                a3.city AS FinalArrivalCity,
 
 
-                    sd.SearchDate AS FirstDepartureDate,
-                    CONVERT(VARCHAR(8), ff1.departureTime, 108) AS FirstDepartureTime,
-                    CONVERT(VARCHAR(8), ff1.estimatedArrivalTime, 108) AS FirstArrivalTime,
-                    r1.stimatedTime AS FirstDuration,
+                sd.SearchDate AS FirstDepartureDate,
+                CAST(firstFlight.FirstArrivalDateTime AS DATE) AS FirstArrivalDate,
+                CONVERT(VARCHAR(8), ff1.departureTime, 108) AS FirstDepartureTime,
+                CONVERT(VARCHAR(8), ff1.estimatedArrivalTime, 108) AS FirstArrivalTime,
+                r1.stimatedTime AS FirstDuration,
 
 
-                    sd.SearchDate AS SecondDepartureDate,
-                    CONVERT(VARCHAR(8), ff2.departureTime, 108) AS SecondDepartureTime,
-                    CONVERT(VARCHAR(8), ff2.estimatedArrivalTime, 108) AS SecondArrivalTime,
-                    r2.stimatedTime AS SecondDuration,
+                CAST(secondFlight.SecondDepartureDateTime AS DATE) AS SecondDepartureDate,
+                CAST(secondFlight.SecondArrivalDateTime AS DATE) AS SecondArrivalDate,
+                CONVERT(VARCHAR(8), ff2.departureTime, 108) AS SecondDepartureTime,
+                CONVERT(VARCHAR(8), ff2.estimatedArrivalTime, 108) AS SecondArrivalTime,
+                r2.stimatedTime AS SecondDuration,
 
-                    r1.turistClassPrice + r2.turistClassPrice AS TouristPrice,
-                    r1.firstClassPrice + r2.firstClassPrice AS FirstClassPrice,
+                r1.turistClassPrice + r2.turistClassPrice AS TouristPrice,
+                r1.firstClassPrice + r2.firstClassPrice AS FirstClassPrice,
 
-                    CAST(0 AS DECIMAL(10, 2)) AS CarryOnPrice,
-                    CAST(0 AS DECIMAL(10, 2)) AS CheckedPrice,
+                CAST(0 AS DECIMAL(10, 2)) AS CarryOnPrice,
+                CAST(0 AS DECIMAL(10, 2)) AS CheckedPrice,
 
-                    CASE
-                        WHEN ac1.cantPasajeros < ac2.cantPasajeros THEN ac1.cantPasajeros
-                        ELSE ac2.cantPasajeros
-                    END AS AvailableSeats
+                CASE
+                    WHEN ac1.cantPasajeros < ac2.cantPasajeros THEN ac1.cantPasajeros
+                    ELSE ac2.cantPasajeros
+                END AS AvailableSeats
                 
 
-                    FROM SearchDates sd
-                        INNER JOIN Route r1 ON r1.codeAirportSalida = @origin
+                FROM SearchDates sd
+                    INNER JOIN Route r1 ON r1.codeAirportSalida = @origin
 
-                        INNNER JOIN route r2 ON r1.codeAirportLlegada = r2.codeAirportSalida
-                        AND r2.codeAirportLlegada = @destination
+                    INNER JOIN Route r2 ON r1.codeAirportLlegada = r2.codeAirportSalida
+                    AND r2.codeAirportLlegada = @destination
 
-                        INNER JOIN FlightFrequency ff1 ON r1.idRoute = ff1.idRoute
-                        INNER JOIN FlightFrequency ff2 ON r2.idRoute = ff2.idRoute
+                    INNER JOIN FlightFrequency ff1 ON r1.idRoute = ff1.idRoute
+                    INNER JOIN FlightFrequency ff2 ON r2.idRoute = ff2.idRoute
 
-                        INNER JOIN Airport a1 ON r1.codeAirportSalida = a1.codeAirport
-                        INNER JOIN Airport a2 ON r1.codeAirportLlegada = a2.codeAirport
-                        INNER JOIN Airport a3 ON r2.codeAirportLlegada = a3.codeAirport
+                    INNER JOIN Airport a1 ON r1.codeAirportSalida = a1.codeAirport
+                    INNER JOIN Airport a2 ON r1.codeAirportLlegada = a2.codeAirport
+                    INNER JOIN Airport a3 ON r2.codeAirportLlegada = a3.codeAirport
 
-                        INNER JOIN Aircraft ac1 ON r1.plateNumber = ac1.plateNumber
-                        INNER JOIN Aircraft ac2 ON r2.plateNumber = ac2.plateNumber
+                    INNER JOIN Aircraft ac1 ON r1.plateNumber = ac1.plateNumber
+                    INNER JOIN Aircraft ac2 ON r2.plateNumber = ac2.plateNumber
 
 
-                        CROSS APPLY (
-                            SELECT DATEADD(
+                    CROSS APPLY (
+                        SELECT
+                            DATEADD(
                                 SECOND,
                                 DATEDIFF(SECOND, CAST('00:00:00' AS TIME), ff1.departureTime),
                                 CAST(sd.SearchDate AS DATETIME)
-                            ) AS FirstDepartureDateTime
-                        ) firstFlight
-
-                        CROSS APPLY (
-                            SELECT DATEADD(
+                            ) AS FirstDepartureDateTime,
+                            DATEADD(
                                 SECOND,
-                                DATEDIFF(SECOND, CAST('00:00:00' AS TIME), ff1.arrivalTime),
+                                DATEDIFF(SECOND, CAST('00:00:00' AS TIME), ff1.estimatedArrivalTime),
                                 CAST(sd.SearchDate AS DATETIME)
                             ) AS FirstArrivalDateTime
-                        ) firstArrival
+                    ) firstFlight
 
-                        CROSS APPLY (
-                            SELECT DATEADD(
+                    CROSS APPLY (
+                        SELECT
+                            CASE
+                                WHEN ff2.departureTime >= ff1.estimatedArrivalTime
+                                    THEN DATEADD(
+                                            SECOND,
+                                            DATEDIFF(SECOND, CAST('00:00:00' AS TIME), ff2.departureTime),
+                                            CAST(sd.SearchDate AS DATETIME)
+                                        )
+                                ELSE DATEADD(
+                                            SECOND,
+                                            DATEDIFF(SECOND, CAST('00:00:00' AS TIME), ff2.departureTime),
+                                            DATEADD(DAY, 1, CAST(sd.SearchDate AS DATETIME))
+                                        )
+                            END AS SecondDepartureDateTime,
+                            DATEADD(
                                 SECOND,
-                                DATEDIFF(SECOND, CAST('00:00:00' AS TIME), ff2.departureTime),
-                                CAST(sd.SearchDate AS DATETIME)
-                            ) AS SecondDepartureDateTime
-                        ) secondFlight
-
-                        CROSS APPLY (
-                            SELECT DATEADD(
-                                SECOND,
-                                DATEDIFF(SECOND, CAST('00:00:00' AS TIME), ff2.arrivalTime),
-                                CAST(sd.SearchDate AS DATETIME)
+                                DATEDIFF(SECOND, CAST('00:00:00' AS TIME), ff2.departureTime) + 
+                                DATEDIFF(SECOND, CAST('00:00:00' AS TIME), CAST(r2.stimatedTime AS TIME)),
+                                CASE
+                                    WHEN ff2.departureTime >= ff1.estimatedArrivalTime
+                                    THEN CAST(sd.SearchDate AS DATETIME)
+                                    ELSE DATEADD(DAY, 1, CAST(sd.SearchDate AS DATETIME))
+                                END
                             ) AS SecondArrivalDateTime
-                        ) secondArrival
+                    ) secondFlight
 
                 WHERE
-                ac1.cantPasajeros >= @quantityOfPassengers
-                AND ac2.cantPasajeros >= @quantityOfPassengers
+                    ac1.cantPasajeros >= @quantityOfPassengers
+                    AND ac2.cantPasajeros >= @quantityOfPassengers
 
-                AND ff1.active = 1
-                AND ff2.active = 1
+                    AND ff1.active = 1
+                    AND ff2.active = 1
 
 
-                AND sd.SearchDate >= ff1.startingDate
-                AND sd.SearchDate <= ff1.endingDate
+                    AND sd.SearchDate >= ff1.startingDate
+                    AND sd.SearchDate <= ff1.endingDate
 
-                AND sd.SearchDate >= ff2.startingDate
-                AND sd.SearchDate <= ff2.endingDate
+                    AND CAST(secondFlight.SecondDepartureDateTime AS DATE) >= ff2.startingDate
+                    AND CAST(secondFlight.SecondDepartureDateTime AS DATE) <= ff2.endingDate
 
                 AND ff1.dayOfWeek = CASE DATEDIFF(DAY, '19000101', sd.SearchDate) % 7
                     WHEN 0 THEN 'Monday'
@@ -251,7 +267,7 @@ namespace AirDreams.API.Repositories
                     WHEN 5 THEN 'Saturday'
                     WHEN 6 THEN 'Sunday'
                 END
-                AND ff2.dayOfWeek = CASE DATEDIFF(DAY, '19000101', sd.SearchDate) % 7
+                AND ff2.dayOfWeek = CASE DATEDIFF(DAY, '19000101', CAST(secondFlight.SecondDepartureDateTime AS DATE)) % 7
                     WHEN 0 THEN 'Monday'
                     WHEN 1 THEN 'Tuesday'
                     WHEN 2 THEN 'Wednesday'
@@ -262,9 +278,8 @@ namespace AirDreams.API.Repositories
                 END
 
                 AND firstFlight.FirstDepartureDateTime >= @earliestDeparture
-                AND secondArrival.SecondArrivalDateTime <= @latestDeparture
-                AND firstArrival.FirstArrivalDateTime <= secondFlight.SecondDepartureDateTime
-                AND DATEDIFF(HOUR, firstArrival.FirstArrivalDateTime, secondFlight.SecondDepartureDateTime) >= 1
+                AND firstFlight.FirstArrivalDateTime <= secondFlight.SecondDepartureDateTime
+                AND DATEDIFF(HOUR, firstFlight.FirstArrivalDateTime, secondFlight.SecondDepartureDateTime) BETWEEN 1 AND 12
                 OPTION (MAXRECURSION 366)
             ";
 

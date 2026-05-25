@@ -5,32 +5,71 @@
         <div class="left-section">
           <div class="flight-number">
             <span class="label">Vuelo:</span>
-            <span class="value">#{{ flight.flightGUID }}</span>
+            <span class="value">#{{ flight.itineraryId }}</span>
           </div>
 
-          <div class="times-section">
-            <div class="time-item">
-              <span class="time">{{ flight.route.departureTime }}</span>
-              <span class="date">{{ formatDate(departureDate) }}</span>
+          <div class="stops-info">
+            <span v-if="flight.stops === 0">Directo</span>
+            <span v-else-if="flight.stops === 1">1 escala</span>
+            <span v-else>{{ flight.stops }} escalas</span>
+          </div>
+
+          <div class="segments">
+            <div
+              v-for="(segment, index) in flight.segments"
+              :key="index"
+              class="segment"
+            >
+              <div class="segment-header">
+                <strong>Segmento {{ index + 1 }}</strong>
+              </div>
+
+              <div class="segment-body">
+                <div class="segment-left">
+                  <div class="airports">
+                    <span class="airport-code">
+                      {{ segment.departureAirport.code }}
+                    </span>
+
+                    <span class="arrow">→</span>
+
+                    <span class="airport-code">
+                      {{ segment.arrivalAirport.code }}
+                    </span>
+                  </div>
+
+                  <div class="times-section">
+                    <div class="time-item">
+                      <span class="label">Salida:</span>
+                      <span class="time">{{ segment.departureTime }}</span>
+                      <span class="date">
+                        {{ formatDate(segment.departureDate) }}
+                      </span>
+                    </div>
+
+                    <div class="time-item">
+                      <span class="label">Llegada:</span>
+                      <span class="time">{{ segment.arrivalTime }}</span>
+                      <span class="date">
+                        {{ formatDate(segment.arrivalDate) }}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="prices">
+                  <span class="price tourist-price">
+                    Turista: {{ formatCurrency(flight.touristPrice) }}
+                  </span>
+
+                  <span class="price first-class-price">
+                    Primera clase: {{ formatCurrency(flight.firstClassPrice) }}
+                  </span>
+                </div>
+              </div>
             </div>
-            <div class="time-item">
-              <span class="time">{{ flight.route.arrivalTime }}</span>
-              <span class="date">{{ formatDate(flight.departureDate) }}</span>
-            </div>
           </div>
 
-          <div class="flight-duration">
-            <span class="label">Duración:</span>
-            <span class="value">{{ flight.route.duration }}</span>
-          </div>
-        </div>
-
-        <div class="right-section">
-          <div class="airports">
-            <span class="airport-code">{{ flight.route.departureAirport.code }}</span>
-            <span class="arrow">→</span>
-            <span class="airport-code">{{ flight.route.arrivalAirport.code }}</span>
-          </div>
         </div>
       </div>
     </div>
@@ -46,12 +85,21 @@ export default {
   methods: {
     formatDate(dateStr) {
       if (!dateStr) return '';
+
       const date = new Date(dateStr);
-      return date.toLocaleDateString('es-ES', { 
-        day: '2-digit', 
-        month: '2-digit', 
-        year: 'numeric' 
+
+      return date.toLocaleDateString('es-ES', {
+        day: '2-digit',
+        month: '2-digit',
+        year: 'numeric'
       });
+    },
+
+    formatCurrency(value) {
+      return new Intl.NumberFormat('en-US', {
+        style: 'currency',
+        currency: 'USD'
+      }).format(value);
     }
   }
 };
@@ -82,7 +130,7 @@ export default {
   display: flex;
   justify-content: flex-start;
   align-items: flex-start;
-  position: relative;
+  width: 100%;
 }
 
 .left-section {
@@ -90,6 +138,7 @@ export default {
   flex-direction: column;
   gap: 12px;
   flex: 1;
+  width: 100%;
 }
 
 .flight-number {
@@ -110,57 +159,43 @@ export default {
   color: #032056;
 }
 
-.times-section {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
-
-.time-item {
-  display: flex;
-  flex-direction: column;
-}
-
-.time-item .time {
+.stops-info {
   font-size: 14px;
   font-weight: 600;
-  color: #032056;
+  color: #2e7d32;
 }
 
-.time-item .date {
-  font-size: 12px;
-  color: #666;
-  margin-top: 2px;
-  display: block;
-}
-
-.flight-duration {
+.segments {
   display: flex;
-  gap: 8px;
-  align-items: center;
-  padding-top: 8px;
+  flex-direction: column;
+  gap: 16px;
+  width: 100%;
+}
+
+.segment {
+  width: 100%;
+  padding-top: 12px;
   border-top: 1px solid #e0e0e0;
 }
 
-.flight-duration .label {
+.segment-header {
+  margin-bottom: 10px;
   font-size: 14px;
-  font-weight: 600;
-  color: #666;
-}
-
-.flight-duration .value {
-  font-size: 14px;
-  font-weight: 600;
   color: #032056;
 }
 
-.right-section {
-  position: absolute;
-  top: 0;
-  right: 0;
+.segment-body {
   display: flex;
-  align-items: center;
-  justify-content: flex-end;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 24px;
+  width: 100%;
+}
+
+.segment-left {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
 }
 
 .airports {
@@ -179,5 +214,52 @@ export default {
   font-size: 24px;
   font-weight: bold;
   color: #032056;
+}
+
+.times-section {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.time-item {
+  display: flex;
+  flex-direction: column;
+}
+
+.time-item .label {
+  font-size: 12px;
+  font-weight: 600;
+  color: #666;
+}
+
+.time-item .time {
+  font-size: 14px;
+  font-weight: 600;
+  color: #032056;
+}
+
+.time-item .date {
+  font-size: 12px;
+  color: #666;
+  margin-top: 2px;
+  display: block;
+}
+
+.prices {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 8px;
+  margin-left: auto;
+  color: #2e7d32;
+  min-width: 180px;
+}
+
+.price {
+  font-size: 15px;
+  font-weight: 700;
+  color: #2e7d32;
+  white-space: nowrap;
 }
 </style>

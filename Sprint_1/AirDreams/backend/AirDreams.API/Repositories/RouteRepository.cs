@@ -76,9 +76,14 @@ public class RouteRepository : IRouteRepository
                 codeAirportSalida, 
                 codeAirportLlegada, 
                 plateNumber,
-                firstClassPrice, 
+                firstClassPrice,
                 turistClassPrice,
                 stimatedTime,
+                luggagePrice,
+                luggageMaxWeight,
+                carryOnPrice,
+                carryOnMaxWeight,
+                porcentageMultiplier,
                 distance)
 
                 VALUES (
@@ -89,6 +94,11 @@ public class RouteRepository : IRouteRepository
                 @FirstClassPrice,
                 @TuristClassPrice,
                 @StimatedTime,
+                @luggagePrice,
+                @luggageMaxWeight,
+                @carryOnPrice,
+                @carryOnMaxWeight,
+                @porcentageMultiplier,             
                 @Distance);
 
                 SELECT CAST(SCOPE_IDENTITY() AS int);

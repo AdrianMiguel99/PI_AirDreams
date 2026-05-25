@@ -44,58 +44,58 @@
 
 
         <div class="card flight-card p-4 shadow-sm mb-5">
-        <h3 class="d-flex section-title mb-3">Registrar Vuelo</h3>
+            <h3 class="d-flex section-title mb-3">Registrar Vuelo</h3>
 
-        <form @submit.prevent="saveFlight">
-            <div class="row">
+            <form @submit.prevent="saveFlight">
+                <div class="row">
 
-            <div class="col-md-6 position-relative mb-3">
-                <label for="originAirport" class="form-label">
-                Aeropuerto de origen
-                </label>
-                <input
-                v-model="originAirportQuery"
-                type="text"
-                id="originAirport"
-                @focus="showOriginResults = true"
-                @input="onOriginAirportInput"
-                placeholder="Ej: SJO o Juan Santamaría"
-                autocomplete="off"
-                class="form-control"
-                required
-            />
+                <div class="col-md-6 position-relative mb-3">
+                    <label for="originAirport" class="form-label">
+                        Aeropuerto de origen
+                    </label>
+                    <input
+                        v-model="originAirportQuery"
+                        type="text"
+                        id="originAirport"
+                        @focus="showOriginResults = true"
+                        @input="onOriginAirportInput"
+                        placeholder="Ej: SJO o Juan Santamaría"
+                        autocomplete="off"
+                        class="form-control"
+                        required
+                    />
 
-            <ul
-                v-if="showOriginResults && filteredOriginAirports.length > 0"
-                class="list-group position-absolute w-100 shadow"
-                style="z-index: 1000; max-height: 200px; overflow-y: auto;"
-            >
-                <li
-                v-for="airport in filteredOriginAirports"
-                :key="airport.id"
-                class="list-group-item list-group-item-action"
-                @click="selectOriginAirport(airport)"
-                style="cursor: pointer"
+                <ul
+                    v-if="showOriginResults && filteredOriginAirports.length > 0"
+                    class="list-group position-absolute w-100 shadow"
+                    style="z-index: 1000; max-height: 200px; overflow-y: auto;"
                 >
-                {{ airport.code }} - {{ airport.name }}
-                </li>
-            </ul>
+                    <li
+                        v-for="airport in filteredOriginAirports"
+                        :key="airport.id"
+                        class="list-group-item list-group-item-action"
+                        @click="selectOriginAirport(airport)"
+                        style="cursor: pointer"
+                    >
+                    {{ airport.code }} - {{ airport.name }}
+                    </li>
+                </ul>
             </div>
             
             <div class="col-md-6 position-relative mb-3">
                 <label for="destinationAirport" class="form-label">
-                Aeropuerto de destino
+                    Aeropuerto de destino
                 </label>
                 <input
-                v-model="destinationAirportQuery"
-                type="text"
-                id="destinationAirport"
-                @focus="showDestinationResults = true"
-                @input="onDestinationAirportInput"
-                placeholder="Ej: LIR o Daniel Oduber"
-                autocomplete="off"
-                class="form-control"
-                required
+                    v-model="destinationAirportQuery"
+                    type="text"
+                    id="destinationAirport"
+                    @focus="showDestinationResults = true"
+                    @input="onDestinationAirportInput"
+                    placeholder="Ej: LIR o Daniel Oduber"
+                    autocomplete="off"
+                    class="form-control"
+                    required
             />
 
             <ul
@@ -104,11 +104,11 @@
                 style="z-index: 1000; max-height: 200px; overflow-y: auto;"
             >
                 <li
-                v-for="airport in filteredDestinationAirports"
-                :key="airport.id"
-                class="list-group-item list-group-item-action"
-                @click="selectDestinationAirport(airport)"
-                style="cursor: pointer"
+                    v-for="airport in filteredDestinationAirports"
+                    :key="airport.id"
+                    class="list-group-item list-group-item-action"
+                    @click="selectDestinationAirport(airport)"
+                    style="cursor: pointer"
                 >
                 {{ airport.code }} - {{ airport.name }}
                 </li>
@@ -116,102 +116,160 @@
             </div>
 
             <div class="col-md-6 mb-3">
-            <label for="departureTime" class="form-label">
-                Hora de salida
-            </label>
-            <input
-                v-model="formData.departureTime"
-                type="time"
-                id="departureTime"
-                class="form-control"
-                required
-            />
+                <label for="departureTime" class="form-label">
+                    Hora de salida
+                </label>
+                <input
+                    v-model="formData.departureTime"
+                    type="time"
+                    id="departureTime"
+                    class="form-control"
+                    required
+                />
             </div>
 
             <div class="col-md-6 mb-3">
-            <label for="arrivalTime" class="form-label">
-                Hora de llegada
-            </label>
-            <input
-                v-model="formData.arrivalTime"
-                type="time"
-                id="arrivalTime"
-                class="form-control"
-                required
-            />
-            </div>
-
-            <div class="col-md-4 mb-3">
-            <label for="basePriceTurist" class="form-label">
-                Precio clase turista
-            </label>
-            <div class="input-group">
-            <input
-                v-model="formData.basePriceTurist"
-                type="number"
-                id="basePriceTurist"
-                class="form-control"
-                min="0"
-                max="99999"
-                step="0.01"
-                required
-            />
-            <span class="input-group-text">$</span>
-            </div>
-            </div>
-
-            <div class="col-md-4 mb-3">
-                <label for="basePriceFirstClass" class="form-label">
-                Precio primera clase
+                <label for="arrivalTime" class="form-label">
+                    Hora de llegada
                 </label>
-            <div class="input-group">
-            <input
-                v-model="formData.basePriceFirstClass"
-                type="number"
-                id="basePriceFirstClass"
-                class="form-control"
-                min="0"
-                max="99999"
-                step="0.01"
-                required
-            />
-            <span class="input-group-text">$</span>
+                <input
+                    v-model="formData.arrivalTime"
+                    type="time"
+                    id="arrivalTime"
+                    class="form-control"
+                    required
+                />
             </div>
+
+            <div class="col-md-4 mb-3">
+                <label for="basePriceTurist" class="form-label">
+                    Precio clase turista
+                </label>
+                <div class="input-group">
+                <input
+                    v-model="formData.basePriceTurist"
+                    type="number"
+                    id="basePriceTurist"
+                    class="form-control"
+                    min="0"
+                    max="99999"
+                    step="0.01"
+                    required
+                />
+                <span class="input-group-text">$</span>
+                </div>
+            </div>
+
+            <div class="col-md-4 mb-3">
+                    <label for="basePriceFirstClass" class="form-label">
+                    Precio primera clase
+                    </label>
+                <div class="input-group">
+                    <input
+                        v-model="formData.basePriceFirstClass"
+                        type="number"
+                        id="basePriceFirstClass"
+                        class="form-control"
+                        min="0"
+                        max="99999"
+                        step="0.01"
+                        required
+                    />
+                    <span class="input-group-text">$</span>
+                </div>
             </div>
             
             <div class="col-md-6 mb-3">
-            <label for="maxWeightLuggage" class="form-label">
-                Peso máximo de equipaje, kg
-            </label>
-            <div class="input-group">
-            <input
-                v-model="formData.maxWeightLuggage"
-                type="number"
-                id="maxWeightLuggage"
-                min="0"
-                max="9999"
-                class="form-control"
-                required
-            />
-            <span class="input-group-text">Kg</span>
+                <label for="luggageMaxWeight" class="form-label">
+                    Peso máximo de equipaje de cabina
+                </label>
+                <div class="input-group">
+                    <input
+                        v-model="formData.luggageMaxWeight"
+                        type="number"
+                        id="luggageMaxWeight"
+                        min="0"
+                        max="9999"
+                        class="form-control"
+                        required
+                    />
+                    <span class="input-group-text">Kg</span>
+                </div>
             </div>
-            </div>
+
             <div class="col-md-6 mb-3">
-            <label for="priceLuggage" class="form-label">
-                Precio por equipaje adicional
-            </label>
-            <div class="input-group">
-            <input
-                v-model="formData.priceLuggage"
-                type="number"
-                id="priceLuggage"
-                min="0"
-                step="0.01"
-                class="form-control"
-                required
-            />
-                <span class="input-group-text">$</span>
+                <label for="LuggagePrice" class="form-label">
+                    Precio por equipaje de cabina adicional
+                </label>
+                <div class="input-group">
+                    <input
+                        v-model="formData.luggagePrice"
+                        type="number"
+                        id="LuggagePrice"
+                        min="0"
+                        step="0.01"
+                        class="form-control"
+                        required
+                    />
+                    <span class="input-group-text">$</span>
+                </div>
             </div>
+
+            
+            <div class="col-md-6 mb-3">
+                <label for="carryOnMaxWeight" class="form-label">
+                    Peso máximo de equipaje carry-on de mano
+                </label>
+                <div class="input-group">
+                    <input
+                        v-model="formData.carryOnMaxWeight"
+                        type="number"
+                        id="carryOnMaxWeight"
+                        min="0"
+                        max="9999"
+                        class="form-control"
+                        required
+                    />
+                    <span class="input-group-text">Kg</span>
+                </div>
+            </div>
+
+            <div class="col-md-6 mb-3">
+                <label for="carryOnPrice" class="form-label">
+                    Precio por equipaje carry-on adicional
+                </label>
+                <div class="input-group">
+                    <input
+                        v-model="formData.carryOnPrice"
+                        type="number"
+                        id="carryOnPrice"
+                        min="0"
+                        step="0.01"
+                        class="form-control"
+                        required
+                    />
+                    <span class="input-group-text">$</span>
+                </div>
+            </div>
+
+
+            <div class="col-md-6 mb-3">
+                <label for="porcentageMultiplier" class="form-label">
+                    Porcentaje de aumento por equipaje adicional
+                </label>
+                <div class="input-group">
+                    <input
+                        v-model="formData.porcentageMultiplier"
+                        type="number"
+                        id="porcentageMultiplier"
+                        min="0"
+                        max="100"
+                        step="0.01"
+                        class="form-control"
+                        required
+                    />
+                    <span class="input-group-text">%</span>
+                </div>
             </div>
 
             <div class="col-12 mb-3">
@@ -342,8 +400,11 @@
             flightDuration: "",
             flightDistance: 0,
             aircraftModel: "",
-            maxWeightLuggage: 0,
-            priceLuggage: 0,
+            luggageMaxWeight: 0,
+            luggagePrice: 0,
+            carryOnPrice:0,
+            carryOnMaxWeight:0,
+            porcentageMultiplier: 0,
             frequency: []
         },
         weekDays: [
@@ -525,8 +586,11 @@
                 firstClassPrice: parseFloat(this.formData.basePriceFirstClass),
                 turistClassPrice: parseFloat(this.formData.basePriceTurist),
                 stimatedTime: stimatedTime,
-                maxWeightLuggage: parseFloat(this.formData.maxWeightLuggage),
-                priceLuggage: parseFloat(this.formData.priceLuggage),
+                luggageMaxWeight: parseFloat(this.formData.luggageMaxWeight),
+                luggagePrice: parseFloat(this.formData.luggagePrice),
+                carryOnMaxWeight: parseFloat(this.formData.carryOnMaxWeight),
+                carryOnPrice: parseFloat(this.formData.carryOnPrice),
+                porcentageMultiplier: parseFloat(this.formData.porcentageMultiplier),
                 distance: parseFloat(this.formData.flightDistance),
                 Frequencies: this.formData.frequency.map(day => ({
                 dayOfWeek: day,
@@ -565,7 +629,6 @@
                 this.errorMessage = "Error registrando vuelo. Revise los datos e inténtelo de nuevo.";
                 this.successMessage = "";
                 this.showSuccessPopup = false;
-                // alert("Error registrando vuelo (ver consola).");
             }
         }
     }

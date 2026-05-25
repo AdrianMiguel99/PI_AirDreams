@@ -14,6 +14,11 @@ namespace AirDreams.API.Models
         public string AircraftModel { get; set; } = string.Empty;
         public int MaxWeightLuggage { get; set; }
         public decimal PriceLuggage { get; set; }
-        public string Status { get; set; } = string.Empty;
+        
+        public decimal carryOnPrice { get; set; }
+
+        public decimal carryOnMaxWeight { get; set; }
+
+        public decimal porcentageMultiplier { get; set; }
     }
 }

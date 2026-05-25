@@ -51,8 +51,14 @@ namespace AirDreams.API.Services
             if (model.FirstClassPrice < 0 || model.TuristClassPrice < 0)
                 throw new ArgumentException("Los precios no pueden ser negativos.");
 
-            if (model.PriceLuggage < 0)
+            if (model.LuggagePrice < 0 || model.carryOnPrice < 0)
                 throw new ArgumentException("El precio de equipaje no puede ser negativo.");
+
+            if (model.carryOnMaxWeight < 0 || model.LuggageMaxWeight < 0)
+                throw new ArgumentException("El peso del equipaje no puede ser negativo");
+
+            if(model.porcentageMultiplier < 0 || model.porcentageMultiplier > 100)
+                throw new ArgumentException("El multiplicador no puede ser menor a 0 ni mayor a 100");
 
             if (model.Distance <= 0)
                 throw new ArgumentException("La distancia debe ser mayor a cero.");
