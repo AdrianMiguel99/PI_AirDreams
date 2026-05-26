@@ -72,9 +72,18 @@ export default {
 
         if (response.ok) {
           localStorage.setItem("token", data.token);
+
           localStorage.setItem("user", JSON.stringify(data.user));
-          localStorage.setItem("role", data.user.role);
-          localStorage.setItem("employeeID", data.user.id);
+
+          localStorage.setItem(
+            "role",
+            data.user.role || data.user.Role
+          );
+
+          localStorage.setItem(
+            "employeeID",
+            data.user.id || data.user.Id
+          );
 
           this.$router.push({name: "admin"});
         } else {
@@ -83,7 +92,6 @@ export default {
           this.errorPassword = true;
         }
       } catch (error) {
-        console.error(error);
         this.mensaje = "Error de conexión con el servidor";
         this.errorCorreo = true;
         this.errorPassword = true;

@@ -102,10 +102,10 @@ namespace AirDreams.API.Controllers
                     message = result.message,
                     user = new 
                     {
-                        result.user.Id,
-                        result.user.FullName,
-                        result.user.Email,
-                        result.user.Role
+                        id = result.user.Id,
+                        fullName = result.user.FullName,
+                        email = result.user.Email,
+                        role = result.user.Role
                     }
                 });
             }
