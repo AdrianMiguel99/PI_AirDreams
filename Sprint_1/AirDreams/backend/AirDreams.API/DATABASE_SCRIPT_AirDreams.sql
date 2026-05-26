@@ -423,3 +423,8 @@ VALUES (
     4,
     'SDIiE8dzYJSdyI6Uxi2n3GgJ5sgnNUlJxe07EvbiqHoO2FYz0mllpyF0dK3TJN4nCmJHmD4lv0MQgb2BM0qA2pPBF0vdOnWE1hnkiBqvi3uNXjIdz1KVGZ25ZXU8XwWlu0Uzu88JmUVGE6BW64fywMG4oNe9mECdcHdI3zXTUcqTkVJP9KiPbWGw1g71JK3EL9V0qs7R2veM8jk0ZHLfFRllt80J0G26OAq6oiB7W3FWP8NT84L7CMJyKTnv6r2o'
 );
+
+UPDATE AirlineEmployee
+SET isAdmin = 1,
+    isOperator = 0
+WHERE emailInternalUser = 'admin3@air.com';
