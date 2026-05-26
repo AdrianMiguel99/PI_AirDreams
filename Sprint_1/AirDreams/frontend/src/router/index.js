@@ -28,14 +28,13 @@ const routes = [
   { path: '/login', name: 'login', component: Login },
   { path: '/registro', name: 'registro', component: RegistroUsuarios },
 
-  { path: '/admin', name: 'admin', component: LandingPageAdmin },
-  { path: '/adminHome', name: 'adminHome', component: LandingPageAdmin },
+  { path: '/admin', name: 'admin', component: LandingPageAdmin, meta: { requiresAdmin: true }},
+  { path: '/adminHome', name: 'adminHome', component: LandingPageAdmin, meta: { requiresAdmin: true }},
 
   { path: '/admin/flightsRegister', name: 'flightsRegister', component: FlightsRegister },
   { path: '/admin/routesList', name: 'routesList', component: ListaRutas },
 
-  { path: '/admin/usuarios', name: 'adminUsuarios', component: ListaUsuarios },
-
+  { path: '/admin/usuarios', name: 'adminUsuarios', component: ListaUsuarios, meta: { requiresAdmin: true }},
   { path: '/addPlane', name: 'addPlane', component: AddAirplaneView },
   { path: '/listPlanes', name: 'listPlanes', component: ListAirplaneView },
   { path: '/editPlane/:plateNumber', name: 'editPlane', component: EditAirplane },
