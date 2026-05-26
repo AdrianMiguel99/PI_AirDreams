@@ -270,5 +270,44 @@ namespace AirDreams.API.Services
             var hashOfInput = HashPassword(password);
             return hashOfInput == hash;
         }
+
+        public async Task<bool> UpdateUserAsync(byte employeeId, UpdateUserDto updateDto, string currentUserEmail)
+        {
+            var currentUserId = await _userRepository.GetCurrentUserIdFromEmailAsync(currentUserEmail);
+            var currentUser = await _userRepository.GetAirlineEmployeeByIdAsync(currentUserId);
+            
+            if (currentUser == null)
+            {
+                throw new UnauthorizedAccessException("Usuario no encontrado");
+            }
+            
+            var targetUser = await _userRepository.GetAirlineEmployeeByIdAsync(employeeId);
+            
+            if (targetUser == null)
+            {
+                return false;
+            }
+            
+            bool isAdmin = currentUser.IsAdmin;
+            bool isEditingSelf = currentUserId == employeeId;
+            
+            if (!isAdmin && !isEditingSelf)
+            {
+                throw new UnauthorizedAccessException("No tienes permiso para editar otros usuarios");
+            }
+            
+            string? firstName = updateDto.FirstName;
+            string? lastName = updateDto.LastName;
+            bool? isAdminUpdate = isAdmin ? updateDto.IsAdmin : null;
+            bool? isOperatorUpdate = isAdmin ? updateDto.IsOperator : null;
+            bool? isActiveUpdate = isAdmin ? updateDto.IsActive : null;
+            
+            await _userRepository.UpdateAirlineEmployeeAsync(employeeId, firstName, lastName, isAdminUpdate, isOperatorUpdate);
+            await _userRepository.UpdateInternalUserActiveStatusAsync(employeeId, isActiveUpdate);
+            
+            return true;
+        }
     }
 }
+
+
