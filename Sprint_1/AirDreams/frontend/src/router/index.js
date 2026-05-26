@@ -11,10 +11,12 @@ import EditAirplane from '../views/EditAirplane.vue'
 import ListaUsuarios from '../components/ListaUsuarios.vue'
 import AirportRegister from '../components/AirportRegister.vue'
 import AirportList from '../components/AirportList.vue'
-import FlightsRegister from '../components/FlightsRegister.vue'
+import FlightsRegister from '../components/RegistroVuelos.vue'
 import ListaRutas from '../components/ListaRutas.vue'
+import RegistroVuelos from '../components/RegistroVuelos.vue'
 import AirplaneManagement from '../views/AirplaneManagement.vue'
 import AddAirplaneView from '../views/AddAirplaneView.vue'
+import AirportEdit from '../components/AirportEdit.vue'
 
 const routes = [
   
@@ -31,7 +33,7 @@ const routes = [
   { path: '/admin', name: 'admin', component: LandingPageAdmin },
   { path: '/adminHome', name: 'adminHome', component: LandingPageAdmin },
 
-  { path: '/admin/flightsRegister', name: 'flightsRegister', component: FlightsRegister },
+  { path: '/admin/flightsRegister', name: 'flightsRegister', component: RegistroVuelos },
   { path: '/admin/routesList', name: 'routesList', component: ListaRutas },
 
   { path: '/admin/usuarios', name: 'adminUsuarios', component: ListaUsuarios },
@@ -42,7 +44,7 @@ const routes = [
   { path: '/admin/airports/register', name: 'airportRegister', component: AirportRegister },
   { path: '/admin/airports/list', name: 'airportList', component: AirportList },
   { path: '/admin/airports', redirect: '/admin/airports/register' },
-
+  { path: '/admin/airports/edit/:code', name: 'airportEdit', component: AirportEdit }
 ]
 
 const router = createRouter({

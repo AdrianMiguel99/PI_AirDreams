@@ -41,19 +41,19 @@ const navigateTo = (path) => {
                 <span class="arrow">›</span>
             </div>
 
-            <div class="card" @click="navigateTo('/admin/flightsRegister')">
+            <div class="card" @click="navigateTo('/admin/routesList')">
                 <img :src="routeIcon" alt="Route" class="icon blue">
                 <div>
-                <h3>Crear ruta</h3>
+                <h3>Administración de rutas</h3>
                 <p>Gestiona y crea nuevas rutas de vuelo.</p>
                 </div>
                 <span class="arrow">›</span>
             </div>
 
-            <div class="card" @click="navigateTo('/admin/airports/register')">
+            <div class="card" @click="navigateTo('/admin/airports/list')">
                 <img :src="airportIcon" alt="Airport" class="icon blue">
                 <div>
-                <h3>Aeropuertos</h3>
+                <h3>Administración de Aeropuertos</h3>
                 <p>Gestiona y crea nuevos aeropuertos.</p>
                 </div>
                 <span class="arrow">›</span>

@@ -40,5 +40,12 @@ namespace AirDreams.API.Repositories
             var count = await _connection.ExecuteScalarAsync<int>(sql, new { Code = code });
             return count > 0;
         }
+
+        public async Task<bool> UpdateAsync(string code, string newName)
+        {
+            var sql = "UPDATE Airport SET nameAirport = @Name WHERE codeAirport = @Code";
+            var affected = await _connection.ExecuteAsync(sql, new { Code = code, Name = newName });
+            return affected > 0;
+        }
     }
 }

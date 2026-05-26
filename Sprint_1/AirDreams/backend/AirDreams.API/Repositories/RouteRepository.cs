@@ -26,24 +26,24 @@ public class RouteRepository : IRouteRepository
     if (_connection.State == ConnectionState.Closed) _connection.Open();
 
     var sql = @"
-    SELECT
-    r.idRoute AS Id,
-    r.stimatedTime AS Duration,
-    r.firstClassPrice AS FirstClassPrice,
-    r.turistClassPrice AS TouristPrice,
-    a1.codeAirport AS Code,
-    a1.nameAirport AS Name,
-    a1.city AS City,
-    a1.country AS Country,
-    a1.timeZone AS TimeZone,
-    a2.codeAirport AS Code,
-    a2.nameAirport AS Name,
-    a2.city AS City,
-    a2.country AS Country,
-    a2.timeZone AS TimeZone
-    FROM Route r
-    LEFT JOIN Airport a1 ON r.codeAirportSalida = a1.codeAirport
-    LEFT JOIN Airport a2 ON r.codeAirportLlegada = a2.codeAirport;
+        SELECT
+            r.idRoute AS Id,
+            r.stimatedTime AS Duration,
+            r.firstClassPrice AS FirstClassPrice,
+            r.turistClassPrice AS TouristPrice,
+            a1.codeAirport AS Code,
+            a1.nameAirport AS Name,
+            a1.city AS City,
+            a1.country AS Country,
+            a1.timeZone AS TimeZone,
+            a2.codeAirport AS Code,
+            a2.nameAirport AS Name,
+            a2.city AS City,
+            a2.country AS Country,
+            a2.timeZone AS TimeZone
+        FROM Route r
+        LEFT JOIN Airport a1 ON r.codeAirportSalida = a1.codeAirport
+        LEFT JOIN Airport a2 ON r.codeAirportLlegada = a2.codeAirport;
     ";
 
     
@@ -71,35 +71,60 @@ public class RouteRepository : IRouteRepository
         try
         {
             var insertRoute = @"
-                INSERT INTO Route (adminID, codeAirportSalida, codeAirportLlegada, plateNumber,
-                    firstClassPrice, turistClassPrice, routeState, stimatedTime, distance)
-                VALUES (@AdminID,@CodeAirportSalida,@CodeAirportLlegada,@PlateNumber,
-                    @FirstClassPrice,@TuristClassPrice, @RouteState, @StimatedTime,@Distance);
+                INSERT INTO Route (
+                adminID,
+                codeAirportSalida, 
+                codeAirportLlegada, 
+                plateNumber,
+                firstClassPrice,
+                turistClassPrice,
+                stimatedTime,
+                luggagePrice,
+                luggageMaxWeight,
+                carryOnPrice,
+                carryOnMaxWeight,
+                porcentageMultiplier,
+                distance)
+
+                VALUES (
+                @AdminID,
+                @CodeAirportSalida,
+                @CodeAirportLlegada,
+                @PlateNumber,
+                @FirstClassPrice,
+                @TuristClassPrice,
+                @StimatedTime,
+                @luggagePrice,
+                @luggageMaxWeight,
+                @carryOnPrice,
+                @carryOnMaxWeight,
+                @porcentageMultiplier,             
+                @Distance);
+
                 SELECT CAST(SCOPE_IDENTITY() AS int);
             ";
             var routeId = await _connection.ExecuteScalarAsync<int>(insertRoute, model, tran);
 
             var insertFreq = @"
-                INSERT INTO FlightFrequency (idRoute, dayOfWeek, departureTime, estimatedArrivalTime, startingDate, endingDate, active)
-                VALUES (@IdRoute, @DayOfWeek, @DepartureTime, @EstimatedArrivalTime, @StartingDate, @EndingDate, @Active);
+                INSERT INTO FlightFrequency (
+                idRoute,
+                dayOfWeek,
+                departureTime,
+                estimatedArrivalTime,
+                startingDate,
+                endingDate,
+                active)
+
+                VALUES (
+                @IdRoute,
+                @DayOfWeek,
+                @DepartureTime,
+                @EstimatedArrivalTime,
+                CAST(GETDATE() AS DATE),
+                @EndingDate,
+                @Active);
             ";
 
-            var insertFlight = @"
-                INSERT INTO Flight (
-                    numberFlight,
-                    routeId,
-                    boardingGate,
-                    priceLuggage,
-                    departureDate
-                    )
-                VALUES (
-                    @NumberFlight,
-                    @RouteId,
-                    @BoardingGate,
-                    @PriceLuggage,
-                    @DepartureDate
-                );
-            ";
 
             int index = 1;
 
@@ -110,22 +135,14 @@ public class RouteRepository : IRouteRepository
                     DayOfWeek = f.DayOfWeek,
                     DepartureTime = f.DepartureTime,
                     EstimatedArrivalTime = f.EstimatedArrivalTime,
-                    StartingDate = f.StartingDate.Date,
                     EndingDate = f.EndingDate.Date,
                     Active = f.Active ? 1 : 0
                 };
                 await _connection.ExecuteAsync(insertFreq, p, tran);
 
-                var flight = new {
-                    NumberFlight = $"F{routeId:D3}{index:D2}",
-                    RouteId = routeId,
-                    BoardingGate = 1,
-                    PriceLuggage = model.PriceLuggage,
-                    DepartureDate = GetNextDateForDay(f.StartingDate.Date, f.DayOfWeek)
-                };
+            
 
-                await _connection.ExecuteAsync(insertFlight, flight, tran);
-
+            
                 index++;
             }
 
