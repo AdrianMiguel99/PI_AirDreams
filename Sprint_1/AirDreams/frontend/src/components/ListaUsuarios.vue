@@ -156,7 +156,6 @@ export default {
         this.users = response.data;
       })
       .catch(error => {
-        console.error(error);
         this.errorMessage = "No se pudieron cargar los usuarios.";
       })
       .finally(() => {
@@ -188,7 +187,6 @@ export default {
           this.users = response.data;
         })
         .catch(error => {
-          console.error(error);
           this.errorMessage = "Error al buscar usuarios.";
         })
         .finally(() => {
@@ -237,7 +235,6 @@ export default {
         this.fetchUsers();
       })
       .catch(error => {
-        console.error(error);
         this.showPopup = true;
         this.popupType = 'error';
         this.popupTitle = 'Error';
