@@ -1,19 +1,13 @@
 <template>
   <div class="container">
     <AdminHeader />
-    <div class="d-flex page">
+    <div class="page">
       <div class="content">
         <h1>Gestión de Aeropuertos</h1>
         <p class="subtitle">Registra un nuevo aeropuerto.</p>
 
-        <div class="d-flex justify-content-between mb-4">
-          <button class="btn boton_listar" @click="volverAlPanel">
-            ← Volver al panel
-          </button>
-          <button class="btn boton_listar" @click="irALista">
-            Listar Aeropuertos
-          </button>
-        </div>
+        <!-- Barra de navegación unificada -->
+        <ButtomNavigationAirports currentView="register" />
 
         <section class="form-section">
           <h2>Registrar Aeropuerto</h2>
@@ -73,39 +67,55 @@
             <div class="text-end">
               <button type="submit" class="btn colores_invertidos">Registrar Aeropuerto</button>
             </div>
-            <div v-if="mensaje" :class="['alert mt-3', tipoMensaje]">{{ mensaje }}</div>
           </form>
         </section>
       </div>
     </div>
+
+    <!-- Popup de éxito / error -->
+    <PopupMessage
+      :show="showPopup"
+      :type="popupType"
+      :title="popupTitle"
+      :message="popupMessage"
+      :actionText="popupActionText"
+      @close="showPopup = false"
+      @action="goToListFromPopup"
+    />
   </div>
 </template>
 
 <script>
 import axios from 'axios'
 import AdminHeader from './AdminHeader.vue'
+import PopupMessage from './PopupMessage.vue'
+import ButtomNavigationAirports from './ButtomNavigationAirports.vue'
 
 export default {
   name: 'AirportRegister',
-  components: { AdminHeader },
+  components: { AdminHeader, PopupMessage, ButtomNavigationAirports },
   data() {
     return {
       paises: [],
       ciudades: [],
-      mensaje: '',
-      tipoMensaje: 'alert-success',
       form: {
         code: '',
         name: '',
         country: '',
         city: '',
         timeZone: ''
-      }
+      },
+      // Popup
+      showPopup: false,
+      popupType: 'success',
+      popupTitle: '',
+      popupMessage: '',
+      popupActionText: ''
     }
   },
   methods: {
     getToken() {
-      return localStorage.getItem("token");
+      return localStorage.getItem('token')
     },
     async cargarPaises() {
       try {
@@ -130,18 +140,34 @@ export default {
         console.error('Error al cargar ciudades:', e)
       }
     },
+    showSuccessPopup() {
+      this.popupType = 'success'
+      this.popupTitle = 'Aeropuerto registrado exitosamente'
+      this.popupMessage = `El aeropuerto ${this.form.code || ''} fue creado correctamente.`
+      this.popupActionText = 'Ver lista'
+      this.showPopup = true
+    },
+    showErrorPopup(message) {
+      this.popupType = 'error'
+      this.popupTitle = 'Error al registrar aeropuerto'
+      this.popupMessage = message
+      this.popupActionText = ''
+      this.showPopup = true
+    },
+    goToListFromPopup() {
+      this.showPopup = false
+      this.$router.push('/admin/airports/list')
+    },
     async registrarAeropuerto() {
-      this.mensaje = ''
+      // Validación local
       if (!/^[A-Z]{3}$/.test(this.form.code)) {
-        this.mensaje = 'El código debe ser exactamente 3 letras mayúsculas.'
-        this.tipoMensaje = 'alert-danger'
+        this.showErrorPopup('El código debe ser exactamente 3 letras mayúsculas.')
         return
       }
       try {
         const token = this.getToken()
         if (!token) {
-          this.mensaje = 'Debes iniciar sesión.'
-          this.tipoMensaje = 'alert-danger'
+          this.showErrorPopup('Debes iniciar sesión.')
           return
         }
         const res = await axios.post('http://localhost:5276/api/airports', this.form, {
@@ -150,8 +176,8 @@ export default {
             'Authorization': `Bearer ${token}`
           }
         })
-        this.mensaje = `Aeropuerto ${res.data.code} registrado con éxito.`
-        this.tipoMensaje = 'alert-success'
+        // Éxito: popup y limpiar formulario
+        this.showSuccessPopup()
         this.form.code = ''
         this.form.name = ''
         this.form.country = ''
@@ -160,21 +186,14 @@ export default {
         this.ciudades = []
       } catch (e) {
         if (e.response?.status === 401) {
-          this.mensaje = 'Debes iniciar sesión.'
+          this.showErrorPopup('Debes iniciar sesión.')
         } else if (e.response?.status === 403) {
-          this.mensaje = 'No tienes permisos de administrador.'
+          this.showErrorPopup('No tienes permisos de administrador.')
         } else {
           const errMsg = e.response?.data?.error || 'Error al registrar.'
-          this.mensaje = errMsg
+          this.showErrorPopup(errMsg)
         }
-        this.tipoMensaje = 'alert-danger'
       }
-    },
-    irALista() {
-      this.$router.push('/admin/airports/list')
-    },
-    volverAlPanel() {
-      this.$router.push('/admin')
     }
   },
   created() {
@@ -184,7 +203,6 @@ export default {
 </script>
 
 <style scoped>
-
 .letra_semibold {
   font-family: 'Inter', sans-serif;
   font-weight: 600;
@@ -198,17 +216,6 @@ export default {
 }
 .colores_invertidos:hover {
   background-color: #2d3756;
-}
-.boton_listar {
-  font-family: 'Inter', sans-serif;
-  color: #384467;
-  font-weight: 600;
-  border: 2px solid #384467;
-  background: transparent;
-}
-.boton_listar:hover {
-  background-color: #384467;
-  color: white;
 }
 .page {
   flex: 1;

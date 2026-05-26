@@ -32,10 +32,10 @@ const navigateTo = (path) => {
         <section>
             <h2>Administración de vuelos</h2>
             <div class="cards">
-            <div class="card" @click="navigateTo('/addPlane')">
+            <div class="card" @click="navigateTo('/pruebas')">
                 <img :src="airplaneIcon" alt="Airplane" class="icon blue">
                 <div>
-                <h3>Tipos de aeronave</h3>
+                <h3>Gestionar aeronaves</h3>
                 <p>Gestiona y crea nuevas aeronaves.</p>
                 </div>
                 <span class="arrow">›</span>
@@ -50,7 +50,7 @@ const navigateTo = (path) => {
                 <span class="arrow">›</span>
             </div>
 
-            <div class="card" @click="navigateTo('/admin/airports/register')">
+            <div class="card" @click="navigateTo('/admin/airports/list')">
                 <img :src="airportIcon" alt="Airport" class="icon blue">
                 <div>
                 <h3>Administración de Aeropuertos</h3>

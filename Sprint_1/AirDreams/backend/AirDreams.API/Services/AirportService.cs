@@ -54,5 +54,16 @@ namespace AirDreams.API.Services
             Country = a.Country,
             TimeZone = a.TimeZone
         };
+
+        public async Task UpdateAsync(string code, UpdateAirportDto dto)
+        {
+            var airport = await _repository.GetByCodeAsync(code);
+            if (airport == null)
+                throw new KeyNotFoundException($"No se encontró el aeropuerto con código {code}.");
+
+            var updated = await _repository.UpdateAsync(code, dto.Name);
+            if (!updated)
+                throw new Exception("No se pudo actualizar el aeropuerto.");
+        }
     }
 }

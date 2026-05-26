@@ -8,5 +8,6 @@ namespace AirDreams.API.Repositories
         Task<Airport?> GetByCodeAsync(string code);
         Task<Airport> CreateAsync(Airport airport);
         Task<bool> ExistsAsync(string code);
+        Task<bool> UpdateAsync(string code, string newName);
     }
 }

@@ -1,53 +1,43 @@
 <template>
-  <!-- Icono -->
-  <div class="d-flex align-items-center">
-    <img 
-      src="https://i.ibb.co/MxwJ1Y9m/Chat-GPT-Image-7-abr-2026-01-52-40.png"
-      class="img-fluid"
-      alt="imagen de aerolinea"
-      style="width:50px"
-    >
-    <h2 class="letra_semibold" style="font-size: 1.3rem; padding-top: 10px;">
-      Air Dreams
-    </h2>
-  </div>
+  <div class="mt-5 add-airplane-view">
 
-  <!-- Título -->
-  <div class="container mt-5">
-
-    <div class="d-flex justify-content-end align-items-center">
-      <a href="/listPlanes"class="btn-volver-lista me-3">
-        Listar Aeronaves
-      </a>
-
-      <a href="/admin"class="btn-volver-lista">
-        Regresar
-      </a>
-
+    <div class="d-flex justify-content-between mb-4">
+      <h1 class="container title">
+        Registrar Aeronave
+      </h1>
     </div>
 
-    <h1 class="letra_bold text-center" style="font-size: 2.5rem; margin-top: 20px; margin-bottom: 50px;">
-      Registro de Aeronave
-    </h1>
+    <AirplaneForm
+      :aeronave="aeronave"
+      :onSubmit="saveAirplane"
+    />
+
+    <!-- popup -->
+    <PopupMessage
+      :show="showPopup"
+      :type="popupType"
+      :title="popupTitle"
+      :message="popupMessage"
+      :actionText="popupActionText"
+      @close="showPopup = false"
+      @action="goToList"
+    />
+
   </div>
-
- <!-- Formulario -->
-  <AirplaneForm
-    :aeronave="aeronave"
-    :onSubmit="saveAirplane"
-  />
-
 </template>
 
 <script>
 import axios from 'axios'
-import AirplaneForm from '../components/AirplaneForm.vue'
+
+import AirplaneForm from '../components/Airplane/AirplaneForm.vue'
+import PopupMessage from '../components/PopupMessage.vue'
 
 export default {
   name: 'AddAirplaneView',
 
   components: {
-    AirplaneForm
+    AirplaneForm,
+    PopupMessage
   },
 
   data() {
@@ -60,83 +50,114 @@ export default {
         cant_Filas_Firstclass: null,
         cant_Asientos_Fila_Turista: null,
         cant_Filas_Turista: null,
-        modelo: '',
-      }
+        modelo: ''
+      },
+
+      // POPUP
+      showPopup: false,
+      popupType: 'success',
+      popupTitle: '',
+      popupMessage: '',
+      popupActionText: ''
     }
   },
 
   methods: {
-    saveAirplane(aeronave) {
 
-      const token = localStorage.getItem("token");
-      axios.post('http://localhost:5276/api/Airplane',aeronave,
-      {
-        headers: {Authorization: `Bearer ${token}`}
-      })
+    resetForm() {
+      this.aeronave = {
+        plateNumber: '',
+        maxWeight: null,
+        cantPasajeros: null,
+        cant_Asientos_Fila_Firstclass: null,
+        cant_Filas_Firstclass: null,
+        cant_Asientos_Fila_Turista: null,
+        cant_Filas_Turista: null,
+        modelo: ''
+      }
+    },
+
+    showSuccessPopup() {
+      this.popupType = 'success'
+      this.popupTitle = 'Aeronave registrada exitosamente'
+      this.popupMessage = 'La aeronave fue creada correctamente.'
+      this.popupActionText = 'Ver lista'
+      this.showPopup = true
+    },
+
+    showErrorPopup(message) {
+      this.popupType = 'error'
+      this.popupTitle = 'Error al registrar aeronave'
+      this.popupMessage = message
+      this.popupActionText = ''
+      this.showPopup = true
+    },
+
+    goToList() {
+      this.showPopup = false
+
+      // Cambiar vista
+      this.$emit('change-view', 'list')
+    },
+
+    saveAirplane(aeronave) {
+      const token = localStorage.getItem('token')
+
+      axios.post(
+        'http://localhost:5276/api/Airplane',
+        aeronave,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`
+          }
+        }
+      )
       .then(() => {
-        alert('Aeronave registrada correctamente');
+
+        this.showSuccessPopup()
+
+        this.resetForm()
       })
       .catch((error) => {
-        console.error(error);
+
+        console.error(error)
 
         if (error.response?.status === 401) {
-          alert('Debes iniciar sesión');
-        return;
+          this.showErrorPopup('Debes iniciar sesión')
+          return
         }
 
         if (error.response?.status === 403) {
-          alert('No tienes permisos');
-          return;
+          this.showErrorPopup('No tienes permisos')
+          return
         }
 
-        alert('Error al registrar aeronave');
-      });
+        this.showErrorPopup(
+  error.response?.data?.message ||
+  error.response?.data ||
+  'Ocurrió un error inesperado'
+)
+      })
     }
   }
 }
 </script>
 
 <style scoped>
-.letra_bold {
+.add-airplane-view {
+  width: 100%;
+  margin-top: 40px;
+}
+
+.title {
   font-family: 'Inter', sans-serif;
   color: #384467;
   font-weight: bold;
+  font-size: 2.5rem;
 }
 
-.letra_semibold {
-  font-family: 'Inter', sans-serif;
-  font-weight: 600;
-  color: #384467;
-}
-
-.boton_listar {
-  font-family: 'Inter', sans-serif;
-  color: #384467;
-  font-weight: 600;
-  border: 2px solid #384467;
-}
-
-.boton_listar:hover {
-  background-color: #384467;
-  color: white;
-}
-
-.btn-volver-lista {
-
-  display: inline-block;
-
-  background-color: #384467;
-  color: white;
-
-  padding: 10px 20px;
-
-  text-decoration: none;
-
-  border-radius: 8px;
-
-  font-family: 'Inter', sans-serif;
-  font-weight: 500;
-
-  transition: 0.3s;
+.container {
+  padding-right: 100px;
+  width: 50%;
 }
 </style>
