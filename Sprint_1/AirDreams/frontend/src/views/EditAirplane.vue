@@ -106,7 +106,7 @@ export default {
     },
 
     goBack() {
-      this.$router.push('/pruebas');
+      this.$router.push('/managementPlanes');
     },
 
     handlePopupAction() {

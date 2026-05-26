@@ -36,15 +36,13 @@ const routes = [
 
   { path: '/admin/usuarios', name: 'adminUsuarios', component: ListaUsuarios },
 
-  { path: '/addPlane', name: 'addPlane', component: AddAirplaneView },
-  { path: '/listPlanes', name: 'listPlanes', component: ListAirplaneView },
+  { path: '/managementPlanes', name: 'managementPlanes', component: AirplaneManagement },
   { path: '/editPlane/:modelo', name: 'editPlane', component: EditAirplane },
 
   { path: '/admin/airports/register', name: 'airportRegister', component: AirportRegister },
   { path: '/admin/airports/list', name: 'airportList', component: AirportList },
   { path: '/admin/airports', redirect: '/admin/airports/register' },
 
-  { path: '/pruebas', name: 'pruebas', component: AirplaneManagement }
 ]
 
 const router = createRouter({
