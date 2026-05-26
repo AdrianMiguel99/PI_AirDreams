@@ -92,7 +92,6 @@ export default {
           this.errorPassword = true;
         }
       } catch (error) {
-        console.error(error);
         this.mensaje = "Error de conexión con el servidor";
         this.errorCorreo = true;
         this.errorPassword = true;
