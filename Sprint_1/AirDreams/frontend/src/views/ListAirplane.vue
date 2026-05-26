@@ -60,18 +60,36 @@
       No hay aeronaves registradas.
     </p>
 
+    <PopupMessage
+      :show="showPopup"
+      :type="popupType"
+      :title="popupTitle"
+      :message="popupMessage"
+      :actionText="popupActionText"
+      @close="showPopup = false"    
+    />                
   </div>
 </template>
 
 <script>
 import axios from 'axios';
+import PopupMessage from '../components/PopupMessage.vue';
 
 export default {
   name: 'ListAirplane',
+  components: {
+    PopupMessage
+  },
 
   data() {
     return {
-      airplanes: []
+      airplanes: [],
+
+      showPopup: false,
+      popupType: 'success',
+      popupTitle: '',
+      popupMessage: '',
+      popupActionText: ''
     };
   },
 
@@ -89,12 +107,17 @@ export default {
     deleteAirplane(modelo) {
       axios.delete(`http://localhost:5276/api/Airplane/${modelo}`)
         .then(() => {
-          alert('Aeronave eliminada con éxito');
+          this.showPopup = true;
+          this.popupType = 'success';
+          this.popupTitle = 'Aeronave Eliminada';
+          this.popupMessage = 'Aeronave eliminada con éxito';
           this.getAirplanes();
         })
         .catch(error => {
-          console.error("ERROR:", error.response?.data);
-          alert('Error al eliminar la aeronave');
+          this.showPopup = true;
+          this.popupType = 'error';
+          this.popupTitle = 'Error al eliminar aeronave';
+          this.popupMessage = error.response?.data?.message || error.response?.data || 'Ocurrió un error al eliminar la aeronave.';
         });
     }
   },

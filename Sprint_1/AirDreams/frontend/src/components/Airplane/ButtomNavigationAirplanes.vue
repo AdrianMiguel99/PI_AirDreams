@@ -1,17 +1,17 @@
 <template>
   <div class="navigation-container">
 
-    <template v-if="mode === 'default'">
+    <template v-if="mode !== 'edit'">
 
       <button
-        :class="['nav-btn', { active: activeButton === 'list' }]"
+        :class="['nav-btn', { active: mode === 'list' }]"
         @click="selectButton('list')"
       >
         Lista de aeronaves
       </button>
 
       <button
-        :class="['nav-btn', { active: activeButton === 'register' }]"
+        :class="['nav-btn', { active: mode === 'register' }]"
         @click="selectButton('register')"
       >
         Registro de Aeronave
@@ -25,7 +25,14 @@
         class="nav-btn active"
         @click="$router.back()"
       >
-        Regresar
+        Editar aeronave
+      </button>
+
+      <button
+        class="nav-btn"
+        @click="$router.back()"
+      >
+        Volver a la lista
       </button>
 
     </template>
@@ -46,34 +53,22 @@ export default {
   props: {
     mode: {
       type: String,
-      default: 'default'
-    }
-  },
-
-  data() {
-    return {
-      activeButton: 'list'
+      default: 'list'
     }
   },
 
   methods: {
 
     selectButton(view) {
-
-      this.activeButton = view
-
       this.$emit(
-        'change-view',
-        view
+      'change-view',
+      view
       )
-
     }
-
   }
 
 }
 </script>
-
 <style scoped>
 
 .navigation-container {

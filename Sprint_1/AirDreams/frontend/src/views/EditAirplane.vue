@@ -16,6 +16,8 @@
       v-if="airplane"
       :aeronave="airplane"
       :onSubmit="updateAirplane"
+      :isEditMode="true"
+      @show-popup="openPopup"
     />
 
     <PopupMessage
@@ -25,7 +27,7 @@
       :message="popupMessage"
       :actionText="popupActionText"
       @close="showPopup = false"
-      @action="goBack"
+      @action="handlePopupAction"
     />
 
   </div>
@@ -85,6 +87,7 @@ export default {
           this.popupType = 'success';
           this.popupTitle = 'Éxito';
           this.popupMessage = 'Aeronave actualizada correctamente';
+          this.popupActionText = 'Volver a la lista';
           this.getAirplane();
 
         })
@@ -98,12 +101,32 @@ export default {
           this.popupType = 'error';
           this.popupTitle = 'Error';
           this.popupMessage = 'Error al actualizar la aeronave';
+          this.popupActionText = '';
         });
     },
 
     goBack() {
       this.$router.push('/pruebas');
+    },
+
+    handlePopupAction() {
+      this.showPopup = false;
+    if (
+      this.popupActionText ===
+      'Volver a la lista'
+    ) {
+      this.goBack();
     }
+
+    },
+
+    openPopup(popupData) {
+      this.showPopup = true;
+      this.popupType = popupData.type;
+      this.popupTitle = popupData.title;
+      this.popupMessage = popupData.message;
+      this.popupActionText = popupData.actionText || 'Aceptar';
+    },
 
   },
 

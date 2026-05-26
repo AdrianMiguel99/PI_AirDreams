@@ -25,31 +25,43 @@ namespace AirDreams.API.Controllers
 
         [HttpPost]
         [Authorize(Roles = "Admin")]
-        public ActionResult<bool> AddAirplane([FromBody] AircraftModel aircraft)
+        public ActionResult AddAirplane([FromBody] AircraftModel aircraft)
         {
             if (aircraft == null)
             {
-                return BadRequest("Datos inválidos.");
+                return BadRequest(new
+                {
+                    message = "Los datos de la aeronave son inválidos."
+                });
             }
 
-            var adminIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value; //variable claim
-            var result = aircraftService.AddAircraft(aircraft);
+            var adminIdClaim =
+                User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
 
-            // si es nula entonces NO es admin
             if (adminIdClaim == null)
             {
-                return Unauthorized("No se pudo identificar el administrador.");
+                return Unauthorized(new
+                {
+                    message = "No se pudo identificar el administrador."
+                });
             }
+
             aircraft.AdminID = int.Parse(adminIdClaim);
 
-            var result2 = aircraftService.AddAircraft(aircraft);
+            var result = aircraftService.AddAircraft(aircraft);
 
-            if (string.IsNullOrEmpty(result2))
+            if (string.IsNullOrEmpty(result))
             {
-                return Ok(true);
+                return Ok(new
+                {
+                    message = "Aeronave registrada correctamente."
+                });
             }
 
-            return BadRequest(result);
+            return BadRequest(new
+            {
+                message = result
+            });
         }
 
         [HttpDelete("{modelo}")]
@@ -59,10 +71,16 @@ namespace AirDreams.API.Controllers
 
             if (string.IsNullOrEmpty(result))
             {
-                return Ok(true);
+                return Ok(new
+                {
+                    message = "Aeronave eliminada correctamente."
+                });
             }
 
-            return BadRequest(result);
+            return BadRequest(new
+            {
+                message = result
+            });
         }
 
         [HttpGet("{modelo}")]
@@ -72,7 +90,10 @@ namespace AirDreams.API.Controllers
 
             if (aircraft == null)
             {
-                return NotFound("Aeronave no encontrada.");
+                return NotFound(new
+                {
+                    message = "Aeronave no encontrada."
+                });
             }
 
             return Ok(aircraft);
@@ -81,19 +102,28 @@ namespace AirDreams.API.Controllers
         [HttpPut("{modelo}")]
         public IActionResult Update(string modelo, [FromBody] AircraftModel aircraft)
         {
-            if (aircraft == null || modelo != aircraft.Modelo   )
+            if (aircraft == null || modelo != aircraft.Modelo)
             {
-                return BadRequest("Datos inválidos.");
+                return BadRequest(new
+                {
+                    message = "Los datos enviados no coinciden con la aeronave seleccionada."
+                });
             }
 
             var result = aircraftService.UpdateAircraft(aircraft);
 
             if (string.IsNullOrEmpty(result))
             {
-                return Ok(true);
+                return Ok(new
+                {
+                    message = "Aeronave actualizada correctamente."
+                });
             }
 
-            return BadRequest(result);
+            return BadRequest(new
+            {
+                message = result
+            });
         }
     }
 }

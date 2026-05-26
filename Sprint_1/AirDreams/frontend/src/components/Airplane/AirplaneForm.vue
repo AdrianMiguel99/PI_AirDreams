@@ -1,5 +1,5 @@
 <template>
-  <form @submit.prevent="onSubmit(aeronave)" class="form-container">
+  <form @submit.prevent="handleSubmit" class="form-container">
     <div class="form-subcontainer">
 
       <div class="form-column">
@@ -10,6 +10,7 @@
             type="text"
             class="form-control"
             placeholder="Ejm: Boeing-747"
+            :disabled="isEditMode"
           >
         </div>
 
@@ -119,7 +120,79 @@ export default {
     onSubmit: {
       type: Function,
       required: true
+    },
+
+    isEditMode: {
+      type: Boolean,
+      default: false
     }
+  },
+
+  methods: {
+
+    showValidationError(title, message) {
+    this.$emit("show-popup", {
+      type: "error",
+      title,
+      message
+    });
+    },
+
+    validateForm() {
+
+      if (!this.aeronave.modelo?.trim()) {
+        this.showValidationError("Modelo requerido", "El modelo de la aeronave es obligatorio.");
+        return false;
+      }
+
+      if (Number(this.aeronave.maxWeight) <= 0) {
+        this.showValidationError("Peso inválido", "El peso de la aeronave debe ser un valor positivo.");
+        return false;
+      }
+
+      if (
+        Number(this.aeronave.cant_Asientos_Fila_Firstclass) < 0 ||
+        Number(this.aeronave.cant_Filas_Firstclass) < 0
+      ) {
+        this.showValidationError("Valores inválidos", "Los valores para FirstClass no pueden ser negativos.");
+        return false;
+      }
+
+      if (
+        Number(this.aeronave.cant_Asientos_Fila_Firstclass) < 0 ||
+        Number(this.aeronave.cant_Filas_Firstclass) < 0
+      ) {
+        this.showValidationError("Valores inválidos", "Los valores para FirstClass no pueden ser negativos.");
+        return false;
+      }
+
+
+      if (
+        Number(this.aeronave.cant_Asientos_Fila_Turista) < 0 ||
+        Number(this.aeronave.cant_Filas_Turista) < 0
+      ) {
+        this.showValidationError("Valores inválidos", "Los valores para Turista no pueden ser negativos.");
+        return false;
+      }
+
+      if (this.aeronave.aircraftSize === "No definido") {
+        this.showValidationError("Tamaño requerido", "Seleccione un tamaño para la aeronave.");
+        return false;
+      }
+
+      return true;
+    },
+
+    handleSubmit() {
+
+      if (!this.validateForm()) {
+        return;
+      }
+
+      this.onSubmit(this.aeronave);
+
+    }
+
   }
 }
 </script>

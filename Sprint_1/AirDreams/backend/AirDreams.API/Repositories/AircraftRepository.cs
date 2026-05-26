@@ -113,5 +113,31 @@ namespace AirDreams.API.Repositories
 
             return affectedRows > 0;
         }
+
+        public bool ExistsByModel(string modelo)
+        {
+            string query = @"
+            SELECT COUNT(*)
+            FROM Aircraft
+            WHERE modelo = @modelo";
+
+            return _connection.ExecuteScalar<int>(
+                query,
+                new { modelo }
+            ) > 0;
+        }
+
+        public bool IsAircraftInUse(string modelo)
+        {
+            string query = @"
+            SELECT COUNT(*)
+            FROM Route
+            WHERE modelo = @modelo";
+
+            return _connection.ExecuteScalar<int>(
+                query,
+                new { modelo }
+            ) > 0;
+        }
     }
 }
