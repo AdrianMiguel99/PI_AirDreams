@@ -20,6 +20,11 @@ namespace AirDreams.API.Repositories
 
         List<UserDTO> GetAll();
         List<UserDTO> Search(string searchTerm);
+
+        Task<AirlineEmployee?> GetAirlineEmployeeByIdAsync(byte employeeId);
+        Task UpdateAirlineEmployeeAsync(byte employeeId, string? firstName, string? lastName, bool? isAdmin, bool? isOperator);
+        Task UpdateInternalUserActiveStatusAsync(byte employeeId, bool? isActive);
+        Task<byte> GetCurrentUserIdFromEmailAsync(string email);
     }
     
     public class InvitationData
