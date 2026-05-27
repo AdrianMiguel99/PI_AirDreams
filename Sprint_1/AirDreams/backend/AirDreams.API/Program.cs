@@ -85,6 +85,9 @@ builder.Services.AddScoped<IAircraftService, AircraftService>();
 builder.Services.AddScoped<IFlightRepository, FlightRepository>();
 builder.Services.AddScoped<IFlightService, FlightService>();
 
+builder.Services.AddScoped<ILuggageRepository, LuggageRepository>();
+builder.Services.AddScoped<ILuggageService, LuggageService>();
+
 var app = builder.Build();
 
 
