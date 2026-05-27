@@ -57,8 +57,7 @@ namespace AirDreams.API.Controllers
                 });
             }
             catch (Exception ex)
-            {
-                return StatusCode(500, new
+            {                return StatusCode(500, new
                 {
                     code = 500,
                     description = "Ocurrió un error inesperado"

@@ -13,7 +13,7 @@ namespace AirDreams.API.Services
             _flightRepository = flightRepository;
         }
 
-        public async Task<List<FlightDTO>> SearchFlightsAsync(
+        public async Task<List<FlightItineraryDTO>> SearchFlightsAsync(
             string origin,
             string destination,
             DateTime earliestDeparture,
@@ -26,22 +26,41 @@ namespace AirDreams.API.Services
             origin = origin.Trim().ToUpper();
             destination = destination.Trim().ToUpper();
 
-            var flightsList = await _flightRepository.SearchFlightsAsync(
+            var directFlights = await _flightRepository.SearchFlightsAsync(
                 origin,
                 destination,
                 earliestDeparture,
                 latestDeparture,
                 quantityOfPassengers
             );
+            
 
-            var result = new List<FlightDTO>();
-            foreach (var flight in flightsList)
+            var oneStopFlightsList = await _flightRepository.SearchOneStopFlightsAsync(
+                origin,
+                destination,
+                earliestDeparture,
+                latestDeparture,
+                quantityOfPassengers
+            );
+            
+            var result = new List<FlightItineraryDTO>();
+
+            foreach (var flight in directFlights)
             {
-                var flightDto = MapToFlightDTO(flight, origin, destination);
+                var flightDto = MapToFlightItinerary(flight, origin, destination);
                 result.Add(flightDto);
             }
 
-            return result;
+            foreach (var flight in oneStopFlightsList)
+            {
+                var flightDto = MapOneStopFlightToItineraryDTO(flight);
+                result.Add(flightDto);
+            }
+
+            return result
+            .OrderBy(itinerary => itinerary.Stops)
+            .ThenBy(itinerary => itinerary.TouristPrice)
+            .ToList();
         }
 
         private void ValidateParameters(string origin, string destination, DateTime earliestDeparture, DateTime latestDeparture, int quantityOfPassengers)
@@ -69,34 +88,93 @@ namespace AirDreams.API.Services
             }
         }
 
-        private FlightDTO MapToFlightDTO(dynamic flight, string origin, string destination)
+        private FlightItineraryDTO MapToFlightItinerary(dynamic flight, string origin, string destination)
         {
-            return new FlightDTO
+            return new FlightItineraryDTO
             {
-                FlightGUID = flight.FlightNumber,
-                DepartureDate = flight.DepartureDate,
-                CarryOnPrice = flight.CarryOnPrice,
-                CheckedPrice = flight.CheckedPrice,
-                Route = new RouteDTO
+                ItineraryId = flight.FlightNumber,
+                Stops = 0,
+                TouristPrice = flight.TouristPrice,
+                FirstClassPrice = flight.FirstClassPrice,
+                Segments = new List<FlightSegmentDTO>
                 {
-                    Id = flight.RouteId,
-                    DepartureTime = flight.DepartureTime,
-                    ArrivalTime = flight.ArrivalTime,
-                    Duration = flight.Duration,
-                    DepartureAirport = new AirportDTO
+                    new FlightSegmentDTO
                     {
-                        Code = flight.DepartureAirportCode,
-                        Name = flight.DepartureAirportName,
-                        City = flight.DepartureCity
-                    },
-                    ArrivalAirport = new AirportDTO
+                        RouteId = flight.RouteId,
+                        DepartureDate = flight.DepartureDate,
+                        ArrivalDate = flight.ArrivalDate,
+                        DepartureTime = flight.DepartureTime,
+                        ArrivalTime = flight.ArrivalTime,
+                        Duration = flight.Duration,
+
+                        DepartureAirport = new AirportDTO
+                        {
+                            Code = flight.DepartureAirportCode,
+                            Name = flight.DepartureAirportName,
+                            City = flight.DepartureCity
+                        },
+                        ArrivalAirport = new AirportDTO
+                        {
+                            Code = flight.ArrivalAirportCode,
+                            Name = flight.ArrivalAirportName,
+                            City = flight.ArrivalCity
+                        }
+                    }
+                }
+            };
+        }
+                private FlightItineraryDTO MapOneStopFlightToItineraryDTO(dynamic flight)
+        {
+            return new FlightItineraryDTO
+            {
+                ItineraryId = flight.FlightNumber,
+                Stops = 1,
+                TouristPrice = flight.TouristPrice,
+                FirstClassPrice = flight.FirstClassPrice,
+                Segments = new List<FlightSegmentDTO>
+                {
+                    new FlightSegmentDTO
                     {
-                        Code = flight.ArrivalAirportCode,
-                        Name = flight.ArrivalAirportName,
-                        City = flight.ArrivalCity
+                        RouteId = flight.FirstRouteID,
+                        DepartureDate = flight.FirstDepartureDate,
+                        DepartureTime = flight.FirstDepartureTime,
+                        ArrivalDate = flight.FirstArrivalDate,
+                        ArrivalTime = flight.FirstArrivalTime,
+                        Duration = flight.FirstDuration,
+                        DepartureAirport = new AirportDTO
+                        {
+                            Code = flight.FirstDepartureAirportCode,
+                            Name = flight.FirstDepartureAirportName,
+                            City = flight.FirstDepartureCity
+                        },
+                        ArrivalAirport = new AirportDTO
+                        {
+                            Code = flight.FirstArrivalAirportCode,
+                            Name = flight.FirstArrivalAirportName,
+                            City = flight.FirstArrivalCity
+                        }
                     },
-                    TouristPrice = flight.TouristPrice,
-                    FirstClassPrice = flight.FirstClassPrice
+                    new FlightSegmentDTO
+                    {
+                        RouteId = flight.SecondRouteID,
+                        DepartureDate = flight.SecondDepartureDate,
+                        DepartureTime = flight.SecondDepartureTime,
+                        ArrivalDate = flight.SecondArrivalDate,
+                        ArrivalTime = flight.SecondArrivalTime,
+                        Duration = flight.SecondDuration,
+                        DepartureAirport = new AirportDTO
+                        {
+                            Code = flight.FirstArrivalAirportCode,
+                            Name = flight.FirstArrivalAirportName,
+                            City = flight.FirstArrivalCity
+                        },
+                        ArrivalAirport = new AirportDTO
+                        {
+                            Code = flight.FinalArrivalAirportCode,
+                            Name = flight.FinalArrivalAirportName,
+                            City = flight.FinalArrivalCity
+                        }
+                    }
                 }
             };
         }

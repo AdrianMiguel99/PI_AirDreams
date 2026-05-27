@@ -73,7 +73,6 @@ export default {
 
   mounted() {
     this.token = this.$route.query.token;
-    console.log("Token recibido:", this.token);
     
     if (this.token) {
       this.validarToken();
@@ -93,7 +92,6 @@ export default {
         );
 
         const data = await response.json();
-        console.log("Respuesta validación:", data);
 
         if (response.ok && data.isValid) {
           this.email = data.email;
@@ -105,7 +103,6 @@ export default {
           this.mensajeError = true;
         }
       } catch (error) {
-        console.error("Error:", error);
         this.tokenInvalido = true;
         this.mensaje = "Error al validar el token";
         this.mensajeError = true;
@@ -148,7 +145,6 @@ export default {
         });
 
         const data = await response.json();
-        console.log("Respuesta completar registro:", data);
 
         if (response.ok) {
           this.mensaje = data.message;
@@ -162,7 +158,6 @@ export default {
           this.mensajeError = true;
         }
       } catch (error) {
-        console.error("Error:", error);
         this.mensaje = "Error de conexión con el servidor";
         this.mensajeError = true;
       } finally {

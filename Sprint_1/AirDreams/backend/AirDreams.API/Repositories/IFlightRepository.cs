@@ -11,5 +11,14 @@ namespace AirDreams.API.Repositories
             DateTime latestTime,
             int quantityOfPassengers
         );
+
+        Task<IEnumerable<dynamic>> SearchOneStopFlightsAsync(
+            string origin,
+            string destination,
+            DateTime earliestTime,
+            DateTime latestTime,
+            int quantityOfPassengers
+        );
+
     }
 }

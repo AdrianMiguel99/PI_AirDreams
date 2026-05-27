@@ -11,10 +11,12 @@ import EditAirplane from '../views/EditAirplane.vue'
 import ListaUsuarios from '../components/ListaUsuarios.vue'
 import AirportRegister from '../components/AirportRegister.vue'
 import AirportList from '../components/AirportList.vue'
-import FlightsRegister from '../components/FlightsRegister.vue'
+import FlightsRegister from '../components/RegistroVuelos.vue'
 import ListaRutas from '../components/ListaRutas.vue'
+import RegistroVuelos from '../components/RegistroVuelos.vue'
 import AirplaneManagement from '../views/AirplaneManagement.vue'
 import AddAirplaneView from '../views/AddAirplaneView.vue'
+import AirportEdit from '../components/AirportEdit.vue'
 
 const routes = [
   
@@ -28,14 +30,13 @@ const routes = [
   { path: '/login', name: 'login', component: Login },
   { path: '/registro', name: 'registro', component: RegistroUsuarios },
 
-  { path: '/admin', name: 'admin', component: LandingPageAdmin },
-  { path: '/adminHome', name: 'adminHome', component: LandingPageAdmin },
+  { path: '/admin', name: 'admin', component: LandingPageAdmin, meta: { requiresAdmin: true }},
+  { path: '/adminHome', name: 'adminHome', component: LandingPageAdmin, meta: { requiresAdmin: true }},
 
-  { path: '/admin/flightsRegister', name: 'flightsRegister', component: FlightsRegister },
+  { path: '/admin/flightsRegister', name: 'flightsRegister', component: RegistroVuelos },
   { path: '/admin/routesList', name: 'routesList', component: ListaRutas },
 
-  { path: '/admin/usuarios', name: 'adminUsuarios', component: ListaUsuarios },
-
+  { path: '/admin/usuarios', name: 'adminUsuarios', component: ListaUsuarios, meta: { requiresAdmin: true }},
   { path: '/addPlane', name: 'addPlane', component: AddAirplaneView },
   { path: '/listPlanes', name: 'listPlanes', component: ListAirplaneView },
   { path: '/editPlane/:plateNumber', name: 'editPlane', component: EditAirplane },
@@ -44,7 +45,8 @@ const routes = [
   { path: '/admin/airports/list', name: 'airportList', component: AirportList },
   { path: '/admin/airports', redirect: '/admin/airports/register' },
 
-  { path: '/pruebas', name: 'pruebas', component: AirplaneManagement }
+  { path: '/pruebas', name: 'pruebas', component: AirplaneManagement },
+  { path: '/admin/airports/edit/:code', name: 'airportEdit', component: AirportEdit }
 ]
 
 const router = createRouter({

@@ -6,11 +6,7 @@
       <h2>Aeropuertos registrados</h2>
     </div>
 
-    <div class="mb-3">
-      <button class="btn btn-outline-secondary btn-volver" @click="volver">
-        ← Volver al registro
-      </button>
-    </div>
+    <ButtomNavigationAirports currentView="list" />
 
     <div v-if="loading" class="state-message">Cargando aeropuertos...</div>
     <div v-else-if="errorMessage" class="state-message error">{{ errorMessage }}</div>
@@ -19,7 +15,7 @@
       No hay aeropuertos registrados.
     </div>
 
-    <div v-else class="d-flex table-wrapper">
+    <div v-else class="table-wrapper">
       <table>
         <thead>
           <tr>
@@ -28,6 +24,7 @@
             <th>Ciudad</th>
             <th>País</th>
             <th>Zona horaria</th>
+            <th>Acciones</th>
           </tr>
         </thead>
         <tbody>
@@ -37,6 +34,19 @@
             <td>{{ airport.city }}</td>
             <td>{{ airport.country }}</td>
             <td>{{ airport.timeZone || '-' }}</td>
+            <td>
+              <a
+                href="javascript:void(0)"
+                class="btn-editar"
+                @click="editar(airport.code)"
+              >
+                <img
+                  src="https://i.postimg.cc/FKTG53Hn/Chat-GPT-Image-5-may-2026-05-10-07-(1).png"
+                  alt="editar"
+                />
+                <span>Editar</span>
+              </a>
+            </td>
           </tr>
         </tbody>
       </table>
@@ -47,10 +57,11 @@
 <script>
 import axios from 'axios'
 import AdminHeader from './AdminHeader.vue'
+import ButtomNavigationAirports from './ButtomNavigationAirports.vue'
 
 export default {
   name: 'AirportList',
-  components: { AdminHeader },
+  components: { AdminHeader, ButtomNavigationAirports },
   data() {
     return {
       airports: [],
@@ -62,30 +73,18 @@ export default {
     async fetchAirports() {
       this.loading = true
       this.errorMessage = ''
-      const token = localStorage.getItem("token")
-      if (!token) {
-        this.errorMessage = 'Debes iniciar sesión.'
-        this.loading = false
-        return
-      }
       try {
-        const res = await axios.get('http://localhost:5276/api/airports', {
-          headers: { 'Authorization': `Bearer ${token}` }
-        })
+        const res = await axios.get('http://localhost:5276/api/airports')
         this.airports = res.data
       } catch (error) {
         console.error('Error al obtener aeropuertos:', error)
-        if (error.response?.status === 401 || error.response?.status === 403) {
-          this.errorMessage = 'No tienes permisos o sesión expirada.'
-        } else {
-          this.errorMessage = 'No se pudieron cargar los aeropuertos.'
-        }
+        this.errorMessage = 'No se pudieron cargar los aeropuertos.'
       } finally {
         this.loading = false
       }
     },
-    volver() {
-      this.$router.push('/admin/airports/register')
+    editar(code) {
+      this.$router.push(`/admin/airports/edit/${code}`)
     }
   },
   created() {
@@ -98,61 +97,67 @@ export default {
 .container {
   padding: 20px;
 }
-
 .header-section {
   margin-bottom: 24px;
 }
-
 .header-section h2 {
   margin: 0;
   font-size: 28px;
   color: #333;
 }
-
 .state-message {
   text-align: center;
   color: #666;
   padding: 20px;
   font-size: 16px;
 }
-
 .state-message.error {
   color: #b42318;
 }
-
 .table-wrapper {
   overflow-x: auto;
   background: #fff;
   border-radius: 8px;
   border: 1px solid #e5e7eb;
 }
-
 table {
   width: 100%;
   border-collapse: collapse;
 }
-
-th,
-td {
+th, td {
   text-align: left;
   padding: 12px 16px;
   border-bottom: 1px solid #f1f5f9;
 }
-
 th {
   background: #f8fafc;
   color: #334155;
   font-weight: 600;
 }
 
-.btn-volver {
-  font-family: 'Inter', sans-serif;
-  color: #384467;
-  border-color: #384467;
-  font-weight: 600;
-}
-.btn-volver:hover {
-  background-color: #384467;
+.btn-editar {
+  background-color: #3E4B78;
   color: white;
+  border: none;
+  border-radius: 999px;          
+  padding: 6px 16px;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  text-decoration: none;
+  font-family: 'Inter', sans-serif;
+  font-size: 14px;
+  font-weight: 400;
+  transition: 0.3s;
+  cursor: pointer;
+}
+
+.btn-editar:hover {
+  filter: brightness(1.1);
+}
+
+.btn-editar img {
+  width: 22px;
+  height: 22px;
 }
 </style>

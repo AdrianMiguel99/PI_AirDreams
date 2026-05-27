@@ -8,7 +8,7 @@
     <div v-else class="vuelos-grid">
       <TarjetaVuelo 
         v-for="flight in flights" 
-        :key="flight.id"
+        :key="flight.itineraryId"
         :flight="flight"
         :departureDate="departureDate"
       />
