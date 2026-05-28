@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using System.Text.Json;
+using AirDreams.ExternalAPI.Services;
 
 namespace AirDreams.ExternalAPI.Controllers
 {
@@ -7,11 +8,13 @@ namespace AirDreams.ExternalAPI.Controllers
     [Route("api/[controller]")]
     public class ExternalController : ControllerBase
     {
-        private readonly IHttpClientFactory _httpClientFactory;
+        private readonly IFlightService _flightService;
+        private readonly ISecurityService _securityService;
 
-        public ExternalController(IHttpClientFactory httpClientFactory)
+        public ExternalController(IFlightService flightService, ISecurityService securityService)
         {
-            _httpClientFactory = httpClientFactory;
+            _flightService = flightService;
+            _securityService = securityService;
         }
 
         [HttpGet]
@@ -29,34 +32,16 @@ namespace AirDreams.ExternalAPI.Controllers
 
             try
             {
-                var client = _httpClientFactory.CreateClient("InternalAPI");
+                var (isValid, errorResponse) = await _securityService.ValidateKeyAsync(apiKey);
 
-                var validationRequest = new HttpRequestMessage(
-                    HttpMethod.Get,
-                    $"api/security/validate?apiKey={Uri.EscapeDataString(apiKey)}"
-                );
-                var validationResponse = await client.SendAsync(validationRequest);
-
-                if (!validationResponse.IsSuccessStatusCode)
+                if (!isValid)
                 {
-                    var error = await validationResponse.Content.ReadFromJsonAsync<JsonElement>();
-                    return Unauthorized(error);
+                    return Unauthorized(errorResponse);
                 }
 
-                var query = $"api/flights/search" +
-                            $"?origin={Uri.EscapeDataString(origin)}" +
-                            $"&destination={Uri.EscapeDataString(destination)}" +
-                            $"&departureDate={earliestDeparture:O}" +
-                            $"&returnDate={latestDeparture:O}" +
-                            $"&passengers={quantityOfPassengers}";
+                var (statusCode, flightsContent) = await _flightService.SearchFlightAsync(origin, destination, earliestDeparture, latestDeparture, quantityOfPassengers);
 
-                var flightsResponse = await client.GetAsync(query);
-                var flightsContent = await flightsResponse.Content.ReadFromJsonAsync<JsonElement>();
-
-                if (!flightsResponse.IsSuccessStatusCode)
-                    return StatusCode((int)flightsResponse.StatusCode, flightsContent);
-
-                return Ok(flightsContent);
+                return StatusCode(statusCode, flightsContent);
             }
             catch (Exception)
             {

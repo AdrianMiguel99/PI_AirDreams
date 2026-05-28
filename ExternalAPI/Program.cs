@@ -1,9 +1,14 @@
+using AirDreams.ExternalAPI.Services;
+
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddHttpClient("InternalAPI", client =>
 {
     client.BaseAddress = new Uri(builder.Configuration["InternalApi:BaseUrl"]!);
 });
+
+builder.Services.AddScoped<IFlightService, FlightService>();
+builder.Services.AddScoped<ISecurityService, SecurityService>();
 
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
