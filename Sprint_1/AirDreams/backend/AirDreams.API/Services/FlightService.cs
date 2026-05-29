@@ -63,6 +63,33 @@ namespace AirDreams.API.Services
             .ToList();
         }
 
+        public async Task<List<FlightItineraryDTO>> SearchFlightsByDestinationAsync(
+            string destination,
+            DateTime earliestDeparture,
+            DateTime latestDeparture,
+            int quantityOfPassengers
+        )
+        {
+            destination = destination.Trim().ToUpper();
+
+            var flights = await _flightRepository.SearchFlightsByDestinationAsync(
+                destination,
+                earliestDeparture,
+                latestDeparture,
+                quantityOfPassengers
+            );
+
+            var result = new List<FlightItineraryDTO>();
+
+            foreach (var flight in flights)
+            {
+                var flightDto = MapToFlightItinerary(flight, flight.DepartureAirportCode, flight.ArrivalAirportCode);
+                result.Add(flightDto);
+            }
+
+            return result.ToList();
+        }
+
         private void ValidateParameters(string origin, string destination, DateTime earliestDeparture, DateTime latestDeparture, int quantityOfPassengers)
         {
             if (string.IsNullOrWhiteSpace(origin) ||

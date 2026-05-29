@@ -11,5 +11,12 @@ namespace AirDreams.API.Services.Interfaces
             DateTime latestDeparture,
             int quantityOfPassengers
         );
+
+        Task<List<FlightItineraryDTO>> SearchFlightsByDestinationAsync(
+            string destination,
+            DateTime earliestDeparture,
+            DateTime latestDeparture,
+            int quantityOfPassengers
+        );
     }
 }
