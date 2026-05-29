@@ -45,7 +45,7 @@ SELECT COLUMN_NAME
 FROM INFORMATION_SCHEMA.COLUMNS
 WHERE TABLE_NAME = 'Route';
 
-
+9
 
 EXEC sp_rename 'Route.luggage_price', 'luggagePrice', 'COLUMN';
 EXEC sp_rename 'Route.luggage_maxWeight', 'luggageMaxWeight', 'COLUMN';
@@ -53,3 +53,20 @@ EXEC sp_rename 'Route.carryOn_price', 'carryOnPrice', 'COLUMN';
 EXEC sp_rename 'Route.carryOn_maxWeight', 'carryOnMaxWeight', 'COLUMN';
 EXEC sp_rename 'Route.porcentage_multiplier', 'porcentageMultiplier', 'COLUMN';
 
+
+Create Table PassengerItinerary(
+    idPassenger INT NOT NULL,
+	passportPassenger VARCHAR(8) NOT NULL,
+    transactionId VARCHAR(20),
+
+    PRIMARY KEY (idPassenger, passportPassenger, transactionId),
+
+    CONSTRAINT fk_Itinerary
+    FOREIGN KEY (transactionId)
+    REFERENCES Itinerary(transactionId),
+
+    CONSTRAINT fk_Passenger
+    FOREIGN KEY (idPassenger, passportPassenger)
+    REFERENCES Passenger(idPassenger, passport)
+);
+GO
