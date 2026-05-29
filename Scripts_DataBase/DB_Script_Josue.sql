@@ -45,7 +45,6 @@ SELECT COLUMN_NAME
 FROM INFORMATION_SCHEMA.COLUMNS
 WHERE TABLE_NAME = 'Route';
 
-9
 
 EXEC sp_rename 'Route.luggage_price', 'luggagePrice', 'COLUMN';
 EXEC sp_rename 'Route.luggage_maxWeight', 'luggageMaxWeight', 'COLUMN';

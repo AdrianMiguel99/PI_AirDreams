@@ -220,7 +220,8 @@ export default {
         type: 'oneWay',
         outboundFlights: result.flights || [],
         returnFlights: [],
-        departureDate: data.departureDate
+        departureDate: data.departureDate,
+        passengers: data.passengers
       });
 
       return;
@@ -263,7 +264,8 @@ export default {
       outboundFlights: outboundResult.flights || [],
       returnFlights: returnResult.flights || [],
       departureDate: data.departureDate,
-      returnDate: data.returnDate
+      returnDate: data.returnDate,
+      passengers: data.passengers
     });
 
   } catch (error) {

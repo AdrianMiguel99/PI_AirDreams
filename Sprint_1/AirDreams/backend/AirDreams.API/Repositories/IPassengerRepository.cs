@@ -7,5 +7,7 @@ namespace AirDreams.API.Repositories
         Task<bool> ExistsAsync(int idPassenger, string passport);
         Task<Passenger?> GetByIdAsync(int idPassenger, string passport);
         Task<Passenger> CreateAsync(Passenger passenger);
+
+        Task<Passenger> GetPassengerByNameAsync(string name);
     }
 }

@@ -6,5 +6,7 @@ namespace AirDreams.API.Services
     {
         Task<PassengerDto> CreateAsync(CreatePassengerDto dto);
         Task<PassengerDto?> GetByIdAsync(int idPassenger, string passport);
+
+        Task<PassengerDto?> GetPassengerByNameAsync(string fullName);
     }
 }

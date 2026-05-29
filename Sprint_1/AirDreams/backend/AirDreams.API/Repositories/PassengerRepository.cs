@@ -80,5 +80,26 @@ namespace AirDreams.API.Repositories
             await _connection.ExecuteAsync(sql, passenger);
             return passenger;
         }
+
+        public async Task<Passenger> GetPassengerByNameAsync(string name)
+        {
+            const string sql = @"
+                SELECT
+                    idPassenger AS IdPassenger,
+                    passport AS Passport,
+                    namePassenger AS NamePassenger,
+                    lastnamesPassenger AS LastnamesPassenger,
+                    emailPassenger AS EmailPassenger,
+                    telephone AS Telephone,
+                    countryCode AS CountryCode
+                FROM Passenger
+                WHERE namePassenger = @Name;
+            ";
+
+            return await _connection.QueryFirstOrDefaultAsync<Passenger>(sql, new
+            {
+                Name = name
+            });
+        }
     }
 }

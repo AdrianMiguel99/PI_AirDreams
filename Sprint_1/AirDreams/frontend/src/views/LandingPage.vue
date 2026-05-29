@@ -16,6 +16,8 @@
       v-if="searchPerformed && outboundFlights.length > 0"
       title="Vuelos de ida"
       :flights="paginatedOutboundFlights"
+      :departureDate="departureDate"
+      @buy="handleBuyFlight($event, 'outbound')"
     />
 
     <Paginacion
@@ -29,6 +31,7 @@
       v-if="searchPerformed && tripType === 'roundTrip' && returnFlights.length > 0"
       title="Vuelos de regreso"
       :flights="paginatedReturnFlights"
+      @buy="handleBuyFlight($event, 'return')"
     />
 
     <Paginacion
@@ -81,7 +84,9 @@ export default {
       outboundPerPage: 10,
       returnPerPage: 10,
       searchPerformed: false,
-      departureDate: ''
+      departureDate: '',
+      passengersCount: 1,
+      selectedPurchase: null
     };
   },
 
@@ -103,12 +108,33 @@ export default {
         this.outboundFlights = data.outboundFlights || [];
         this.returnFlights = data.returnFlights || [];
         this.departureDate = data.departureDate;
+        this.passengersCount = Number(data.passengers || 1);
         this.searchPerformed = true;
         this.currentPage = 1;
       },
 
       changePage(page) {
         this.currentPage = page;
+      },
+
+      handleBuyFlight(selection, direction) {
+        const purchaseSelection = {
+          tripType: this.tripType,
+          direction,
+          seatClass: selection.seatClass,
+          price: selection.price,
+          passengerCount: this.passengersCount,
+          itinerary: selection.flight,
+          selectedAt: new Date().toISOString()
+        };
+
+        this.selectedPurchase = purchaseSelection;
+        sessionStorage.setItem(
+          'selectedFlightPurchase',
+          JSON.stringify(purchaseSelection)
+        );
+
+        this.$router.push({ name: 'passengers' });
       }
     }
 };

@@ -41,6 +41,20 @@ namespace AirDreams.API.Services
             return passenger is null ? null : MapToDto(passenger);
         }
 
+        public async Task<PassengerDto?> GetPassengerByNameAsync(string fullName)
+        {
+            var names = fullName.Trim().Split(' ', 2);
+
+            if (names.Length < 2)
+                return null;
+
+            var name = names[0];
+            var lastNames = names[1];
+
+            var passenger = await _repository.GetPassengerByNameAsync(name);
+            return passenger is null ? null : MapToDto(passenger);
+        }
+
         private static PassengerDto MapToDto(Passenger passenger) => new()
         {
             IdPassenger = passenger.IdPassenger,
