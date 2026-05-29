@@ -19,7 +19,6 @@ namespace AirDreams.ExternalAPI.Controllers
 
         [HttpGet]
         public async Task<IActionResult> SearchFlights(
-            [FromQuery] string origin,
             [FromQuery] string destination,
             [FromQuery] DateTime earliestDeparture,
             [FromQuery] DateTime latestDeparture,
@@ -39,7 +38,7 @@ namespace AirDreams.ExternalAPI.Controllers
                     return Unauthorized(errorResponse);
                 }
 
-                var (statusCode, flightsContent) = await _flightService.SearchFlightAsync(origin, destination, earliestDeparture, latestDeparture, quantityOfPassengers);
+                var (statusCode, flightsContent) = await _flightService.SearchFlightAsync(destination, earliestDeparture, latestDeparture, quantityOfPassengers);
 
                 return StatusCode(statusCode, flightsContent);
             }

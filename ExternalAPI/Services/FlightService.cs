@@ -12,7 +12,6 @@ namespace AirDreams.ExternalAPI.Services
         }
 
         public async Task<(int StatusCode, JsonElement Content)> SearchFlightAsync(
-            string origin,
             string destination,
             DateTime earliestDeparture,
             DateTime latestDeparture,
@@ -21,9 +20,8 @@ namespace AirDreams.ExternalAPI.Services
         {
             var client = _httpClientFactory.CreateClient("InternalAPI");
 
-            var query = $"api/flights/search" +
-                        $"?origin={Uri.EscapeDataString(origin)}" +
-                        $"&destination={Uri.EscapeDataString(destination)}" +
+            var query = $"api/flights/search-destination" +
+                        $"?destination={Uri.EscapeDataString(destination)}" +
                         $"&departureDate={earliestDeparture:O}" +
                         $"&returnDate={latestDeparture:O}" +
                         $"&passengers={quantityOfPassengers}";
