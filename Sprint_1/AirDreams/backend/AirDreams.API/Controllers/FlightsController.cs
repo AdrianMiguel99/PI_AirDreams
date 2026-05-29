@@ -68,7 +68,7 @@ namespace AirDreams.API.Controllers
         }
 
         [HttpGet("search-destination")]
-        public async Task<IActionResult> SearchFlightsByDestinationOnly([FromQuery] DestinationSearchDto request)
+        public async Task<IActionResult> SearchFlightsByDestination([FromQuery] DestinationSearchDto request)
         {
             try
             {

@@ -1,4 +1,5 @@
 using AirDreams.API.DTOs;
+using AirDreams.ExternalAPI.DTOs;
 
 namespace AirDreams.API.Services.Interfaces
 {
@@ -12,7 +13,7 @@ namespace AirDreams.API.Services.Interfaces
             int quantityOfPassengers
         );
 
-        Task<List<FlightItineraryDTO>> SearchFlightsByDestinationAsync(
+        Task<List<ExternalResponseFlightDTO>> SearchFlightsByDestinationAsync(
             string destination,
             DateTime earliestDeparture,
             DateTime latestDeparture,

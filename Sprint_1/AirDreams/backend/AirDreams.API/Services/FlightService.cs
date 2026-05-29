@@ -1,4 +1,5 @@
 using AirDreams.API.DTOs;
+using AirDreams.ExternalAPI.DTOs;
 using AirDreams.API.Repositories;
 using AirDreams.API.Services.Interfaces;
 
@@ -63,7 +64,7 @@ namespace AirDreams.API.Services
             .ToList();
         }
 
-        public async Task<List<FlightItineraryDTO>> SearchFlightsByDestinationAsync(
+        public async Task<List<ExternalResponseFlightDTO>> SearchFlightsByDestinationAsync(
             string destination,
             DateTime earliestDeparture,
             DateTime latestDeparture,
@@ -79,11 +80,11 @@ namespace AirDreams.API.Services
                 quantityOfPassengers
             );
 
-            var result = new List<FlightItineraryDTO>();
+            var result = new List<ExternalResponseFlightDTO>();
 
             foreach (var flight in flights)
             {
-                var flightDto = MapToFlightItinerary(flight, flight.DepartureAirportCode, flight.ArrivalAirportCode);
+                var flightDto = MapToExternalResponseFlight(flight);
                 result.Add(flightDto);
             }
 
@@ -203,6 +204,33 @@ namespace AirDreams.API.Services
                         }
                     }
                 }
+            };
+        }
+
+        private ExternalResponseFlightDTO MapToExternalResponseFlight(dynamic flight)
+        {
+            return new ExternalResponseFlightDTO
+            {
+                flightGUID = flight.FlightNumber,
+                departureTime = flight.DepartureTime,
+                arrivalTime = flight.ArrivalTime,
+                duration = flight.Duration != null ? ((TimeSpan)flight.Duration).ToString(@"hh\-mm") : string.Empty,
+                departureAirport = new ExternalResponseAirportDTO
+                {
+                    code = flight.DepartureAirportCode,
+                    name = flight.DepartureAirportName,
+                    city = flight.DepartureCity
+                },
+                arrivalAirport = new ExternalResponseAirportDTO
+                {
+                    code = flight.ArrivalAirportCode,
+                    name = flight.ArrivalAirportName,
+                    city = flight.ArrivalCity
+                },
+                touristPrice = flight.TouristPrice,
+                firstClassPrice = flight.FirstClassPrice,
+                carryOnPrice = flight.CarryOnPrice,
+                checkedPrice = flight.CheckedPrice
             };
         }
     }
