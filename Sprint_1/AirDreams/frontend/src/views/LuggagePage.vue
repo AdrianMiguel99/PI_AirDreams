@@ -136,7 +136,10 @@ export default {
         this.showPopup = true;
 
         setTimeout(() => {
-          this.$router.push({ name: 'home' });
+          this.$router.push({ 
+            name: 'payment', 
+            query: { transactionId: this.transactionIdItinerary } 
+          });
         }, 2000);
       } catch (error) {
         this.popupType = 'error';
