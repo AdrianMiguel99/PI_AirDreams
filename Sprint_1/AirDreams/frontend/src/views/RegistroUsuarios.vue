@@ -91,7 +91,6 @@ export default {
         }
 
       } catch (error) {
-        console.error(error);
         this.mensaje = "Error de conexión con el servidor";
         this.mensajeError = true;
       } finally {

@@ -30,14 +30,13 @@ const routes = [
   { path: '/login', name: 'login', component: Login },
   { path: '/registro', name: 'registro', component: RegistroUsuarios },
 
-  { path: '/admin', name: 'admin', component: LandingPageAdmin },
-  { path: '/adminHome', name: 'adminHome', component: LandingPageAdmin },
+  { path: '/admin', name: 'admin', component: LandingPageAdmin, meta: { requiresAdmin: true }},
+  { path: '/adminHome', name: 'adminHome', component: LandingPageAdmin, meta: { requiresAdmin: true }},
 
   { path: '/admin/flightsRegister', name: 'flightsRegister', component: RegistroVuelos },
   { path: '/admin/routesList', name: 'routesList', component: ListaRutas },
 
-  { path: '/admin/usuarios', name: 'adminUsuarios', component: ListaUsuarios },
-
+  { path: '/admin/usuarios', name: 'adminUsuarios', component: ListaUsuarios, meta: { requiresAdmin: true }},
   { path: '/managementPlanes', name: 'managementPlanes', component: AirplaneManagement },
   { path: '/editPlane/:modelo', name: 'editPlane', component: EditAirplane },
 
