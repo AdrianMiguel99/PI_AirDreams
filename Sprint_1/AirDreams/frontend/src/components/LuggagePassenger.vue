@@ -3,13 +3,14 @@
     <div class="passenger-info">
       <span class="passenger-name">{{ passengerLabel }}</span>
       <span class="passenger-fullname">{{ fullName }}</span>
+      <span class="passenger-total">Total: {{ formatCurrency(passengerTotal) }}</span>
     </div>
 
     <div class="luggage-options">
       <div class="luggage-item">
         <div class="luggage-details">
           <span class="luggage-type">Equipaje documentado</span>
-          <span class="luggage-price">$ {{ checkedPrice }}</span>
+          <span class="luggage-price">{{ formatCurrency(checkedPrice) }}</span>
           <span class="luggage-per">por pieza</span>
         </div>
         <div class="counter">
@@ -22,7 +23,7 @@
       <div class="luggage-item">
         <div class="luggage-details">
           <span class="luggage-type">Carry on</span>
-          <span class="luggage-price">$ {{ carryOnPrice }}</span>
+          <span class="luggage-price">{{ formatCurrency(carryOnPrice) }}</span>
           <span class="luggage-per">por pieza</span>
         </div>
         <div class="counter">
@@ -49,12 +50,12 @@ export default {
       default: 'Nombre Apellidos'
     },
     checkedPrice: {
-      type: String,
-      default: '00.00'
+      type: Number,
+      default: 0
     },
     carryOnPrice: {
-      type: String,
-      default: '00.00'
+      type: Number,
+      default: 0
     }
   },
 
@@ -68,6 +69,11 @@ export default {
   computed: {
     passengerLabel() {
       return `Pasajero ${this.passengerIndex}`;
+    },
+
+    passengerTotal() {
+      return (this.checkedCount * this.checkedPrice) +
+        (this.carryOnCount * this.carryOnPrice);
     }
   },
 
@@ -94,8 +100,16 @@ export default {
       this.$emit('luggage-change', {
         passengerIndex: this.passengerIndex,
         checkedCount: this.checkedCount,
-        carryOnCount: this.carryOnCount
+        carryOnCount: this.carryOnCount,
+        passengerTotal: this.passengerTotal
       });
+    },
+
+    formatCurrency(value) {
+      return new Intl.NumberFormat('en-US', {
+        style: 'currency',
+        currency: 'USD'
+      }).format(Number(value || 0));
     }
   }
 };
@@ -135,6 +149,13 @@ export default {
   font-size: 13px;
   color: #8a94a8;
   margin-top: 2px;
+}
+
+.passenger-total {
+  color: #032056;
+  font-size: 14px;
+  font-weight: 700;
+  margin-top: 8px;
 }
 
 .luggage-options {

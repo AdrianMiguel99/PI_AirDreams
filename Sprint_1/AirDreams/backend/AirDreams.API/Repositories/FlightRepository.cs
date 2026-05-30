@@ -41,7 +41,7 @@ namespace AirDreams.API.Repositories
                 WHERE SearchDate < CAST(@searchEndDate AS DATE)
             )
             SELECT
-                    CONCAT('R', r.idRoute, 'F', ff.idFrequency, '-', CONVERT(CHAR(8), sd.SearchDate, 112)) AS FlightNumber,
+                    CONCAT('AD', r.idRoute, ff.idFrequency, CONVERT(CHAR(8), sd.SearchDate, 112)) AS FlightNumber,
                     r.idRoute AS RouteId,
                     sd.SearchDate AS DepartureDate,
                     CAST(searchedFlight.ArrivalDateTime AS DATE) AS ArrivalDate,
@@ -50,8 +50,8 @@ namespace AirDreams.API.Repositories
                     r.stimatedTime AS Duration,
                     r.turistClassPrice AS TouristPrice,
                     r.firstClassPrice AS FirstClassPrice,
-                    CAST(0 AS DECIMAL(10, 2)) AS CarryOnPrice,
-                    CAST(0 AS DECIMAL(10, 2)) AS CheckedPrice,
+                    r.carryOnPrice AS CarryOnPrice,
+                    r.luggagePrice AS CheckedPrice,
                     a1.codeAirport AS DepartureAirportCode,
                     a1.nameAirport AS DepartureAirportName,
                     a1.city AS DepartureCity,
@@ -136,14 +136,18 @@ namespace AirDreams.API.Repositories
             )
             SELECT
                 CONCAT(
-                'R', r1.idRoute,
-                'F', ff1.idFrequency,
-                '-R', r2.idRoute,
-                'F', ff2.idFrequency,
-                '-',
+                'AD', r1.idRoute,
+                ff1.idFrequency,
                 CONVERT(CHAR(8),
                 sd.SearchDate, 112)
-                ) AS FlightNumber,
+                ) AS FirstFlightNumber,
+
+                CONCAT(
+                'AD', r2.idRoute,
+                ff2.idFrequency,
+                CONVERT(CHAR(8),
+                CAST(secondFlight.SecondDepartureDateTime AS DATE), 112)
+                ) AS SecondFlightNumber,
 
                 r1.idRoute AS FirstRouteID,
                 r2.idRoute AS SecondRouteID,
@@ -177,8 +181,10 @@ namespace AirDreams.API.Repositories
                 r1.turistClassPrice + r2.turistClassPrice AS TouristPrice,
                 r1.firstClassPrice + r2.firstClassPrice AS FirstClassPrice,
 
-                CAST(0 AS DECIMAL(10, 2)) AS CarryOnPrice,
-                CAST(0 AS DECIMAL(10, 2)) AS CheckedPrice,
+                r1.carryOnPrice AS FirstCarryOnPrice,
+                r1.luggagePrice AS FirstCheckedPrice,
+                r2.carryOnPrice AS SecondCarryOnPrice,
+                r2.luggagePrice AS SecondCheckedPrice,
 
                 CASE
                     WHEN ac1.cantPasajeros < ac2.cantPasajeros THEN ac1.cantPasajeros
@@ -299,4 +305,3 @@ namespace AirDreams.API.Repositories
         }
     }
 }
-

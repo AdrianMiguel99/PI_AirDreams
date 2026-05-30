@@ -116,11 +116,14 @@ namespace AirDreams.API.Services
                 {
                     new FlightSegmentDTO
                     {
+                        FlightNumber = flight.FlightNumber,
                         RouteId = flight.RouteId,
                         DepartureDate = flight.DepartureDate,
                         ArrivalDate = flight.ArrivalDate,
                         DepartureTime = flight.DepartureTime,
                         ArrivalTime = flight.ArrivalTime,
+                        CarryOnPrice = flight.CarryOnPrice,
+                        CheckedPrice = flight.CheckedPrice,
                         Duration = flight.Duration,
 
                         DepartureAirport = new AirportDTO
@@ -143,7 +146,7 @@ namespace AirDreams.API.Services
         {
             return new FlightItineraryDTO
             {
-                ItineraryId = flight.FlightNumber,
+                ItineraryId = $"{flight.FirstFlightNumber}-{flight.SecondFlightNumber}",
                 Stops = 1,
                 TouristPrice = flight.TouristPrice,
                 FirstClassPrice = flight.FirstClassPrice,
@@ -151,11 +154,14 @@ namespace AirDreams.API.Services
                 {
                     new FlightSegmentDTO
                     {
+                        FlightNumber = flight.FirstFlightNumber,
                         RouteId = flight.FirstRouteID,
                         DepartureDate = flight.FirstDepartureDate,
                         DepartureTime = flight.FirstDepartureTime,
                         ArrivalDate = flight.FirstArrivalDate,
                         ArrivalTime = flight.FirstArrivalTime,
+                        CarryOnPrice = flight.FirstCarryOnPrice,
+                        CheckedPrice = flight.FirstCheckedPrice,
                         Duration = flight.FirstDuration,
                         DepartureAirport = new AirportDTO
                         {
@@ -172,11 +178,14 @@ namespace AirDreams.API.Services
                     },
                     new FlightSegmentDTO
                     {
+                        FlightNumber = flight.SecondFlightNumber,
                         RouteId = flight.SecondRouteID,
                         DepartureDate = flight.SecondDepartureDate,
                         DepartureTime = flight.SecondDepartureTime,
                         ArrivalDate = flight.SecondArrivalDate,
                         ArrivalTime = flight.SecondArrivalTime,
+                        CarryOnPrice = flight.SecondCarryOnPrice,
+                        CheckedPrice = flight.SecondCheckedPrice,
                         Duration = flight.SecondDuration,
                         DepartureAirport = new AirportDTO
                         {

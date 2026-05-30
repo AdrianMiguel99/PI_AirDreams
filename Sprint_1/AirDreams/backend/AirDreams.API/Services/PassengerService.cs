@@ -15,15 +15,12 @@ namespace AirDreams.API.Services
 
         public async Task<PassengerDto> CreateAsync(CreatePassengerDto dto)
         {
-            var passport = dto.Passport.Trim().ToUpper();
-
-            if (await _repository.ExistsAsync(dto.IdPassenger, passport))
+            if (await _repository.ExistsAsync(dto.IdPassenger))
                 throw new InvalidOperationException("El pasajero ya existe.");
 
             var passenger = new Passenger
             {
                 IdPassenger = dto.IdPassenger,
-                Passport = passport,
                 NamePassenger = dto.NamePassenger.Trim(),
                 LastnamesPassenger = dto.LastnamesPassenger.Trim(),
                 EmailPassenger = dto.EmailPassenger.Trim().ToLower(),
@@ -35,9 +32,9 @@ namespace AirDreams.API.Services
             return MapToDto(created);
         }
 
-        public async Task<PassengerDto?> GetByIdAsync(int idPassenger, string passport)
+        public async Task<PassengerDto?> GetByIdAsync(int idPassenger)
         {
-            var passenger = await _repository.GetByIdAsync(idPassenger, passport.Trim().ToUpper());
+            var passenger = await _repository.GetByIdAsync(idPassenger);
             return passenger is null ? null : MapToDto(passenger);
         }
 
@@ -58,7 +55,6 @@ namespace AirDreams.API.Services
         private static PassengerDto MapToDto(Passenger passenger) => new()
         {
             IdPassenger = passenger.IdPassenger,
-            Passport = passenger.Passport,
             NamePassenger = passenger.NamePassenger,
             LastnamesPassenger = passenger.LastnamesPassenger,
             EmailPassenger = passenger.EmailPassenger,
