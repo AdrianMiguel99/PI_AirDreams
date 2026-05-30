@@ -89,6 +89,8 @@ builder.Services.AddScoped<ILuggageRepository, LuggageRepository>();
 builder.Services.AddScoped<ILuggageService, LuggageService>();
 builder.Services.AddScoped<IPassengerRepository, PassengerRepository>();
 builder.Services.AddScoped<IPassengerService, PassengerService>();
+builder.Services.AddScoped<IPaymentRepository, PaymentRepository>();
+builder.Services.AddScoped<IPaymentService, PaymentService>();
 
 var app = builder.Build();
 
