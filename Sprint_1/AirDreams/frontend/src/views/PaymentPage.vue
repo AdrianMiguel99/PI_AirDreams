@@ -3,8 +3,42 @@
     <div class="page-header">
       <h2 class="section-title">Pago</h2>
       <p class="section-subtitle">
-        Ingresa los datos del comprador y elige el método de pago.
+        Revisa el detalle de tu compra y selecciona un método de pago.
       </p>
+    </div>
+
+    <div class="purchase-summary">
+      <h3>Resumen de compra</h3>
+      <div class="summary-grid">
+        <div class="summary-item">
+          <span class="summary-label">Vuelo</span>
+          <strong>{{ flightDescription }}</strong>
+        </div>
+        <div class="summary-item">
+          <span class="summary-label">Clase</span>
+          <strong>{{ seatClassLabel }}</strong>
+        </div>
+        <div class="summary-item">
+          <span class="summary-label">Pasajeros</span>
+          <strong>{{ passengerCount }}</strong>
+        </div>
+        <div class="summary-item">
+          <span class="summary-label">Precio por pasajero</span>
+          <strong>{{ formatCurrency(pricePerPassenger) }}</strong>
+        </div>
+        <div class="summary-item">
+          <span class="summary-label">Subtotal vuelo</span>
+          <strong>{{ formatCurrency(flightSubtotal) }}</strong>
+        </div>
+        <div class="summary-item">
+          <span class="summary-label">Equipaje</span>
+          <strong>{{ formatCurrency(luggageTotal) }}</strong>
+        </div>
+        <div class="summary-item total">
+          <span class="summary-label">Total a pagar</span>
+          <strong>{{ formatCurrency(grandTotal) }}</strong>
+        </div>
+      </div>
     </div>
 
     <form @submit.prevent="processPayment">
@@ -12,16 +46,6 @@
         <label class="form-field">
           Nombre del comprador
           <input v-model="payment.buyerName" type="text" required maxlength="100" />
-        </label>
-
-        <label class="form-field">
-          Correo electrónico
-          <input v-model="payment.buyerEmail" type="email" required maxlength="100" />
-        </label>
-
-        <label class="form-field">
-          Teléfono
-          <input v-model="payment.buyerPhone" type="tel" maxlength="20" />
         </label>
       </div>
 
@@ -115,8 +139,6 @@ export default {
       payment: {
         transactionId: '',
         buyerName: '',
-        buyerEmail: '',
-        buyerPhone: '',
         paymentMethod: '',
         cardNumber: '',
         cardExpiry: '',
@@ -134,18 +156,68 @@ export default {
       popupTitle: '',
       popupMessage: '',
       popupActionText: '',
-      popupAction: null
+      popupAction: null,
+
+      selectedPurchase: null,
+      luggageData: []
+    }
+  },
+  computed: {
+    transactionId() {
+      return this.payment.transactionId
+    },
+    seatClassLabel() {
+      if (!this.selectedPurchase) return ''
+      return this.selectedPurchase.seatClass === 'FirstClass' ? 'Primera clase' : 'Turista'
+    },
+    passengerCount() {
+      return this.selectedPurchase?.passengerCount || 1
+    },
+    pricePerPassenger() {
+      return Number(this.selectedPurchase?.price || 0)
+    },
+    flightSubtotal() {
+      return this.passengerCount * this.pricePerPassenger
+    },
+    luggageTotal() {
+      return this.luggageData.reduce((total, item) => {
+        const passengerLuggage = item.luggageItems?.reduce((sum, luggage) => sum + (luggage.subtotal || 0), 0) || 0
+        return total + passengerLuggage
+      }, 0)
+    },
+    grandTotal() {
+      return this.flightSubtotal + this.luggageTotal
+    },
+    flightDescription() {
+      const p = this.selectedPurchase
+      if (p) {
+        if (p.origin && p.destination) return `${p.origin} → ${p.destination}`
+        if (p.flightNumber) return `Vuelo ${p.flightNumber}`
+        if (p.itinerary?.itineraryId) return `Vuelo #${p.itinerary.itineraryId}`
+      }
+      return `#${this.transactionId}`
     }
   },
   created() {
     this.loadTransactionId()
+    this.loadPurchaseData()
   },
   methods: {
     loadTransactionId() {
       this.payment.transactionId =
         this.$route.query.transactionId ||
         sessionStorage.getItem('transactionId') ||
-        'TXN-DEFAULT'
+        'TXN-' + crypto.randomUUID().substring(0, 8)
+    },
+    loadPurchaseData() {
+      const savedPurchase = sessionStorage.getItem('selectedFlightPurchase')
+      if (savedPurchase) {
+        this.selectedPurchase = JSON.parse(savedPurchase)
+      }
+      const savedLuggage = sessionStorage.getItem('purchaseLuggage')
+      if (savedLuggage) {
+        this.luggageData = JSON.parse(savedLuggage)
+      }
     },
     onMethodChange() {
       if (this.payment.paymentMethod !== 'Card') {
@@ -165,14 +237,50 @@ export default {
       if (value.length > 2) value = value.substring(0,2) + '/' + value.substring(2,4)
       this.payment.cardExpiry = value
     },
+    formatCurrency(value) {
+      return new Intl.NumberFormat('en-US', {
+        style: 'currency',
+        currency: 'USD'
+      }).format(Number(value || 0))
+    },
     async processPayment() {
       this.processing = true
       try {
-        const payload = { ...this.payment }
-        if (payload.paymentMethod === 'Card') {
-          payload.cardNumber = payload.cardNumber.replace(/\s/g, '')
+        const purchase = JSON.parse(sessionStorage.getItem('selectedFlightPurchase'))
+        const passengers = JSON.parse(sessionStorage.getItem('purchasePassengers'))
+        const luggage = JSON.parse(sessionStorage.getItem('purchaseLuggage'))
+
+        const payload = {
+          transactionId: this.payment.transactionId,
+          buyerName: this.payment.buyerName,
+          paymentMethod: this.payment.paymentMethod,
+          cardNumber: this.payment.cardNumber?.replace(/\s/g, '') || null,
+          cardExpiry: this.payment.cardExpiry || null,
+          cardCvv: this.payment.cardCvv || null,
+          segments: purchase.itinerary.segments.map(s => ({
+            flightNumber: (s.flightNumber || '').trim().substring(0, 10),
+            routeId: s.routeId || s.idRoute || null,
+            checkedPrice: s.checkedPrice || 0,
+            carryOnPrice: s.carryOnPrice || 0
+          })),
+          seatClass: purchase.seatClass,
+          pricePerPassenger: purchase.price,
+          passengerCount: purchase.passengerCount,
+          passengers: passengers.map(p => ({
+            namePassenger: p.namePassenger,
+            lastnamesPassenger: p.lastnamesPassenger,
+            emailPassenger: p.emailPassenger || '',
+            telephone: p.telephone || '',
+            country: p.country || ''
+          })),
+          luggage: luggage ? luggage.map(l => ({
+            passengerIndex: l.passenger.index,
+            luggageItems: l.luggageItems
+          })) : []
         }
+
         await axios.post('http://localhost:5276/api/payment', payload)
+
         this.popupType = 'success'
         this.popupTitle = 'Pago exitoso'
         this.popupMessage = 'Tu compra ha sido confirmada. ¡Gracias por volar con Air Dreams!'
@@ -183,7 +291,14 @@ export default {
         console.error(error)
         this.popupType = 'error'
         this.popupTitle = 'Error en el pago'
-        this.popupMessage = error.response?.data?.error || 'No se pudo procesar el pago.'
+        if (error.response?.data?.error) {
+          this.popupMessage = error.response.data.error
+        } else if (error.response?.data?.errors) {
+          const messages = Object.values(error.response.data.errors).flat().join(', ')
+          this.popupMessage = messages || 'Datos inválidos.'
+        } else {
+          this.popupMessage = 'No se pudo procesar el pago.'
+        }
         this.popupActionText = ''
         this.showPopup = true
       } finally {
@@ -195,28 +310,38 @@ export default {
 </script>
 
 <style scoped>
-.page-header {
+.page-header { margin-bottom: 24px; }
+.section-title { font-size: 20px; font-weight: 700; color: #032056; margin: 0 0 6px; }
+.section-subtitle { color: #667085; font-size: 14px; margin: 0; }
+
+.purchase-summary {
+  background: #ffffff;
+  border: 1px solid #e8ecf4;
+  border-radius: 12px;
+  padding: 20px;
   margin-bottom: 24px;
+  box-shadow: 0 1px 4px rgba(3, 32, 86, 0.06);
 }
-
-.section-title {
-  font-size: 20px;
-  font-weight: 700;
+.purchase-summary h3 {
   color: #032056;
-  margin: 0 0 6px;
+  margin: 0 0 16px;
+  font-size: 16px;
 }
-
-.section-subtitle {
-  color: #667085;
-  font-size: 14px;
-  margin: 0;
-}
-
-.form-grid {
+.summary-grid {
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 16px;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
 }
+.summary-item {
+  display: flex;
+  justify-content: space-between;
+  color: #334155;
+  font-size: 14px;
+}
+.summary-label { color: #8a94a8; }
+.summary-item.total { border-top: 1px solid #e8ecf4; padding-top: 12px; margin-top: 4px; font-weight: 700; }
+
+.form-grid { display: grid; grid-template-columns: 1fr; gap: 16px; }
 
 .form-field {
   color: #032056;
@@ -332,7 +457,7 @@ export default {
 }
 
 @media (max-width: 720px) {
-  .form-grid,
+  .summary-grid,
   .card-row {
     grid-template-columns: 1fr;
   }

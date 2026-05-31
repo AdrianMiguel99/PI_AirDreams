@@ -8,22 +8,22 @@ namespace AirDreams.API.Controllers
     [Route("api/payment")]
     public class PaymentController : ControllerBase
     {
-        private readonly IPaymentService _paymentService;
+        private readonly IPurchaseService _purchaseService;
 
-        public PaymentController(IPaymentService paymentService)
+        public PaymentController(IPurchaseService purchaseService)
         {
-            _paymentService = paymentService;
+            _purchaseService = purchaseService;
         }
 
         [HttpPost]
-        public async Task<IActionResult> ProcessPayment([FromBody] PaymentRequestDto dto)
+        public async Task<IActionResult> ProcessPayment([FromBody] ConfirmPurchaseDto dto)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
             try
             {
-                var result = await _paymentService.ProcessPaymentAsync(dto);
+                var result = await _purchaseService.ConfirmPurchaseAsync(dto);
                 return Ok(result);
             }
             catch (Exception ex)

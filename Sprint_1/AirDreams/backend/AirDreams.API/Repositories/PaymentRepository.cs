@@ -12,16 +12,13 @@ namespace AirDreams.API.Repositories
             _connection = connection;
         }
 
-        public async Task<bool> UpdatePaymentAsync(string transactionId, string paymentMethod, string? cardLastFour,
-            string buyerName, string buyerEmail, string buyerPhone)
+        public async Task<bool> UpdatePaymentAsync(string transactionId, string paymentMethod, string? cardLastFour, string buyerName)
         {
             var sql = @"
                 UPDATE Itinerary
                 SET paymentMethod = @PaymentMethod,
                     cardLastFour = @CardLastFour,
                     buyerName = @BuyerName,
-                    buyerEmail = @BuyerEmail,
-                    buyerPhone = @BuyerPhone,
                     paymentDate = GETDATE()
                 WHERE transactionId = @TransactionId";
 
@@ -30,9 +27,7 @@ namespace AirDreams.API.Repositories
                 TransactionId = transactionId,
                 PaymentMethod = paymentMethod,
                 CardLastFour = cardLastFour,
-                BuyerName = buyerName,
-                BuyerEmail = buyerEmail,
-                BuyerPhone = buyerPhone
+                BuyerName = buyerName
             });
 
             return affected > 0;

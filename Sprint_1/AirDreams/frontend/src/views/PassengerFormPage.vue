@@ -80,7 +80,7 @@
           <label class="form-field">
             Pais del pasaporte
             <input
-              v-model.trim="passenger.passportCountry"
+              v-model.trim="passenger.country"
               type="text"
               maxlength="56"
               required
@@ -205,7 +205,7 @@ export default {
         namePassenger: '',
         lastnamesPassenger: '',
         birthDate: '',
-        passportCountry: '',
+        country: '',
         emailPassenger: '',
         telephone: ''
       };
@@ -219,7 +219,7 @@ export default {
         namePassenger: passenger.namePassenger.trim(),
         lastnamesPassenger: passenger.lastnamesPassenger.trim(),
         birthDate: passenger.birthDate,
-        passportCountry: passenger.passportCountry.trim(),
+        passportCountry: passenger.country.trim(),
         emailPassenger: this.isMainPassenger(index)
           ? passenger.emailPassenger.trim().toLowerCase()
           : null,

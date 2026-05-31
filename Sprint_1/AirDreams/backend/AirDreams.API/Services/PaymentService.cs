@@ -26,19 +26,13 @@ namespace AirDreams.API.Services
                 dto.TransactionId,
                 dto.PaymentMethod,
                 lastFour,
-                dto.BuyerName,
-                dto.BuyerEmail,
-                dto.BuyerPhone
+                dto.BuyerName
             );
 
             if (!success)
                 throw new Exception("No se encontró el itinerario o no se pudo actualizar el pago.");
 
-            return new PaymentResponseDto
-            {
-                Success = true,
-                Message = "Pago procesado correctamente"
-            };
+            return new PaymentResponseDto { Success = true, Message = "Pago procesado correctamente" };
         }
     }
 }

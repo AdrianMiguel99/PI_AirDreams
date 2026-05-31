@@ -13,12 +13,6 @@ namespace AirDreams.API.Models.Dtos
         [Required, MaxLength(100)]
         public string BuyerName { get; set; }
 
-        [Required, EmailAddress, MaxLength(100)]
-        public string BuyerEmail { get; set; }
-
-        [Phone, MaxLength(20)]
-        public string? BuyerPhone { get; set; }
-
         [CreditCard]
         public string? CardNumber { get; set; }
 
