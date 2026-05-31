@@ -29,8 +29,7 @@ namespace AirDreams.API.Controllers
                     nameof(GetById),
                     new
                     {
-                        idPassenger = created.IdPassenger,
-                        passport = created.Passport
+                        idPassenger = created.IdPassenger
                     },
                     created
                 );
@@ -41,10 +40,10 @@ namespace AirDreams.API.Controllers
             }
         }
 
-        [HttpGet("{idPassenger:int}/{passport}")]
-        public async Task<IActionResult> GetById(int idPassenger, string passport)
+        [HttpGet("{idPassenger:int}")]
+        public async Task<IActionResult> GetById(int idPassenger)
         {
-            var passenger = await _passengerService.GetByIdAsync(idPassenger, passport);
+            var passenger = await _passengerService.GetByIdAsync(idPassenger);
 
             if (passenger is null)
                 return NotFound(new { error = "Pasajero no encontrado." });

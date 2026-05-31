@@ -1,6 +1,9 @@
 <template>
   <StepperLayout :currentStep="2">
     <h2 class="section-title">Equipaje por pasajero</h2>
+    <div class="luggage-summary">
+    </div>
+
 
     <LuggagePassenger
       v-for="passenger in passengers"
@@ -45,8 +48,8 @@ export default {
 
   data() {
     return {
-      checkedBagPrice: '25.00',
-      carryOnBagPrice: '15.00',
+      checkedBagPrice: 0,
+      carryOnBagPrice: 0,
 
       passengers: [],
 
@@ -62,14 +65,43 @@ export default {
   computed: {
     transactionIdItinerary() {
       return this.$route.query.transactionId || sessionStorage.getItem('transactionId') || 'TXN-DEFAULT';
+    },
+
+    luggageTotal() {
+      return Object.values(this.luggageSelections).reduce((total, selection) => {
+        return total +
+          (selection.checkedCount * this.checkedBagPrice) +
+          (selection.carryOnCount * this.carryOnBagPrice);
+      }, 0);
     }
   },
 
   created() {
+    this.loadLuggagePrices();
     this.loadPassengers();
   },
 
   methods: {
+    loadLuggagePrices() {
+      const savedPurchase = sessionStorage.getItem('selectedFlightPurchase');
+
+      if (!savedPurchase) {
+        return;
+      }
+
+      const selectedPurchase = JSON.parse(savedPurchase);
+      const segments = selectedPurchase.itinerary?.segments || [];
+
+      this.checkedBagPrice = this.sumSegmentPrice(segments, 'checkedPrice');
+      this.carryOnBagPrice = this.sumSegmentPrice(segments, 'carryOnPrice');
+    },
+
+    sumSegmentPrice(segments, priceField) {
+      return segments.reduce((total, segment) => {
+        return total + Number(segment[priceField] || 0);
+      }, 0);
+    },
+
     loadPassengers() {
       const savedPassengers = sessionStorage.getItem('purchasePassengers');
 
@@ -89,8 +121,12 @@ export default {
       }));
     },
 
-    handleLuggageChange({ passengerIndex, checkedCount, carryOnCount }) {
-      this.luggageSelections[passengerIndex] = { checkedCount, carryOnCount };
+    handleLuggageChange({ passengerIndex, checkedCount, carryOnCount, passengerTotal }) {
+      this.luggageSelections[passengerIndex] = {
+        checkedCount,
+        carryOnCount,
+        passengerTotal
+      };
     },
 
     buildLuggageItems(passengerIndex) {
@@ -102,19 +138,30 @@ export default {
       if (selection.checkedCount > 0) {
         items.push({
           type: 'checked',
-          quantity: selection.checkedCount
+          quantity: selection.checkedCount,
+          unitPrice: this.checkedBagPrice,
+          subtotal: selection.checkedCount * this.checkedBagPrice
         });
       }
 
       if (selection.carryOnCount > 0) {
         items.push({
           type: 'carryOn',
-          quantity: selection.carryOnCount
+          quantity: selection.carryOnCount,
+          unitPrice: this.carryOnBagPrice,
+          subtotal: selection.carryOnCount * this.carryOnBagPrice
         });
       }
 
       return items;
     },
+    formatCurrency(value) {
+      return new Intl.NumberFormat('en-US', {
+        style: 'currency',
+        currency: 'USD'
+      }).format(Number(value || 0));
+    },
+    
 
     async continueToPay() {
       this.loading = true;

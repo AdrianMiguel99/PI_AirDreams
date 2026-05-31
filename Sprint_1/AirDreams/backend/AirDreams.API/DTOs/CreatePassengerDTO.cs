@@ -8,10 +8,6 @@ namespace AirDreams.API.DTOs
         public int IdPassenger { get; set; }
 
         [Required]
-        [StringLength(8)]
-        public string Passport { get; set; } = string.Empty;
-
-        [Required]
         [StringLength(30)]
         public string NamePassenger { get; set; } = string.Empty;
 

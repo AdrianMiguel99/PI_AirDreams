@@ -3,10 +3,6 @@
     <div class="card-content">
       <div class="card-main">
         <div class="left-section">
-          <div class="flight-number">
-            <span class="label">Vuelo:</span>
-            <span class="value">#{{ flight.itineraryId }}</span>
-          </div>
 
           <div class="stops-info">
             <span v-if="flight.stops === 0">Directo</span>
@@ -21,7 +17,7 @@
               class="segment"
             >
               <div class="segment-header">
-                <strong>Segmento {{ index + 1 }}</strong>
+                <strong>Vuelo #{{ segment.flightNumber }}</strong>
               </div>
 
               <div class="segment-body">

@@ -6,54 +6,26 @@
     <FormularioBusqueda @search="handleSearch" />
 
     <div
-      v-if="searchPerformed && outboundFlights.length === 0 && returnFlights.length === 0"
+      v-if="searchPerformed && flights.length === 0"
       class="no-results"
     >
       No hay vuelos disponibles para los filtros seleccionados
     </div>
 
     <ListaVuelos
-      v-if="searchPerformed && outboundFlights.length > 0"
-      title="Vuelos de ida"
-      :flights="paginatedOutboundFlights"
+      v-if="searchPerformed && flights.length > 0"
+      title="Vuelos disponibles"
+      :flights="paginatedFlights"
       :departureDate="departureDate"
-      @buy="handleBuyFlight($event, 'outbound')"
+      @buy="handleBuyFlight"
     />
 
     <Paginacion
-      v-if="searchPerformed && outboundFlights.length > outboundPerPage"
-      :total="outboundFlights.length"
-      :perPage="outboundPerPage"
-      @changePage="changeOutboundPage"
+      v-if="searchPerformed && flights.length > flightsPerPage"
+      :total="flights.length"
+      :perPage="flightsPerPage"
+      @changePage="changePage"
     />
-
-    <ListaVuelos
-      v-if="searchPerformed && tripType === 'roundTrip' && returnFlights.length > 0"
-      title="Vuelos de regreso"
-      :flights="paginatedReturnFlights"
-      @buy="handleBuyFlight($event, 'return')"
-    />
-
-    <Paginacion
-      v-if="searchPerformed && tripType === 'roundTrip' && returnFlights.length > returnPerPage"
-      :total="returnFlights.length"
-      :perPage="returnPerPage"
-      @changePage="changeReturnPage"
-    />
-
-    <div
-      v-if="searchPerformed && outboundFlights.length === 0 && returnFlights.length > 0"
-      class="no-results"
-    >
-      No hay vuelos de ida disponibles para los filtros seleccionados
-    </div>
-
-    <div
-      v-if="searchPerformed && tripType === 'roundTrip' && outboundFlights.length > 0 && returnFlights.length === 0"
-      class="no-results"
-    >
-      No hay vuelos de regreso disponibles para los filtros seleccionados
-    </div>
   </div>
 </template>
 
@@ -76,13 +48,8 @@ export default {
   data() {
     return {
       currentPage: 1,
-      outboundFlights: [],
-      returnFlights: [],
-      tripType: '',
-      outboundPage: 1,
-      returnPage: 1,
-      outboundPerPage: 10,
-      returnPerPage: 10,
+      flights: [],
+      flightsPerPage: 10,
       searchPerformed: false,
       departureDate: '',
       passengersCount: 1,
@@ -91,52 +58,45 @@ export default {
   },
 
   computed: {
-    paginatedOutboundFlights() {
-      const start = (this.outboundPage - 1) * this.outboundPerPage;
-      return this.outboundFlights.slice(start, start + this.outboundPerPage);
-    },
-
-    paginatedReturnFlights() {
-      const start = (this.returnPage - 1) * this.returnPerPage;
-      return this.returnFlights.slice(start, start + this.returnPerPage);
+    paginatedFlights() {
+      const start = (this.currentPage - 1) * this.flightsPerPage;
+      return this.flights.slice(start, start + this.flightsPerPage);
     }
-    },
+  },
   
-    methods: {
-      handleSearch(data) {
-        this.tripType = data.type;
-        this.outboundFlights = data.outboundFlights || [];
-        this.returnFlights = data.returnFlights || [];
-        this.departureDate = data.departureDate;
-        this.passengersCount = Number(data.passengers || 1);
-        this.searchPerformed = true;
-        this.currentPage = 1;
-      },
+  methods: {
+    handleSearch(data) {
+      this.flights = data.flights || [];
+      this.departureDate = data.departureDate;
+      this.passengersCount = Number(data.passengers || 1);
+      this.searchPerformed = true;
+      this.currentPage = 1;
+    },
 
-      changePage(page) {
-        this.currentPage = page;
-      },
+    changePage(page) {
+      this.currentPage = page;
+    },
 
-      handleBuyFlight(selection, direction) {
-        const purchaseSelection = {
-          tripType: this.tripType,
-          direction,
-          seatClass: selection.seatClass,
-          price: selection.price,
-          passengerCount: this.passengersCount,
-          itinerary: selection.flight,
-          selectedAt: new Date().toISOString()
-        };
+    handleBuyFlight(selection) {
+      const purchaseSelection = {
+        seatClass: selection.seatClass,
+        price: selection.price,
+        passengerCount: this.passengersCount,
+        itinerary: selection.flight,
+        selectedAt: new Date().toISOString()
+      };
 
-        this.selectedPurchase = purchaseSelection;
-        sessionStorage.setItem(
-          'selectedFlightPurchase',
-          JSON.stringify(purchaseSelection)
-        );
+      this.selectedPurchase = purchaseSelection;
+      sessionStorage.setItem(
+        'selectedFlightPurchase',
+        JSON.stringify(purchaseSelection)
+      );
+      sessionStorage.removeItem('purchasePassengers');
+      sessionStorage.removeItem('purchaseLuggage');
 
-        this.$router.push({ name: 'passengers' });
-      }
+      this.$router.push({ name: 'passengers' });
     }
+  }
 };
 </script>
 

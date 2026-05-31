@@ -31,28 +31,21 @@
         class="passenger-form"
       >
         <div class="passenger-title">
-          <span>Pasajero {{ index + 1 }}</span>
+          <span>
+            Pasajero {{ index + 1 }}
+            <small v-if="isMainPassenger(index)">Principal</small>
+          </span>
         </div>
 
         <div class="form-grid">
           <label class="form-field">
-            Identificacion
-            <input
-              v-model.trim="passenger.idPassenger"
-              type="number"
-              min="1"
-              required
-            />
-          </label>
-
-          <label class="form-field">
-            Pasaporte
-            <input
-              v-model.trim="passenger.passport"
-              type="text"
-              maxlength="8"
-              required
-            />
+            Genero
+            <select v-model="passenger.gender" required>
+              <option value="" disabled>Selecciona una opcion</option>
+              <option value="Female">Femenino</option>
+              <option value="Male">Masculino</option>
+              <option value="Other">Otro</option>
+            </select>
           </label>
 
           <label class="form-field">
@@ -76,33 +69,45 @@
           </label>
 
           <label class="form-field">
-            Correo
+            Fecha de nacimiento
             <input
-              v-model.trim="passenger.emailPassenger"
-              type="email"
-              maxlength="50"
+              v-model="passenger.birthDate"
+              type="date"
               required
             />
           </label>
 
           <label class="form-field">
-            Codigo pais
+            Pais del pasaporte
             <input
-              v-model.trim="passenger.countryCode"
-              type="number"
-              min="1"
-              max="255"
+              v-model.trim="passenger.passportCountry"
+              type="text"
+              maxlength="56"
+              required
             />
           </label>
 
-          <label class="form-field">
-            Telefono
-            <input
-              v-model.trim="passenger.telephone"
-              type="number"
-              min="1"
-            />
-          </label>
+          <template v-if="isMainPassenger(index)">
+            <label class="form-field">
+              Telefono
+              <input
+                v-model.trim="passenger.telephone"
+                type="tel"
+                maxlength="20"
+                required
+              />
+            </label>
+
+            <label class="form-field">
+              Email
+              <input
+                v-model.trim="passenger.emailPassenger"
+                type="email"
+                maxlength="50"
+                required
+              />
+            </label>
+          </template>
         </div>
       </div>
 
@@ -195,28 +200,38 @@ export default {
     createEmptyPassenger(index) {
       return {
         index,
-        idPassenger: '',
-        passport: '',
+        isMainPassenger: index === 1,
+        gender: '',
         namePassenger: '',
         lastnamesPassenger: '',
+        birthDate: '',
+        passportCountry: '',
         emailPassenger: '',
-        countryCode: '',
         telephone: ''
       };
     },
 
     normalizePassengers() {
-      return this.passengers.map((passenger) => ({
+      return this.passengers.map((passenger, index) => ({
         ...passenger,
-        idPassenger: Number(passenger.idPassenger),
-        passport: passenger.passport.trim().toUpperCase(),
+        isMainPassenger: this.isMainPassenger(index),
+        gender: passenger.gender,
         namePassenger: passenger.namePassenger.trim(),
         lastnamesPassenger: passenger.lastnamesPassenger.trim(),
-        emailPassenger: passenger.emailPassenger.trim().toLowerCase(),
-        countryCode: passenger.countryCode ? Number(passenger.countryCode) : null,
-        telephone: passenger.telephone ? Number(passenger.telephone) : null,
+        birthDate: passenger.birthDate,
+        passportCountry: passenger.passportCountry.trim(),
+        emailPassenger: this.isMainPassenger(index)
+          ? passenger.emailPassenger.trim().toLowerCase()
+          : null,
+        telephone: this.isMainPassenger(index)
+          ? passenger.telephone.trim()
+          : null,
         fullName: `${passenger.namePassenger.trim()} ${passenger.lastnamesPassenger.trim()}`
       }));
+    },
+
+    isMainPassenger(index) {
+      return index === 0;
     },
 
     continueToLuggage() {
@@ -308,6 +323,21 @@ export default {
   margin-bottom: 16px;
 }
 
+.passenger-title span {
+  align-items: center;
+  display: flex;
+  gap: 8px;
+}
+
+.passenger-title small {
+  background: #e8f2ff;
+  border-radius: 999px;
+  color: #032056;
+  font-size: 11px;
+  font-weight: 700;
+  padding: 3px 9px;
+}
+
 .form-grid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -323,9 +353,11 @@ export default {
   gap: 6px;
 }
 
-.form-field input {
+.form-field input,
+.form-field select {
   border: 1px solid #c8d0de;
   border-radius: 8px;
+  background: #ffffff;
   color: #032056;
   font-size: 14px;
   padding: 11px 12px;
@@ -333,7 +365,8 @@ export default {
   transition: border 0.2s ease, box-shadow 0.2s ease;
 }
 
-.form-field input:focus {
+.form-field input:focus,
+.form-field select:focus {
   border-color: #032056;
   box-shadow: 0 0 0 3px rgba(3, 32, 86, 0.1);
 }

@@ -13,44 +13,39 @@ namespace AirDreams.API.Repositories
             _connection = connection;
         }
 
-        public async Task<bool> ExistsAsync(int idPassenger, string passport)
+        public async Task<bool> ExistsAsync(int idPassenger)
         {
             const string sql = @"
                 SELECT COUNT(1)
                 FROM Passenger
-                WHERE idPassenger = @IdPassenger
-                AND passport = @Passport;
+                WHERE idPassenger = @IdPassenger;
             ";
 
             var count = await _connection.ExecuteScalarAsync<int>(sql, new
             {
-                IdPassenger = idPassenger,
-                Passport = passport
+                IdPassenger = idPassenger
             });
 
             return count > 0;
         }
 
-        public async Task<Passenger?> GetByIdAsync(int idPassenger, string passport)
+        public async Task<Passenger?> GetByIdAsync(int idPassenger)
         {
             const string sql = @"
                 SELECT
                     idPassenger AS IdPassenger,
-                    passport AS Passport,
                     namePassenger AS NamePassenger,
                     lastnamesPassenger AS LastnamesPassenger,
                     emailPassenger AS EmailPassenger,
                     telephone AS Telephone,
                     countryCode AS CountryCode
                 FROM Passenger
-                WHERE idPassenger = @IdPassenger
-                AND passport = @Passport;
+                WHERE idPassenger = @IdPassenger;
             ";
 
             return await _connection.QueryFirstOrDefaultAsync<Passenger>(sql, new
             {
-                IdPassenger = idPassenger,
-                Passport = passport
+                IdPassenger = idPassenger
             });
         }
 
@@ -59,7 +54,6 @@ namespace AirDreams.API.Repositories
             const string sql = @"
                 INSERT INTO Passenger (
                     idPassenger,
-                    passport,
                     namePassenger,
                     lastnamesPassenger,
                     emailPassenger,
@@ -68,7 +62,6 @@ namespace AirDreams.API.Repositories
                 )
                 VALUES (
                     @IdPassenger,
-                    @Passport,
                     @NamePassenger,
                     @LastnamesPassenger,
                     @EmailPassenger,
@@ -86,7 +79,6 @@ namespace AirDreams.API.Repositories
             const string sql = @"
                 SELECT
                     idPassenger AS IdPassenger,
-                    passport AS Passport,
                     namePassenger AS NamePassenger,
                     lastnamesPassenger AS LastnamesPassenger,
                     emailPassenger AS EmailPassenger,
