@@ -15,7 +15,7 @@ namespace AirDreams.API.Services
         public async Task<PaymentResponseDto> ConfirmPurchaseAsync(ConfirmPurchaseDto dto)
         {
             var amount = dto.PassengerCount * dto.PricePerPassenger
-                         + (dto.Luggage?.Sum(l => l.LuggageItems.Sum(i => i.Subtotal)) ?? 0);
+                        + (dto.Luggage?.Sum(l => l.LuggageItems.Sum(i => i.Subtotal)) ?? 0);
 
             string? lastFour = null;
             if (dto.PaymentMethod.Equals("Card", StringComparison.OrdinalIgnoreCase) &&

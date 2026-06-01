@@ -348,7 +348,7 @@
                     @click="selectAircraft(aircraft)"
                     style="cursor: pointer"
                     >
-                    {{ aircraft.plateNumber }} - {{ aircraft.modelo }}
+                    {{ aircraft.modelo }}
                 </li>
             </ul>    
             </div>
@@ -444,7 +444,7 @@
                 const res = await axios.get('/api/airports', {
                 headers: { 'Authorization': `Bearer ${token}` }
             });
-            // adapter según la forma del DTO que devuelva el backend
+            
             this.airports = res.data.map((a, i) => ({ id: i+1, code: a.code || a.Code || a.CodeAirport, name: a.name || a.Name || a.NameAirport }));
             } catch (e) {
             console.error('No se pudieron cargar aeropuertos', e);
@@ -456,10 +456,8 @@
             const res = await axios.get('/api/Airplane', {
                 headers: { 'Authorization': `Bearer ${token}` }
             });
-            // adapter según la forma del DTO que devuelva el backend
             this.aircrafts = res.data.map((a, i) => ({
                 id: i+1,
-                plateNumber: a.plateNumber || a.PlateNumber,
                 modelo: a.aircraftModel || a.modelo || a.Model
             }));
             } catch (e) {
@@ -483,9 +481,8 @@
             if (!query) return [];
             
             return this.aircrafts.filter((aircraft) => {
-                const plateNumber = String(aircraft.plateNumber || "").toLowerCase();
                 const aircraftModel = String(aircraft.modelo || "").toLowerCase();
-                return plateNumber.includes(query) || aircraftModel.includes(query);
+                return aircraftModel.includes(query);
                 }
             );
         },
@@ -495,8 +492,8 @@
         },
         selectAircraft(aircraft) {
             this.selectedAircraft = aircraft;
-            this.aircraftQuery = `${aircraft.plateNumber} - ${aircraft.modelo}`;
-            this.formData.aircraftModel = aircraft.plateNumber;
+            this.aircraftQuery = `${aircraft.modelo}`;
+            this.formData.aircraftModel = aircraft.modelo;
             this.showAircraftResults = false;
         },
         onOriginAirportInput() {
@@ -582,7 +579,7 @@
                 adminID: 1,
                 codeAirportSalida: codeSalida,
                 codeAirportLlegada: codeLlegada,
-                plateNumber: this.formData.aircraftModel,
+                modelo: this.formData.aircraftModel,
                 firstClassPrice: parseFloat(this.formData.basePriceFirstClass),
                 turistClassPrice: parseFloat(this.formData.basePriceTurist),
                 stimatedTime: stimatedTime,

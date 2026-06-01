@@ -5,7 +5,7 @@ namespace AirDreams.API.Models
         public int AdminID { get; set; }
         public string CodeAirportSalida { get; set; } = string.Empty;
         public string CodeAirportLlegada { get; set; } = string.Empty;
-        public string PlateNumber { get; set; } = string.Empty;
+        public string Modelo { get; set; } = string.Empty;
         public decimal FirstClassPrice { get; set; }
         public decimal TuristClassPrice { get; set; }
         public decimal LuggagePrice {get; set; }

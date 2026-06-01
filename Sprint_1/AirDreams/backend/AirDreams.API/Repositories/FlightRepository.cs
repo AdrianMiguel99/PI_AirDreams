@@ -54,7 +54,7 @@ namespace AirDreams.API.Repositories
                 INNER JOIN FlightFrequency ff ON r.idRoute = ff.idRoute
                 INNER JOIN Airport a1 ON r.codeAirportSalida = a1.codeAirport
                 INNER JOIN Airport a2 ON r.codeAirportLlegada = a2.codeAirport
-                INNER JOIN Aircraft ac ON r.plateNumber = ac.plateNumber
+                INNER JOIN AircraftView ac ON r.modelo = ac.modelo
                 CROSS APPLY (
                     SELECT DATEADD(
                         SECOND,
@@ -194,8 +194,8 @@ namespace AirDreams.API.Repositories
                     INNER JOIN Airport a2 ON r1.codeAirportLlegada = a2.codeAirport
                     INNER JOIN Airport a3 ON r2.codeAirportLlegada = a3.codeAirport
 
-                    INNER JOIN Aircraft ac1 ON r1.plateNumber = ac1.plateNumber
-                    INNER JOIN Aircraft ac2 ON r2.plateNumber = ac2.plateNumber
+                    INNER JOIN AircraftView ac1 ON r1.modelo = ac1.modelo
+                    INNER JOIN AircraftView ac2 ON r2.modelo = ac2.modelo
 
 
                     CROSS APPLY (
@@ -309,7 +309,7 @@ namespace AirDreams.API.Repositories
                 WHERE SearchDate < CAST(@searchEndDate AS DATE)
             )
             SELECT
-                    CONCAT('R', r.idRoute, 'F', ff.idFrequency, '-', CONVERT(CHAR(8), sd.SearchDate, 112)) AS FlightNumber,
+                    CONCAT('AD', r.idRoute, ff.idFrequency, CONVERT(CHAR(8), sd.SearchDate, 112)) AS FlightNumber,
                     r.idRoute AS RouteId,
                     sd.SearchDate AS DepartureDate,
                     CAST(searchedFlight.ArrivalDateTime AS DATE) AS ArrivalDate,
@@ -318,8 +318,8 @@ namespace AirDreams.API.Repositories
                     r.stimatedTime AS Duration,
                     r.turistClassPrice AS TouristPrice,
                     r.firstClassPrice AS FirstClassPrice,
-                    r.carryOnprice AS CarryOnPrice,
-                    r.luggageprice AS CheckedPrice,
+                    r.carryOnPrice AS CarryOnPrice,
+                    r.luggagePrice AS CheckedPrice,
                     a1.codeAirport AS DepartureAirportCode,
                     a1.nameAirport AS DepartureAirportName,
                     a1.city AS DepartureCity,
@@ -333,7 +333,7 @@ namespace AirDreams.API.Repositories
                 INNER JOIN FlightFrequency ff ON r.idRoute = ff.idRoute
                 INNER JOIN Airport a1 ON r.codeAirportSalida = a1.codeAirport
                 INNER JOIN Airport a2 ON r.codeAirportLlegada = a2.codeAirport
-                INNER JOIN Aircraft ac ON r.plateNumber = ac.plateNumber
+                INNER JOIN AircraftView ac ON r.modelo = ac.modelo
                 CROSS APPLY (
                     SELECT DATEADD(
                         SECOND,

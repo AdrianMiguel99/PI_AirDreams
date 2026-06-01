@@ -50,6 +50,11 @@ Create Table PassengerItinerary(
 );
 GO
 
+SELECT * FROM Passenger;
+
+SELECT * FROM PassengerItinerary;
+
+
 ALTER TABLE Itinerary 
 DROP CONSTRAINT fk_itinerary_passenger;
 
@@ -88,6 +93,12 @@ DROP CONSTRAINT CK__Passenger__idPas__5EBF139D;
 ALTER TABLE Passenger
 DROP CONSTRAINT PK__Passenge__FC0F47D7EFB529AE;
 
+ALTER TABLE Registra
+DROP CONSTRAINT fk_registra_passenger;
+
+ALTER TABLE Registra
+DROP COLUMN passportPassenger;
+
 SELECT COLUMN_NAME
 FROM INFORMATION_SCHEMA.COLUMNS
 WHERE TABLE_NAME = 'Passenger';
@@ -107,4 +118,11 @@ DROP COLUMN countryCode;
 ALTER TABLE Passenger
 ADD country varchar(50);
 
+ALTER TABLE Passenger
+ADD CONSTRAINT PK_idPassenger PRIMARY KEY (idPassenger);
 
+
+SELECT * FROM Aircraft;
+
+SELECT * FROM Route;
+SELECT * FROM FlightFrequency;
