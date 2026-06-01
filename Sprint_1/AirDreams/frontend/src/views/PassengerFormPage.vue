@@ -79,12 +79,12 @@
 
           <label class="form-field">
             Pais del pasaporte
-            <input
-              v-model.trim="passenger.passportCountry"
-              type="text"
-              maxlength="56"
-              required
-            />
+            <select v-model="passenger.country" required>
+              <option value="" disabled>Seleccione un pais</option>
+              <option v-for="country in countries" :key="country" :value="country">
+                {{ country }}
+              </option>
+            </select>
           </label>
 
           <template v-if="isMainPassenger(index)">
@@ -147,6 +147,7 @@ export default {
   data() {
     return {
       selectedPurchase: null,
+      countries: [],
       passengers: [],
       showPopup: false,
       popupType: 'error',
@@ -165,11 +166,24 @@ export default {
   },
 
   created() {
+    this.loadCountries();
     this.loadPurchaseSelection();
     this.loadPassengers();
   },
 
   methods: {
+    async loadCountries() {
+      try {
+        const response = await fetch('http://localhost:5276/api/locations/countries');
+        this.countries = await response.json();
+      } catch (error) {
+        console.error('Error al cargar paises:', error);
+        this.popupTitle = 'No se pudieron cargar los paises';
+        this.popupMessage = 'Intenta de nuevo antes de continuar.';
+        this.showPopup = true;
+      }
+    },
+
     loadPurchaseSelection() {
       const savedPurchase = sessionStorage.getItem('selectedFlightPurchase');
 
@@ -186,7 +200,11 @@ export default {
       const savedPassengers = sessionStorage.getItem('purchasePassengers');
 
       if (savedPassengers) {
-        this.passengers = JSON.parse(savedPassengers);
+        this.passengers = JSON.parse(savedPassengers).map((passenger, index) => ({
+          ...this.createEmptyPassenger(index + 1),
+          ...passenger,
+          country: passenger.country || ''
+        }));
         return;
       }
 
@@ -205,7 +223,7 @@ export default {
         namePassenger: '',
         lastnamesPassenger: '',
         birthDate: '',
-        passportCountry: '',
+        country: '',
         emailPassenger: '',
         telephone: ''
       };
@@ -219,7 +237,7 @@ export default {
         namePassenger: passenger.namePassenger.trim(),
         lastnamesPassenger: passenger.lastnamesPassenger.trim(),
         birthDate: passenger.birthDate,
-        passportCountry: passenger.passportCountry.trim(),
+        country: (passenger.country || '').trim(),
         emailPassenger: this.isMainPassenger(index)
           ? passenger.emailPassenger.trim().toLowerCase()
           : null,

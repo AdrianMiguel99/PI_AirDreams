@@ -22,6 +22,8 @@ namespace AirDreams.API.DTOs
 
         public long? Telephone { get; set; }
 
-        public byte? CountryCode { get; set; }
+        [Required]
+        [StringLength(50)]
+        public string Country { get; set; } = string.Empty;
     }
 }
