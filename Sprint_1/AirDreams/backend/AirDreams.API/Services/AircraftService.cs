@@ -13,14 +13,24 @@ namespace AirDreams.API.Services
             this.aircraftRepository = aircraftRepository;
         }
 
-        public List<AircraftModel> GetAircrafts()
+        public List<AircraftViewModel> GetAircrafts()
         {
             return aircraftRepository.GetAircrafts();
         }
 
         public string AddAircraft(AircraftModel aircraft)
         {
-            var result = string.Empty;
+            var validationResult = ValidateAircraft(aircraft);
+
+            if (!string.IsNullOrEmpty(validationResult))
+            {
+                return validationResult;
+            }
+
+            if (aircraftRepository.ExistsByModel(aircraft.Modelo))
+            {
+                return "Ya existe una aeronave con ese modelo.";
+            }
 
             try
             {
@@ -28,46 +38,59 @@ namespace AirDreams.API.Services
 
                 if (!isAdded)
                 {
-                    result = "Error al registrar la aeronave.";
+                    return "Error al registrar la aeronave.";
                 }
             }
             catch (Exception ex)
             {
-                result = ex.Message;
+                return ex.Message;
             }
 
-            return result;
+            return string.Empty;
         }
 
-        public string DeleteAircraft(string plateNumber)
+        public string DeleteAircraft(string modelo)
         {
-            var result = string.Empty;
+            if (string.IsNullOrWhiteSpace(modelo))
+            {
+                return "El modelo es obligatorio.";
+            }
+
+            if (aircraftRepository.IsAircraftInUse(modelo))
+            {
+                return "No se puede eliminar la aeronave porque está asociada a una ruta.";
+            }
 
             try
             {
-                var isDeleted = aircraftRepository.DeleteAircraft(plateNumber);
+                var isDeleted = aircraftRepository.DeleteAircraft(modelo);
 
                 if (!isDeleted)
                 {
-                    result = "No se pudo eliminar la aeronave";
+                    return "No existe una aeronave con ese modelo.";
                 }
             }
             catch (Exception ex)
             {
-                result = ex.Message;
+                return ex.Message;
             }
 
-            return result;
+            return string.Empty;
         }
 
-        public AircraftModel? GetAircraftByPlateNumber(string plateNumber)
+        public AircraftViewModel? GetAircraftByModel(string modelo)
         {
-            return aircraftRepository.GetAircraftByPlateNumber(plateNumber);
+            return aircraftRepository.GetAircraftByModel(modelo);
         }
 
         public string UpdateAircraft(AircraftModel aircraft)
         {
-            var result = string.Empty;
+            var validationResult = ValidateAircraft(aircraft);
+
+            if (!string.IsNullOrEmpty(validationResult))
+            {
+                return validationResult;
+            }
 
             try
             {
@@ -75,15 +98,50 @@ namespace AirDreams.API.Services
 
                 if (!isUpdated)
                 {
-                    result = "No se pudo actualizar la aeronave.";
+                    return "No se pudo actualizar la aeronave.";
                 }
             }
             catch (Exception ex)
             {
-                result = ex.Message;
+                return ex.Message;
             }
 
-            return result;
+            return string.Empty;
+        }
+
+        private string ValidateAircraft(AircraftModel aircraft)
+        {
+            if (aircraft == null)
+            {
+                return "Los datos de la aeronave son obligatorios.";
+            }
+
+            if (string.IsNullOrWhiteSpace(aircraft.Modelo))
+            {
+                return "El modelo de la aeronave es obligatorio.";
+            }
+
+            if (aircraft.MaxWeight <= 0)
+            {
+                return "El peso máximo debe ser mayor a 0.";
+            }
+
+            if (
+                aircraft.Cant_Asientos_Fila_Firstclass < 0 ||
+                aircraft.Cant_Filas_Firstclass < 0 ||
+                aircraft.Cant_Asientos_Fila_Turista < 0 ||
+                aircraft.Cant_Filas_Turista < 0
+            )
+            {
+                return "Las filas y asientos no pueden ser negativos.";
+            }
+
+            if (aircraft.AircraftSize == "No definido")
+            {
+                return "Debe seleccionar el tamaño de la aeronave.";
+            }
+
+            return string.Empty;
         }
     }
 }

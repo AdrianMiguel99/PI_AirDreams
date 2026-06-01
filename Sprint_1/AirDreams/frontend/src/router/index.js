@@ -38,17 +38,13 @@ const routes = [
   { path: '/admin/routesList', name: 'routesList', component: ListaRutas },
 
   { path: '/admin/usuarios', name: 'adminUsuarios', component: ListaUsuarios, meta: { requiresAdmin: true }},
-  { path: '/addPlane', name: 'addPlane', component: AddAirplaneView },
-  { path: '/listPlanes', name: 'listPlanes', component: ListAirplaneView },
-  { path: '/editPlane/:plateNumber', name: 'editPlane', component: EditAirplane },
+  { path: '/managementPlanes', name: 'managementPlanes', component: AirplaneManagement },
+  { path: '/editPlane/:modelo', name: 'editPlane', component: EditAirplane },
 
   { path: '/admin/airports/register', name: 'airportRegister', component: AirportRegister },
   { path: '/admin/airports/list', name: 'airportList', component: AirportList },
   { path: '/admin/airports', redirect: '/admin/airports/register' },
-
-  { path: '/pruebas', name: 'pruebas', component: AirplaneManagement },
   { path: '/admin/airports/edit/:code', name: 'airportEdit', component: AirportEdit },
-
   { path: '/luggage', name: 'luggage', component: LuggagePage }
 ]
 

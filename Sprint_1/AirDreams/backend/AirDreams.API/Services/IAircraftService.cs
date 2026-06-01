@@ -4,10 +4,10 @@ namespace AirDreams.API.Services.Interfaces
 {
     public interface IAircraftService
     {
-        List<AircraftModel> GetAircrafts();
+        List<AircraftViewModel> GetAircrafts();
         string AddAircraft(AircraftModel aircraft);
-        string DeleteAircraft(string plateNumber);
-        AircraftModel? GetAircraftByPlateNumber(string plateNumber);
+        string DeleteAircraft(string modelo);
+        AircraftViewModel? GetAircraftByModel(string modelo);
         string UpdateAircraft(AircraftModel aircraft);
     }
 }

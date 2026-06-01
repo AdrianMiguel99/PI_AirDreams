@@ -13,49 +13,73 @@ namespace AirDreams.API.Repositories
             _connection = connection;
         }
 
-        public List<AircraftModel> GetAircrafts()
+        public List<AircraftViewModel> GetAircrafts()
         {
-            string query = "SELECT * FROM Aircraft";
-            return _connection.Query<AircraftModel>(query).ToList();
+            string query = @"
+                SELECT *
+                FROM AircraftView";
+
+            return _connection
+                .Query<AircraftViewModel>(query)
+                .ToList();
         }
 
         public bool AddAircraft(AircraftModel aircraft)
         {
             string query = @"
                 INSERT INTO dbo.Aircraft
-                    (plateNumber, maxWeight, cantPasajeros,
-                     cant_Asientos_Fila_Firstclass, cant_Filas_Firstclass,
-                     cant_Asientos_Fila_Turista, cant_Filas_Turista,
-                     modelo, adminId)
+                (
+                    adminId,
+                    modelo,
+                    aircraftSize,
+                    maxWeight,
+                    cant_Asientos_Fila_Firstclass,
+                    cant_Filas_Firstclass,
+                    cant_Asientos_Fila_Turista,
+                    cant_Filas_Turista
+                )
                 VALUES
-                    (@plateNumber, @maxWeight, @cantPasajeros,
-                     @cant_Asientos_Fila_Firstclass, @cant_Filas_Firstclass,
-                     @cant_Asientos_Fila_Turista, @cant_Filas_Turista,
-                     @modelo, @adminId)";
+                (
+                    @adminId,
+                    @modelo,
+                    @aircraftSize,
+                    @maxWeight,
+                    @cant_Asientos_Fila_Firstclass,
+                    @cant_Filas_Firstclass,
+                    @cant_Asientos_Fila_Turista,
+                    @cant_Filas_Turista
+                )";
 
-            var affectedRows = _connection.Execute(query, aircraft);
+            int affectedRows =
+                _connection.Execute(query, aircraft);
+
             return affectedRows > 0;
         }
 
-        public bool DeleteAircraft(string plateNumber)
+        public bool DeleteAircraft(string modelo)
         {
-            string query = "DELETE FROM Aircraft WHERE plateNumber = @plateNumber";
+            string query = @"
+                DELETE FROM Aircraft
+                WHERE modelo = @modelo";
 
-            var affectedRows = _connection.Execute(query, new { plateNumber });
+            int affectedRows =
+                _connection.Execute(
+                    query,
+                    new { modelo });
 
             return affectedRows > 0;
         }
 
-        public AircraftModel? GetAircraftByPlateNumber(string plateNumber)
+        public AircraftViewModel? GetAircraftByModel(string modelo)
         {
             string query = @"
                 SELECT *
-                FROM dbo.Aircraft
-                WHERE plateNumber = @plateNumber";
+                FROM AircraftView
+                WHERE modelo = @modelo";
 
-            return _connection.QueryFirstOrDefault<AircraftModel>(
+            return _connection.QueryFirstOrDefault<AircraftViewModel>(
                 query,
-                new { plateNumber }
+                new { modelo }
             );
         }
 
@@ -63,19 +87,57 @@ namespace AirDreams.API.Repositories
         {
             string query = @"
                 UPDATE dbo.Aircraft
-                SET 
+                SET
+                    aircraftSize = @aircraftSize,
                     maxWeight = @maxWeight,
-                    cantPasajeros = @cantPasajeros,
-                    cant_Asientos_Fila_Firstclass = @cant_Asientos_Fila_Firstclass,
-                    cant_Filas_Firstclass = @cant_Filas_Firstclass,
-                    cant_Asientos_Fila_Turista = @cant_Asientos_Fila_Turista,
-                    cant_Filas_Turista = @cant_Filas_Turista,
-                    modelo = @modelo
-                WHERE plateNumber = @plateNumber";
 
-            var affectedRows = _connection.Execute(query, aircraft);
+                    cant_Asientos_Fila_Firstclass =
+                        @cant_Asientos_Fila_Firstclass,
+
+                    cant_Filas_Firstclass =
+                        @cant_Filas_Firstclass,
+
+                    cant_Asientos_Fila_Turista =
+                        @cant_Asientos_Fila_Turista,
+
+                    cant_Filas_Turista =
+                        @cant_Filas_Turista
+
+                WHERE modelo = @modelo";
+
+            int affectedRows =
+                _connection.Execute(
+                    query,
+                    aircraft
+                );
 
             return affectedRows > 0;
+        }
+
+        public bool ExistsByModel(string modelo)
+        {
+            string query = @"
+            SELECT COUNT(*)
+            FROM Aircraft
+            WHERE modelo = @modelo";
+
+            return _connection.ExecuteScalar<int>(
+                query,
+                new { modelo }
+            ) > 0;
+        }
+
+        public bool IsAircraftInUse(string modelo)
+        {
+            string query = @"
+            SELECT COUNT(*)
+            FROM Route
+            WHERE modelo = @modelo";
+
+            return _connection.ExecuteScalar<int>(
+                query,
+                new { modelo }
+            ) > 0;
         }
     }
 }

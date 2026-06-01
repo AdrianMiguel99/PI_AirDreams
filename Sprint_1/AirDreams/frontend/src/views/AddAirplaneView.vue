@@ -10,6 +10,7 @@
     <AirplaneForm
       :aeronave="aeronave"
       :onSubmit="saveAirplane"
+      @show-popup="showErrorFromForm"
     />
 
     <!-- popup -->
@@ -43,9 +44,7 @@ export default {
   data() {
     return {
       aeronave: {
-        plateNumber: '',
         maxWeight: null,
-        cantPasajeros: null,
         cant_Asientos_Fila_Firstclass: null,
         cant_Filas_Firstclass: null,
         cant_Asientos_Fila_Turista: null,
@@ -95,8 +94,6 @@ export default {
 
     goToList() {
       this.showPopup = false
-
-      // Cambiar vista
       this.$emit('change-view', 'list')
     },
 
@@ -113,15 +110,10 @@ export default {
         }
       )
       .then(() => {
-
         this.showSuccessPopup()
-
         this.resetForm()
       })
       .catch((error) => {
-
-        console.error(error)
-
         if (error.response?.status === 401) {
           this.showErrorPopup('Debes iniciar sesión')
           return
@@ -133,11 +125,19 @@ export default {
         }
 
         this.showErrorPopup(
-  error.response?.data?.message ||
-  error.response?.data ||
-  'Ocurrió un error inesperado'
-)
+          error.response?.data?.message ||
+          error.response?.data ||
+          'Ocurrió un error inesperado'
+        )
       })
+    },
+
+    showErrorFromForm(popupData) {
+      this.popupType = popupData.type
+      this.popupTitle = popupData.title
+      this.popupMessage = popupData.message
+      this.popupActionText = ''
+      this.showPopup = true
     }
   }
 }
