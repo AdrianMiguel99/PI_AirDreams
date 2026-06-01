@@ -177,6 +177,42 @@ export default {
     formatCurrency(value) {
       return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(Number(value || 0))
     },
+    
+    formatDate(value) {
+      const date = new Date(value)
+      return date.toLocaleDateString('es-ES', { day: '2-digit', month: 'long', year: 'numeric' })
+    },
+
+
+    createStructForPage() {
+      const purchase = JSON.parse(sessionStorage.getItem('selectedFlightPurchase') || '{}')
+      const passengers = JSON.parse(sessionStorage.getItem('purchasePassengers') || '[]')
+      const luggage = JSON.parse(sessionStorage.getItem('purchaseLuggage') || '[]')
+
+      return {
+        transactionId: this.payment.transactionId,
+        buyerName: this.payment.buyerName,
+        paymentMethod: this.payment.paymentMethod,
+        flightDescription: this.flightDescription,
+        seatClassLabel: this.seatClassLabel,
+        seatClass: purchase.seatClass,
+        passengerCount: this.passengerCount,
+        pricePerPassenger: this.pricePerPassenger,
+        flightSubtotal: this.flightSubtotal,
+        luggageTotal: this.luggageTotal,
+        grandTotal: this.grandTotal,
+        purchase: purchase,
+        passengers: passengers,
+        luggage: luggage
+      }
+    },
+
+    callPurchaseSuccess(purchasewindowData) {
+      sessionStorage.setItem('purchaseSuccessData', JSON.stringify(purchasewindowData))
+      this.$router.push({ name: 'PurchaseSuccess', params: { idCompra: this.transactionId } })
+    },
+
+    
     async processPayment() {
       this.processing = true
       try {
@@ -215,14 +251,10 @@ export default {
         }
 
         await axios.post('http://localhost:5276/api/payment', payload)
+        const purchasewindowData = this.createStructForPage()
         sessionStorage.removeItem('transactionId')
 
-        this.popupType = 'success'
-        this.popupTitle = 'Pago exitoso'
-        this.popupMessage = 'Tu compra ha sido confirmada. ¡Gracias por volar con Air Dreams!'
-        this.popupActionText = 'Volver al inicio'
-        this.popupAction = () => this.$router.push({ name: 'home' })
-        this.showPopup = true
+        this.callPurchaseSuccess(purchasewindowData)
       } catch (error) {
         console.error(error)
         this.popupType = 'error'

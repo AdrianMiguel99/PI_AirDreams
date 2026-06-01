@@ -1,21 +1,41 @@
 <template>
-  <main class="purchase-success-page">
-    <section class="success-hero">
-      <div class="success-icon">✈️</div>
+  <div class="purchase-success-page">
+    <div class="top-bar">
+      <div class="brand">
+    <img
+      src="https://i.ibb.co/MxwJ1Y9m/Chat-GPT-Image-7-abr-2026-01-52-40.png"
+      alt="AirDreams"
+      class="logo-image"
+    >
+    <span>AirDreams</span>
+  </div>
+      <button
+        class="btn btn-primary btn"
+        @click="goHome"
+      >
+        Volver al inicio
+      </button> 
+</div>
+
+    <div class="success-hero">
+      <div class="success-logo">
+        <img src="https://i.ibb.co/MxwJ1Y9m/Chat-GPT-Image-7-abr-2026-01-52-40.png" alt="AirDreams" class="logo-image" />
+  <span>AirDreams</span>
+</div>
 
       <h1>¡Compra realizada con éxito!</h1>
 
       <p class="success-message">
-        En AIRDREAMS creemos que cada viaje comienza con un sueño.
+        En Air Dreams creemos que cada viaje comienza con un sueño.
         Hoy estás un paso más cerca de vivir el tuyo.
       </p>
 
       <p class="purchase-id">
         Código de compra: <strong>#{{ idCompra }}</strong>
       </p>
-    </section>
+    </div>
 
-    <section class="summary-card">
+    <div class="summary-card">
       <h2>Resumen de compra</h2>
 
       <div class="summary-grid">
@@ -45,20 +65,20 @@
           <strong>${{ purchase.total }}</strong>
         </div>
       </div>
-    </section>
+    </div>
 
-    <section class="tickets-section">
+    <div class="tickets-section mb-5">
       <h2>Tiquetes comprados</h2>
 
-      <div class="tickets-list">
+      <div class="d-flex flex-column gap-3">
         <article
           v-for="ticket in tickets"
           :key="ticket.id"
           class="ticket-card"
         >
-          <div class="ticket-header">
+          <div class="d-flex justify-content-between align-items-center">
             <h3>{{ ticket.passengerName }}</h3>
-            <span>{{ ticket.seatNumber }}</span>
+            <span class="seat-badge"> {{ ticket.seatNumber }} </span>
           </div>
 
           <div
@@ -122,12 +142,8 @@
           </div>
         </article>
       </div>
-    </section>
-
-    <div class="actions">
-      <button @click="goHome">Volver al inicio</button>
     </div>
-  </main>
+  </div>
 </template>
 
 <script>
@@ -136,60 +152,132 @@ export default {
 
   data() {
     return {
-      idCompra: this.$route.params.idCompra,
-
-      // Cambia purchaseType a "direct" o "layover"
+      idCompra: "",
       purchase: {
-        purchaseType: "layover",
-
-        flightCode: "AD-245 / AD-310",
-        firstFlightCode: "AD-245",
-        secondFlightCode: "AD-310",
-
-        origin: "SJO",
-        layover: "PTY",
-        destination: "MIA",
-
-        departureDate: "15 Julio 2026",
-        departureTime: "08:30 AM",
-        firstDepartureTime: "08:30 AM",
-        secondDepartureTime: "01:15 PM",
-
-        total: 700
+        purchaseType: "direct",
+        flightCode: "",
+        firstFlightCode: "",
+        secondFlightCode: "",
+        origin: "",
+        layover: "",
+        destination: "",
+        departureDate: "",
+        departureTime: "",
+        firstDepartureTime: "",
+        secondDepartureTime: "",
+        total: 0
       },
-
-      tickets: [
-        {
-          id: 1,
-          passengerName: "Adrian Arrieta",
-          seatNumber: "12A",
-          classType: "Turista",
-          price: 350
-        },
-        {
-          id: 2,
-          passengerName: "Melissa Garita",
-          seatNumber: "12B",
-          classType: "Turista",
-          price: 350
-        }
-      ]
+      tickets: []
     };
   },
 
+  created() {
+    this.loadPurchaseSuccessData();
+  },
+
   methods: {
+
+    formatDate(value) {
+      const date = new Date(value);
+      const day = String(date.getDate()).padStart(2, '0');
+      const month = String(date.getMonth() + 1).padStart(2, '0');
+      const year = date.getFullYear();
+
+      return `${day}/${month}/${year}`;
+    },
+
+    loadPurchaseSuccessData() {
+      const successData = JSON.parse(
+        sessionStorage.getItem("purchaseSuccessData") || "{}"
+      );
+
+      const purchase = successData.purchase || {};
+      const passengers = successData.passengers || [];
+      const segments = purchase.itinerary?.segments || [];
+
+      const isLayover = segments.length > 1;
+      const firstSegment = segments[0] || {};
+      const secondSegment = segments[1] || {};
+
+      this.idCompra =
+        successData.transactionId ||
+        this.$route.params.idCompra ||
+        "SIN-CODIGO";
+
+      this.purchase = {
+        purchaseType: isLayover ? "layover" : "direct",
+
+        flightCode: isLayover
+          ? `${firstSegment.flightNumber || "N/A"} / ${secondSegment.flightNumber || "N/A"}`
+          : firstSegment.flightNumber || purchase.flightNumber || "N/A",
+
+        firstFlightCode: firstSegment.flightNumber || "N/A",
+        secondFlightCode: secondSegment.flightNumber || "N/A",
+
+        origin:
+          firstSegment.departureAirport?.code || "Origen",
+
+        layover:
+          isLayover ? secondSegment.departureAirport?.code || "" : "",
+
+        destination:
+          isLayover
+            ? secondSegment.arrivalAirport?.code || "Destino"
+            : firstSegment.arrivalAirport?.code || "Destino",
+
+        departureDate: this.formatDate(
+          purchase.departureDate ||
+          firstSegment.departureDate ||
+          secondSegment.departureDate ||
+          "Fecha no disponible"
+        ),
+
+        departureTime:
+          firstSegment.departureTime ||
+          purchase.departureTime ||
+          "Hora no disponible",
+
+        firstDepartureTime:
+          firstSegment.departureTime ||
+          "Hora no disponible",
+
+        secondDepartureTime:
+          secondSegment.departureTime ||
+          "Hora no disponible",
+
+        total: Number(successData.grandTotal || 0)
+      };
+
+      this.tickets = passengers.map((passenger, index) => {
+        return {
+          id: index + 1,
+          passengerName: `${passenger.namePassenger || ""} ${passenger.lastnamesPassenger || ""}`.trim(),
+          seatNumber: this.generateRandomSeat(index),
+          classType: successData.seatClassLabel || "Turista",
+          price: Number(successData.pricePerPassenger || 0)
+        };
+      });
+    },
+
+    generateRandomSeat(index) {
+      const letters = ["A", "B", "C", "D", "E", "F"];
+      const row = (index % 30) + 1;
+      const letter = letters[index % letters.length];
+
+      return `${row}${letter}`;
+    },
+
     goHome() {
-      this.$router.push("/");
+      this.$router.push({ name: "home" });
     }
   }
 };
 </script>
-
 <style scoped>
 .purchase-success-page {
   min-height: 100vh;
   padding: 40px;
-  background: #f4f8fb;
+  background: #f7f8fc;
 }
 
 .success-hero,
@@ -201,6 +289,7 @@ export default {
   background: white;
   border-radius: 24px;
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+  color: #032056;
 }
 
 .success-hero {
@@ -214,7 +303,7 @@ export default {
 }
 
 .success-hero h1 {
-  color: #0b7fc3;
+  color: #032056;
   margin-bottom: 15px;
 }
 
@@ -246,11 +335,6 @@ export default {
   font-size: 14px;
 }
 
-.tickets-list {
-  display: grid;
-  gap: 20px;
-}
-
 .ticket-card {
   border: 1px solid #dde6ee;
   border-radius: 18px;
@@ -258,26 +342,12 @@ export default {
   background: #ffffff;
 }
 
-.ticket-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-.ticket-header span {
-  background: #0b7fc3;
-  color: white;
-  padding: 8px 14px;
-  border-radius: 999px;
-  font-weight: bold;
-}
-
 .ticket-route {
   display: flex;
   gap: 15px;
   font-size: 24px;
   margin: 20px 0 10px;
-  color: #0b7fc3;
+  color: #032056;
 }
 
 .layover-label,
@@ -290,8 +360,8 @@ export default {
 }
 
 .layover-label {
-  background: #eaf6fc;
-  color: #0b7fc3;
+  background: #e8edf7;
+  color: #032056;
 }
 
 .direct-label {
@@ -309,33 +379,61 @@ export default {
   text-align: center;
 }
 
-.actions button {
-  padding: 14px 28px;
-  border: none;
-  border-radius: 12px;
-  background: #0b7fc3;
+.btn-primary {
+  background-color: #032056;
+  border-color: #032056;
+}
+
+.btn-primary:hover {
+  background-color: #384467;
+  border-color: #384467;
+}
+
+.seat-badge {
+  background: #032056;
   color: white;
-  font-size: 16px;
-  cursor: pointer;
+  padding: 8px 14px;
+  border-radius: 999px;
+  font-weight: bold;
+  min-width: 55px;
+  text-align: center;
 }
 
-.actions button:hover {
-  background: #096fa9;
+.tickets-section h2 {
+  margin-bottom: 40px;
 }
 
-@media (max-width: 768px) {
-  .summary-grid,
-  .ticket-info {
-    grid-template-columns: 1fr;
-  }
+.top-bar {
+  position: absolute;
+  top: 20px;
+  left: 20px;
+  right: 20px;
 
-  .ticket-route {
-    font-size: 20px;
-    flex-wrap: wrap;
-  }
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 
-  .purchase-success-page {
-    padding: 20px;
-  }
+  z-index: 100;
+}
+
+.brand,
+.success-logo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: #032056;
+  font-weight: 700;
+  font-size: 20px;
+}
+
+.logo-image {
+  width: 50px;
+  height: 50px;
+  object-fit: contain;
+}
+
+.success-logo {
+  justify-content: center;
+  margin-bottom: 15px;
 }
 </style>
