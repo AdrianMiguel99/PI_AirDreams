@@ -17,13 +17,24 @@ GO
 
 ALTER TABLE Aircraft
 ADD CONSTRAINT CHK_Aircraft_Tamano
-CHECK (aircraftSize IN ('Pequena', 'Mediana','Grande', 'No definido'));
+CHECK (aircraftSize IN ('Pequena', 'Mediana', 'Grande', 'No definido'));
 GO
 
 -- Hacemos la migracion de Route a que apunte a la nueva PK modelo de aeronave.
 -- Quitamos la restriccion de la fk de route.
-ALTER TABLE Route
-DROP CONSTRAINT fk_route_aircraft;
+DECLARE @fkName NVARCHAR(200);
+DECLARE @sql NVARCHAR(MAX);
+
+SELECT @fkName = fk.name
+FROM sys.foreign_keys fk
+WHERE fk.parent_object_id = OBJECT_ID('Route')
+  AND fk.referenced_object_id = OBJECT_ID('Aircraft');
+
+IF @fkName IS NOT NULL
+BEGIN
+    SET @sql = 'ALTER TABLE Route DROP CONSTRAINT ' + QUOTENAME(@fkName);
+    EXEC sp_executesql @sql;
+END
 GO
 
 --agregamos modelo como columna de route
@@ -45,8 +56,19 @@ DROP COLUMN plateNumber;
 GO
 
 --Quitamos la pk de Aircraft y borramos el plateNumber y la columnna del total de pasajeros
-ALTER TABLE Aircraft
-DROP CONSTRAINT PK__Aircraft__04A7B9BE5D240E72;
+DECLARE @pkName NVARCHAR(200);
+DECLARE @sql NVARCHAR(MAX);
+
+SELECT @pkName = kc.name
+FROM sys.key_constraints kc
+WHERE kc.parent_object_id = OBJECT_ID('Aircraft')
+  AND kc.type = 'PK';
+
+IF @pkName IS NOT NULL
+BEGIN
+    SET @sql = 'ALTER TABLE Aircraft DROP CONSTRAINT ' + QUOTENAME(@pkName);
+    EXEC sp_executesql @sql;
+END
 GO
 
 ALTER TABLE Aircraft
@@ -54,8 +76,19 @@ DROP COLUMN plateNumber;
 GO
 
 --eliminamos check antiguo
-ALTER TABLE Aircraft
-DROP CONSTRAINT CK__Aircraft__cantPa__5629CD9C;
+DECLARE @checkName NVARCHAR(200);
+DECLARE @sql NVARCHAR(MAX);
+
+SELECT @checkName = cc.name
+FROM sys.check_constraints cc
+WHERE cc.parent_object_id = OBJECT_ID('Aircraft')
+  AND cc.definition LIKE '%cantPasajeros%';
+
+IF @checkName IS NOT NULL
+BEGIN
+    SET @sql = 'ALTER TABLE Aircraft DROP CONSTRAINT ' + QUOTENAME(@checkName);
+    EXEC sp_executesql @sql;
+END
 GO
 
 ALTER TABLE Aircraft
@@ -84,4 +117,3 @@ ADD CONSTRAINT FK_Route_Aircraft_Modelo
 FOREIGN KEY (modelo)
 REFERENCES Aircraft(modelo);
 GO
-
