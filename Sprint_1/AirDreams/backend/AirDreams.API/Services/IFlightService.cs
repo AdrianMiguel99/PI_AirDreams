@@ -1,4 +1,5 @@
 using AirDreams.API.DTOs;
+using AirDreams.ExternalAPI.DTOs;
 
 namespace AirDreams.API.Services.Interfaces
 {
@@ -12,8 +13,11 @@ namespace AirDreams.API.Services.Interfaces
             int quantityOfPassengers
         );
 
-        Task ValidateApiKeyAsync(string apiKey);
-
-        
+        Task<List<ExternalResponseFlightDTO>> SearchFlightsByDestinationAsync(
+            string destination,
+            DateTime earliestDeparture,
+            DateTime latestDeparture,
+            int quantityOfPassengers
+        );
     }
 }
