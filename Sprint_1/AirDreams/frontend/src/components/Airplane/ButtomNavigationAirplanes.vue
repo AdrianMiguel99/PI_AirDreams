@@ -1,18 +1,41 @@
 <template>
   <div class="navigation-container">
-    <button
-      :class="['nav-btn', { active: activeButton === 'list' }]"
-      @click="selectButton('list')"
-    >
-      Lista de aeronaves
-    </button>
 
-    <button
-      :class="['nav-btn', { active: activeButton === 'register' }]"
-      @click="selectButton('register')"
-    >
-      Registro de Aeronave
-    </button>
+    <template v-if="mode !== 'edit'">
+
+      <button
+        :class="['nav-btn', { active: mode === 'list' }]"
+        @click="selectButton('list')"
+      >
+        Lista de aeronaves
+      </button>
+
+      <button
+        :class="['nav-btn', { active: mode === 'register' }]"
+        @click="selectButton('register')"
+      >
+        Registro de Aeronave
+      </button>
+
+    </template>
+
+    <template v-if="mode === 'edit'">
+
+      <button
+        class="nav-btn active"
+        @click="$router.back()"
+      >
+        Editar aeronave
+      </button>
+
+      <button
+        class="nav-btn"
+        @click="$router.back()"
+      >
+        Volver a la lista
+      </button>
+
+    </template>
 
     <button
       class="nav-btn"
@@ -20,26 +43,32 @@
     >
       Regresar a Menu
     </button>
+
   </div>
 </template>
 
 <script>
 export default {
-  data() {
-    return {
-      activeButton: 'list'
+
+  props: {
+    mode: {
+      type: String,
+      default: 'list'
     }
   },
 
   methods: {
+
     selectButton(view) {
-      this.activeButton = view
-      this.$emit('change-view', view)
+      this.$emit(
+      'change-view',
+      view
+      )
     }
   }
+
 }
 </script>
-
 <style scoped>
 
 .navigation-container {

@@ -2,7 +2,10 @@
   <div>
     <HeaderLogo />
 
-    <ButtomNavigationAirplanes @change-view="currentView = $event" />
+    <ButtomNavigationAirplanes
+      :mode="currentView"
+      @change-view="currentView = $event"
+    />
 
     <div class="mt-4">
       <AddAirplaneView

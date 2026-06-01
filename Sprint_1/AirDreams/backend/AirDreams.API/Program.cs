@@ -90,6 +90,9 @@ builder.Services.AddScoped<ILuggageService, LuggageService>();
 builder.Services.AddScoped<IPassengerRepository, PassengerRepository>();
 builder.Services.AddScoped<IPassengerService, PassengerService>();
 
+builder.Services.AddScoped<ISecurityRepository, SecurityRepository>();
+builder.Services.AddScoped<ISecurityService, SecurityService>();
+
 var app = builder.Build();
 
 
@@ -99,7 +102,7 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
-//app.UseHttpsRedirection();
+
 app.UseCors("AllowVueApp");
 
 app.UseAuthentication();

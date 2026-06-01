@@ -22,14 +22,90 @@ namespace AirDreams.API.Services
             _configuration = configuration;
         }
 
-        public List<UserDTO> GetAll()
+        public async Task<List<UserDTO>> GetAll(string currentUserEmail)
         {
-            return _userRepository.GetAll();
+            var currentUser = await _userRepository.GetUserByEmail(currentUserEmail);
+
+            if (currentUser == null)
+            {
+                throw new UnauthorizedAccessException("Usuario no encontrado");
+            }
+
+            if (currentUser.Role == "Admin")
+            {
+                return _userRepository.GetAll();
+            }
+
+            var ownUser = await _userRepository.GetUserById(currentUser.Id);
+
+            return ownUser != null
+                ? new List<UserDTO>
+                {
+                    new UserDTO
+                    {
+                        Id = ownUser.Id,
+                        FullName = ownUser.FullName,
+                        Email = ownUser.Email,
+                        Role = ownUser.Role
+                    }
+                }
+                : new List<UserDTO>();
         }
 
-        public List<UserDTO> Search(string searchTerm)
+        public async Task<List<UserDTO>> Search(string searchTerm, string currentUserEmail)
         {
-            return _userRepository.Search(searchTerm);
+            var currentUser = await _userRepository.GetUserByEmail(currentUserEmail);
+
+            if (currentUser == null)
+            {
+                throw new UnauthorizedAccessException("Usuario no encontrado");
+            }
+
+            if (currentUser.Role == "Admin")
+            {
+                return _userRepository.Search(searchTerm);
+            }
+
+            var ownUser = await _userRepository.GetUserById(currentUser.Id);
+
+            if (ownUser == null)
+            {
+                return new List<UserDTO>();
+            }
+
+            if (string.IsNullOrWhiteSpace(searchTerm))
+            {
+                return new List<UserDTO>
+                {
+                    new UserDTO
+                    {
+                        Id = ownUser.Id,
+                        FullName = ownUser.FullName,
+                        Email = ownUser.Email,
+                        Role = ownUser.Role
+                    }
+                };
+            }
+
+            bool matches =
+                ownUser.FullName.Contains(searchTerm, StringComparison.OrdinalIgnoreCase)
+                || ownUser.Email.Contains(searchTerm, StringComparison.OrdinalIgnoreCase);
+
+            if (!matches)
+            {
+                return new List<UserDTO>();
+            }
+
+            return new List<UserDTO>
+            {
+                new UserDTO
+                {
+                    Id = ownUser.Id,
+                    FullName = ownUser.FullName,
+                    Email = ownUser.Email,
+                    Role = ownUser.Role
+                }
+            };
         }
 
         public async Task<(bool success, string message)> SendInvitation(InvitationModel model)

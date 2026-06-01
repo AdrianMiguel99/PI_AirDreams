@@ -1,4 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
+using AirDreams.API.DTOs;
+using AirDreams.API.Models.Dto;
 using AirDreams.API.Services.Interfaces;
 
 namespace AirDreams.API.Controllers
@@ -58,6 +60,41 @@ namespace AirDreams.API.Controllers
             }
             catch (Exception ex)
             {                return StatusCode(500, new
+                {
+                    code = 500,
+                    description = "Ocurrió un error inesperado"
+                });
+            }
+        }
+
+        [HttpGet("search-destination")]
+        public async Task<IActionResult> SearchFlightsByDestination([FromQuery] DestinationSearchDto request)
+        {
+            try
+            {
+                request.Validate();
+
+                var flights = await _flightService.SearchFlightsByDestinationAsync(
+                    request.Destination,
+                    request.DepartureDate,
+                    request.ReturnDate,
+                    request.Passengers
+                );
+                
+                var response = new { flights };
+                return Ok(response);
+            }
+            catch (ArgumentException ex)
+            {
+                return BadRequest(new
+                {
+                    code = 400,
+                    description = ex.Message
+                });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new
                 {
                     code = 500,
                     description = "Ocurrió un error inesperado"
