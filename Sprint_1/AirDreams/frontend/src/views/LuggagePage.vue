@@ -64,7 +64,13 @@ export default {
 
   computed: {
     transactionIdItinerary() {
-      return this.$route.query.transactionId || sessionStorage.getItem('transactionId') || 'TXN-DEFAULT';
+      let txId = this.$route.query.transactionId ||
+                sessionStorage.getItem('transactionId');
+      if (!txId || txId === 'TXN-DEFAULT') {
+        txId = 'TXN-' + crypto.randomUUID().substring(0, 8);
+        sessionStorage.setItem('transactionId', txId);
+      }
+      return txId;
     },
 
     luggageTotal() {

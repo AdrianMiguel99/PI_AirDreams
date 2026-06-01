@@ -204,10 +204,12 @@ export default {
   },
   methods: {
     loadTransactionId() {
-      this.payment.transactionId =
-        this.$route.query.transactionId ||
-        sessionStorage.getItem('transactionId') ||
-        'TXN-' + crypto.randomUUID().substring(0, 8)
+      let txId = this.$route.query.transactionId;
+      if (!txId || txId === 'TXN-DEFAULT') {
+        txId = 'TXN-' + crypto.randomUUID().substring(0, 8);
+        sessionStorage.setItem('transactionId', txId);
+      }
+      this.payment.transactionId = txId;
     },
     loadPurchaseData() {
       const savedPurchase = sessionStorage.getItem('selectedFlightPurchase')
@@ -280,6 +282,8 @@ export default {
         }
 
         await axios.post('http://localhost:5276/api/payment', payload)
+
+        sessionStorage.removeItem('transactionId')
 
         this.popupType = 'success'
         this.popupTitle = 'Pago exitoso'
