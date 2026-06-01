@@ -21,7 +21,7 @@ namespace AirDreams.API.Services
 
             model.CodeAirportSalida = model.CodeAirportSalida.Trim().ToUpper();
             model.CodeAirportLlegada = model.CodeAirportLlegada.Trim().ToUpper();
-            model.PlateNumber = model.PlateNumber.Trim().ToUpper();
+            model.Modelo = model.Modelo.Trim().ToUpper();
 
             return await _routeRepository.CreateRouteWithFrequenciesAsync(model);
         }
@@ -45,7 +45,7 @@ namespace AirDreams.API.Services
             if (model.CodeAirportSalida.Equals(model.CodeAirportLlegada, StringComparison.OrdinalIgnoreCase))
                 throw new ArgumentException("El aeropuerto de origen y destino no pueden ser el mismo.");
 
-            if (string.IsNullOrWhiteSpace(model.PlateNumber))
+            if (string.IsNullOrWhiteSpace(model.Modelo))
                 throw new ArgumentException("La aeronave es requerida.");
 
             if (model.FirstClassPrice < 0 || model.TuristClassPrice < 0)

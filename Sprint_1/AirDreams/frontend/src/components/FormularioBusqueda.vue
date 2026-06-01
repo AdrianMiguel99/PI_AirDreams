@@ -117,7 +117,8 @@ export default {
         const result = await response.json();
 
         if (!response.ok) {
-          alert(result.description || 'Error al buscar vuelos');
+          console.error('Backend response:', result);
+          alert(result.detail || result.description || 'Error al buscar vuelos');
           return;
         }
 
