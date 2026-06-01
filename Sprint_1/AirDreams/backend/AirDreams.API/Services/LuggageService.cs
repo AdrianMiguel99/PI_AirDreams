@@ -41,7 +41,7 @@ namespace AirDreams.API.Services
                     }
 
                     var luggageRegistered = await _luggageRepository.RegisterLuggageAsync(
-                        passenger.Id,
+                        passenger.IdPassenger,
                         model.TransactionIdItinerary,
                         luggageNumber
                     );

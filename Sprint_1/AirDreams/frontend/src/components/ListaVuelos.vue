@@ -11,6 +11,7 @@
         :key="flight.itineraryId"
         :flight="flight"
         :departureDate="departureDate"
+        @buy="$emit('buy', $event)"
       />
     </div>
   </div>
@@ -21,15 +22,20 @@ import TarjetaVuelo from "./TarjetaVuelo.vue";
 
 export default {
   props: {
-  flights: {
-    type: Array,
-    default: () => []
+    flights: {
+      type: Array,
+      default: () => []
+    },
+    title: {
+      type: String,
+      default: "Vuelos disponibles"
+    },
+    departureDate: {
+      type: String,
+      default: ""
+    }
   },
-  title: {
-    type: String,
-    default: "Vuelos disponibles"
-  }
-  },
+  emits: ['buy'],
   components: {
     TarjetaVuelo
   }
