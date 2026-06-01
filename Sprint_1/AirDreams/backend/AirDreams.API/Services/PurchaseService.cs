@@ -1,33 +1,28 @@
 ﻿using AirDreams.API.Models.Dtos;
 using AirDreams.API.Repositories;
+using AirDreams.API.Services;
 
-namespace AirDreams.API.Services
+public class PurchaseService : IPurchaseService
 {
-    public class PurchaseService : IPurchaseService
+    private readonly IPurchaseRepository _repository;
+
+    public PurchaseService(IPurchaseRepository repository)
     {
-        private readonly IPurchaseRepository _repository;
+        _repository = repository;
+    }
 
-        public PurchaseService(IPurchaseRepository repository)
+    public async Task<PaymentResponseDto> ConfirmPurchaseAsync(ConfirmPurchaseDto dto)
+    {
+        string? lastFour = null;
+        if (dto.PaymentMethod.Equals("Card", StringComparison.OrdinalIgnoreCase) &&
+            !string.IsNullOrWhiteSpace(dto.CardNumber))
         {
-            _repository = repository;
+            var digits = new string(dto.CardNumber.Where(char.IsDigit).ToArray());
+            lastFour = digits.Length >= 4 ? digits[^4..] : null;
         }
 
-        public async Task<PaymentResponseDto> ConfirmPurchaseAsync(ConfirmPurchaseDto dto)
-        {
-            var amount = dto.PassengerCount * dto.PricePerPassenger
-                        + (dto.Luggage?.Sum(l => l.LuggageItems.Sum(i => i.Subtotal)) ?? 0);
+        await _repository.ConfirmPurchaseAsync(dto, lastFour);
 
-            string? lastFour = null;
-            if (dto.PaymentMethod.Equals("Card", StringComparison.OrdinalIgnoreCase) &&
-                !string.IsNullOrWhiteSpace(dto.CardNumber))
-            {
-                var digits = new string(dto.CardNumber.Where(char.IsDigit).ToArray());
-                lastFour = digits.Length >= 4 ? digits[^4..] : null;
-            }
-
-            await _repository.ConfirmPurchaseAsync(dto, amount, lastFour);
-
-            return new PaymentResponseDto { Success = true, Message = "Compra confirmada y pago procesado correctamente." };
-        }
+        return new PaymentResponseDto { Success = true, Message = "Compra confirmada y pago procesado correctamente." };
     }
 }

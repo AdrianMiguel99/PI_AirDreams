@@ -46,6 +46,7 @@ namespace AirDreams.API.Models.Dtos
         public int? RouteId { get; set; }
         public decimal CheckedPrice { get; set; }
         public decimal CarryOnPrice { get; set; }
+        public decimal Multiplier { get; set; }
     }
 
     public class LuggagePerPassengerDto
