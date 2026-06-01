@@ -1,10 +1,23 @@
 <template>
   <div class="container mt-5">
-    <h1 class="mb-4 text-center" style="color: #384467; font-family: 'Inter', sans-serif; font-weight: bold;">Editar Aeronave</h1>
+
+    <ButtomNavigationAirplanes
+      mode="edit"
+      class="mb-5"
+    />
+
+    <div class="form-title-container">
+      <h1 class="form-title">
+        Editar Aeronave
+      </h1>
+    </div>
 
     <AirplaneForm
+      v-if="airplane"
       :aeronave="airplane"
       :onSubmit="updateAirplane"
+      :isEditMode="true"
+      @show-popup="openPopup"
     />
 
     <PopupMessage
@@ -14,23 +27,25 @@
       :message="popupMessage"
       :actionText="popupActionText"
       @close="showPopup = false"
-      @action="goBack"
+      @action="handlePopupAction"
     />
 
-    <a href="/pruebas" class="mt-3" style="background-color: #384467; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px; 
-                          font-family: 'Inter', sans-serif; font-weight: 400;"> 
-      Regresar
-    </a>
   </div>
 </template>
 
 <script>
 import axios from 'axios';
 import AirplaneForm from '../components/Airplane/AirplaneForm.vue';
-import PopupMessage from '../components/PopupMessage.vue'
+import PopupMessage from '../components/PopupMessage.vue';
+import ButtomNavigationAirplanes from '../components/Airplane/ButtomNavigationAirplanes.vue';
 
 export default {
-  components: { AirplaneForm, PopupMessage },
+
+  components: {
+    AirplaneForm,
+    PopupMessage,
+    ButtomNavigationAirplanes
+  },
 
   data() {
     return {
@@ -44,37 +59,97 @@ export default {
   },
 
   methods: {
-    getAirplane() {
-      const plateNumber = this.$route.params.plateNumber;
 
-      axios.get(`http://localhost:5276/api/Airplane/${plateNumber}`).then(response => {
+    getAirplane() {
+
+      const modelo =
+        this.$route.params.modelo;
+
+      axios
+        .get(`http://localhost:5276/api/Airplane/${modelo}`).then(response => {
+
           this.airplane = response.data;
-        })
-        .catch(error => {
-          console.error(error.response?.data);
+          delete this.airplane.cantPasajeros;
+        }).catch(error => {
+          console.error(
+            error.response?.data
+          );
+
         });
     },
 
     updateAirplane(updatedAirplane) {
-      axios.put(`http://localhost:5276/api/Airplane/${updatedAirplane.plateNumber}`, updatedAirplane).then(() => {
-        this.showPopup = true;
-        this.popupType = 'success';
-        this.popupTitle = 'Éxito';
-        this.popupMessage = 'Aeronave actualizada correctamente';
-        this.getAirplane();
-      })
-      .catch(error => {
-        console.error(error.response?.data);
-        this.showPopup = true;
-        this.popupType = 'error';
-        this.popupTitle = 'Error';
-        this.popupMessage = 'Error al actualizar la aeronave';
-      });
+
+      axios
+        .put(
+          `http://localhost:5276/api/Airplane/${updatedAirplane.modelo}`,updatedAirplane).then(() => {
+          this.showPopup = true;
+          this.popupType = 'success';
+          this.popupTitle = 'Éxito';
+          this.popupMessage = 'Aeronave actualizada correctamente';
+          this.popupActionText = 'Volver a la lista';
+          this.getAirplane();
+
+        })
+
+        .catch(error => {
+
+          console.error(
+            error.response?.data
+          );
+          this.showPopup = true;
+          this.popupType = 'error';
+          this.popupTitle = 'Error';
+          this.popupMessage = 'Error al actualizar la aeronave';
+          this.popupActionText = '';
+        });
+    },
+
+    goBack() {
+      this.$router.push('/managementPlanes');
+    },
+
+    handlePopupAction() {
+      this.showPopup = false;
+    if (
+      this.popupActionText ===
+      'Volver a la lista'
+    ) {
+      this.goBack();
     }
+
+    },
+
+    openPopup(popupData) {
+      this.showPopup = true;
+      this.popupType = popupData.type;
+      this.popupTitle = popupData.title;
+      this.popupMessage = popupData.message;
+      this.popupActionText = popupData.actionText || 'Aceptar';
+    },
+
   },
 
   created() {
     this.getAirplane();
   }
+
 };
 </script>
+
+<style scoped>
+
+.form-title-container {
+  width: 50%;
+  margin: 0 auto 20px;
+}
+
+.form-title {
+  color: #384467;
+  font-family: 'Inter', sans-serif;
+  font-weight: bold;
+  text-align: left;
+  margin: 0;
+}
+
+</style>

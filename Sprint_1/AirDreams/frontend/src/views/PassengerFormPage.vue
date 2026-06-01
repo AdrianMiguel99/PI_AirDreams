@@ -147,6 +147,7 @@ export default {
   data() {
     return {
       selectedPurchase: null,
+      countries: [],
       passengers: [],
       showPopup: false,
       popupType: 'error',
@@ -165,11 +166,24 @@ export default {
   },
 
   created() {
+    this.loadCountries();
     this.loadPurchaseSelection();
     this.loadPassengers();
   },
 
   methods: {
+    async loadCountries() {
+      try {
+        const response = await fetch('http://localhost:5276/api/locations/countries');
+        this.countries = await response.json();
+      } catch (error) {
+        console.error('Error al cargar paises:', error);
+        this.popupTitle = 'No se pudieron cargar los paises';
+        this.popupMessage = 'Intenta de nuevo antes de continuar.';
+        this.showPopup = true;
+      }
+    },
+
     loadPurchaseSelection() {
       const savedPurchase = sessionStorage.getItem('selectedFlightPurchase');
 
@@ -186,7 +200,11 @@ export default {
       const savedPassengers = sessionStorage.getItem('purchasePassengers');
 
       if (savedPassengers) {
-        this.passengers = JSON.parse(savedPassengers);
+        this.passengers = JSON.parse(savedPassengers).map((passenger, index) => ({
+          ...this.createEmptyPassenger(index + 1),
+          ...passenger,
+          country: passenger.country || ''
+        }));
         return;
       }
 

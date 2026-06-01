@@ -25,75 +25,105 @@ namespace AirDreams.API.Controllers
 
         [HttpPost]
         [Authorize(Roles = "Admin")]
-        public ActionResult<bool> AddAirplane([FromBody] AircraftModel aircraft)
+        public ActionResult AddAirplane([FromBody] AircraftModel aircraft)
         {
             if (aircraft == null)
             {
-                return BadRequest("Datos inválidos.");
+                return BadRequest(new
+                {
+                    message = "Los datos de la aeronave son inválidos."
+                });
             }
 
-            var adminIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value; //variable claim
-            var result = aircraftService.AddAircraft(aircraft);
+            var adminIdClaim =
+                User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
 
-            // si es nula entonces NO es admin
             if (adminIdClaim == null)
             {
-                return Unauthorized("No se pudo identificar el administrador.");
-            }
-            aircraft.adminId = int.Parse(adminIdClaim);
-
-            var result2 = aircraftService.AddAircraft(aircraft);
-
-            if (string.IsNullOrEmpty(result2))
-            {
-                return Ok(true);
+                return Unauthorized(new
+                {
+                    message = "No se pudo identificar el administrador."
+                });
             }
 
-            return BadRequest(result);
-        }
+            aircraft.AdminID = int.Parse(adminIdClaim);
 
-        [HttpDelete("{plateNumber}")]
-        public IActionResult Delete(string plateNumber)
-        {
-            var result = aircraftService.DeleteAircraft(plateNumber);
+            var result = aircraftService.AddAircraft(aircraft);
 
             if (string.IsNullOrEmpty(result))
             {
-                return Ok(true);
+                return Ok(new
+                {
+                    message = "Aeronave registrada correctamente."
+                });
             }
 
-            return BadRequest(result);
+            return BadRequest(new
+            {
+                message = result
+            });
         }
 
-        [HttpGet("{plateNumber}")]
-        public ActionResult<AircraftModel> GetByPlateNumber(string plateNumber)
+        [HttpDelete("{modelo}")]
+        public IActionResult Delete(string modelo)
         {
-            var aircraft = aircraftService.GetAircraftByPlateNumber(plateNumber);
+            var result = aircraftService.DeleteAircraft(modelo);
+
+            if (string.IsNullOrEmpty(result))
+            {
+                return Ok(new
+                {
+                    message = "Aeronave eliminada correctamente."
+                });
+            }
+
+            return BadRequest(new
+            {
+                message = result
+            });
+        }
+
+        [HttpGet("{modelo}")]
+        public ActionResult<AircraftModel> GetAircraftByModel(string modelo)
+        {
+            var aircraft = aircraftService.GetAircraftByModel(modelo);
 
             if (aircraft == null)
             {
-                return NotFound("Aeronave no encontrada.");
+                return NotFound(new
+                {
+                    message = "Aeronave no encontrada."
+                });
             }
 
             return Ok(aircraft);
         }
 
-        [HttpPut("{plateNumber}")]
-        public IActionResult Update(string plateNumber, [FromBody] AircraftModel aircraft)
+        [HttpPut("{modelo}")]
+        public IActionResult Update(string modelo, [FromBody] AircraftModel aircraft)
         {
-            if (aircraft == null || plateNumber != aircraft.plateNumber)
+            if (aircraft == null || modelo != aircraft.Modelo)
             {
-                return BadRequest("Datos inválidos.");
+                return BadRequest(new
+                {
+                    message = "Los datos enviados no coinciden con la aeronave seleccionada."
+                });
             }
 
             var result = aircraftService.UpdateAircraft(aircraft);
 
             if (string.IsNullOrEmpty(result))
             {
-                return Ok(true);
+                return Ok(new
+                {
+                    message = "Aeronave actualizada correctamente."
+                });
             }
 
-            return BadRequest(result);
+            return BadRequest(new
+            {
+                message = result
+            });
         }
     }
 }

@@ -25,7 +25,7 @@ namespace AirDreams.API.Services
                 LastnamesPassenger = dto.LastnamesPassenger.Trim(),
                 EmailPassenger = dto.EmailPassenger.Trim().ToLower(),
                 Telephone = dto.Telephone,
-                CountryCode = dto.CountryCode
+                Country = dto.Country.Trim()
             };
 
             var created = await _repository.CreateAsync(passenger);
@@ -59,7 +59,7 @@ namespace AirDreams.API.Services
             LastnamesPassenger = passenger.LastnamesPassenger,
             EmailPassenger = passenger.EmailPassenger,
             Telephone = passenger.Telephone,
-            CountryCode = passenger.CountryCode
+            Country = passenger.Country
         };
     }
 }

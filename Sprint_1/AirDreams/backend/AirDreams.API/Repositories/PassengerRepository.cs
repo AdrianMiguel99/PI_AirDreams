@@ -38,7 +38,7 @@ namespace AirDreams.API.Repositories
                     lastnamesPassenger AS LastnamesPassenger,
                     emailPassenger AS EmailPassenger,
                     telephone AS Telephone,
-                    countryCode AS CountryCode
+                    country AS Country
                 FROM Passenger
                 WHERE idPassenger = @IdPassenger;
             ";
@@ -58,7 +58,7 @@ namespace AirDreams.API.Repositories
                     lastnamesPassenger,
                     emailPassenger,
                     telephone,
-                    countryCode
+                    country
                 )
                 VALUES (
                     @IdPassenger,
@@ -66,7 +66,7 @@ namespace AirDreams.API.Repositories
                     @LastnamesPassenger,
                     @EmailPassenger,
                     @Telephone,
-                    @CountryCode
+                    @Country
                 );
             ";
 
@@ -83,7 +83,7 @@ namespace AirDreams.API.Repositories
                     lastnamesPassenger AS LastnamesPassenger,
                     emailPassenger AS EmailPassenger,
                     telephone AS Telephone,
-                    countryCode AS CountryCode
+                    country AS Country
                 FROM Passenger
                 WHERE namePassenger = @Name;
             ";

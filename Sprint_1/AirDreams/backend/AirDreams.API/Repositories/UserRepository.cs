@@ -237,18 +237,22 @@ namespace AirDreams.API.Repositories
         public async Task<UserModel?> GetUserByEmail(string email)
         {
             var sql = @"
-        --Seleccione el ID de AirlineEmployee, junte el nombre y apellido y tratelo como Fullname y el Email.
-        SELECT ae.employeeID AS Id,
-        ae.nameEmployee + ' ' + ae.lastnames AS FullName,
-        iu.emailUser AS Email,
-        'Admin' AS Role,
-        iu.hashPasswordUser AS PasswordHash,
-        1 AS IsActive
-            FROM InternalUser iu
-            INNER JOIN AirlineEmployee ae
-                ON ae.emailInternalUser = iu.emailUser
-            WHERE iu.emailUser = @Email;
-        ";
+                SELECT 
+                    ae.employeeID AS Id,
+                    ae.nameEmployee + ' ' + ae.lastnames AS FullName,
+                    iu.emailUser AS Email,
+                    CASE
+                        WHEN ae.isAdmin = 1 THEN 'Admin'
+                        WHEN ae.isOperator = 1 THEN 'Operator'
+                        ELSE 'User'
+                    END AS Role,
+                    iu.hashPasswordUser AS PasswordHash,
+                    iu.isActive AS IsActive
+                FROM InternalUser iu
+                INNER JOIN AirlineEmployee ae
+                    ON ae.emailInternalUser = iu.emailUser
+                WHERE iu.emailUser = @Email;
+            ";
 
             return await _dbConnection.QueryFirstOrDefaultAsync<UserModel>(
                 sql,
