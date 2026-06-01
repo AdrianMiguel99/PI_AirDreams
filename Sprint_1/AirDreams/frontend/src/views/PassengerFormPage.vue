@@ -79,12 +79,12 @@
 
           <label class="form-field">
             Pais del pasaporte
-            <select v-model="passenger.country" required>
-              <option value="" disabled>Seleccione un pais</option>
-              <option v-for="country in countries" :key="country" :value="country">
-                {{ country }}
-              </option>
-            </select>
+            <input
+              v-model.trim="passenger.country"
+              type="text"
+              maxlength="56"
+              required
+            />
           </label>
 
           <template v-if="isMainPassenger(index)">
@@ -237,7 +237,7 @@ export default {
         namePassenger: passenger.namePassenger.trim(),
         lastnamesPassenger: passenger.lastnamesPassenger.trim(),
         birthDate: passenger.birthDate,
-        country: (passenger.country || '').trim(),
+        passportCountry: passenger.country.trim(),
         emailPassenger: this.isMainPassenger(index)
           ? passenger.emailPassenger.trim().toLowerCase()
           : null,
