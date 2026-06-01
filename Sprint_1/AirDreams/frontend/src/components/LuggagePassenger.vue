@@ -12,6 +12,7 @@
           <span class="luggage-type">Equipaje documentado</span>
           <span class="luggage-price">{{ formatCurrency(checkedPrice) }}</span>
           <span class="luggage-per">por pieza</span>
+          <span class="luggage-extra-warning">+20% por cada pieza extra</span>
         </div>
         <div class="counter">
           <button class="counter-btn" @click="decrement('checked')" :disabled="checkedCount <= 0">−</button>
@@ -25,6 +26,7 @@
           <span class="luggage-type">Carry on</span>
           <span class="luggage-price">{{ formatCurrency(carryOnPrice) }}</span>
           <span class="luggage-per">por pieza</span>
+          <span class="luggage-extra-warning">+20% por cada pieza extra</span>
         </div>
         <div class="counter">
           <button class="counter-btn" @click="decrement('carryOn')" :disabled="carryOnCount <= 0">−</button>
@@ -39,72 +41,42 @@
 <script>
 export default {
   name: 'LuggagePassenger',
-
   props: {
-    passengerIndex: {
-      type: Number,
-      required: true
-    },
-    fullName: {
-      type: String,
-      default: 'Nombre Apellidos'
-    },
-    checkedPrice: {
-      type: Number,
-      default: 0
-    },
-    carryOnPrice: {
-      type: Number,
-      default: 0
-    }
+    passengerIndex: { type: Number, required: true },
+    fullName: { type: String, default: 'Nombre Apellidos' },
+    passengerTotal: { type: Number, default: 0 },
+    checkedPrice: { type: Number, default: 0 },
+    carryOnPrice: { type: Number, default: 0 }
   },
-
   data() {
     return {
       checkedCount: 0,
       carryOnCount: 0
     };
   },
-
   computed: {
     passengerLabel() {
       return `Pasajero ${this.passengerIndex}`;
-    },
-
-    passengerTotal() {
-      return (this.checkedCount * this.checkedPrice) +
-        (this.carryOnCount * this.carryOnPrice);
     }
   },
-
   methods: {
     increment(type) {
-      if (type === 'checked') {
-        this.checkedCount++;
-      } else {
-        this.carryOnCount++;
-      }
+      if (type === 'checked') this.checkedCount++;
+      else this.carryOnCount++;
       this.emitChange();
     },
-
     decrement(type) {
-      if (type === 'checked' && this.checkedCount > 0) {
-        this.checkedCount--;
-      } else if (type === 'carryOn' && this.carryOnCount > 0) {
-        this.carryOnCount--;
-      }
+      if (type === 'checked' && this.checkedCount > 0) this.checkedCount--;
+      else if (type === 'carryOn' && this.carryOnCount > 0) this.carryOnCount--;
       this.emitChange();
     },
-
     emitChange() {
       this.$emit('luggage-change', {
         passengerIndex: this.passengerIndex,
         checkedCount: this.checkedCount,
-        carryOnCount: this.carryOnCount,
-        passengerTotal: this.passengerTotal
+        carryOnCount: this.carryOnCount
       });
     },
-
     formatCurrency(value) {
       return new Intl.NumberFormat('en-US', {
         style: 'currency',

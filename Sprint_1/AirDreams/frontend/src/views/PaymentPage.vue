@@ -52,17 +52,8 @@
       <div class="payment-methods">
         <h3>Método de pago</h3>
         <div class="method-options">
-          <label
-            v-for="method in paymentMethods"
-            :key="method.value"
-            class="method-label"
-          >
-            <input
-              type="radio"
-              v-model="payment.paymentMethod"
-              :value="method.value"
-              @change="onMethodChange"
-            />
+          <label v-for="method in paymentMethods" :key="method.value" class="method-label">
+            <input type="radio" v-model="payment.paymentMethod" :value="method.value" @change="onMethodChange" />
             <span>{{ method.label }}</span>
           </label>
         </div>
@@ -71,43 +62,22 @@
       <div v-if="payment.paymentMethod === 'Card'" class="card-fields">
         <label class="form-field">
           Número de tarjeta
-          <input
-            v-model="payment.cardNumber"
-            type="text"
-            maxlength="19"
-            placeholder="0000 0000 0000 0000"
-            @input="formatCardNumber"
-          />
+          <input v-model="payment.cardNumber" type="text" maxlength="19" placeholder="0000 0000 0000 0000" @input="formatCardNumber" />
         </label>
-
         <div class="card-row">
           <label class="form-field">
             Vencimiento (MM/YY)
-            <input
-              v-model="payment.cardExpiry"
-              type="text"
-              maxlength="5"
-              placeholder="MM/YY"
-              @input="formatExpiry"
-            />
+            <input v-model="payment.cardExpiry" type="text" maxlength="5" placeholder="MM/YY" @input="formatExpiry" />
           </label>
-
           <label class="form-field">
             CVV
-            <input
-              v-model="payment.cardCvv"
-              type="password"
-              maxlength="4"
-              placeholder="123"
-            />
+            <input v-model="payment.cardCvv" type="password" maxlength="4" placeholder="123" />
           </label>
         </div>
       </div>
 
       <div class="footer-actions">
-        <button type="button" class="btn-back" @click="$router.push({ name: 'luggage' })">
-          ← Volver a equipaje
-        </button>
+        <button type="button" class="btn-back" @click="$router.push({ name: 'luggage' })">← Volver a equipaje</button>
         <button type="submit" class="btn-continue" :disabled="processing">
           {{ processing ? 'Procesando...' : 'Confirmar pago' }}
         </button>
@@ -137,12 +107,8 @@ export default {
   data() {
     return {
       payment: {
-        transactionId: '',
-        buyerName: '',
-        paymentMethod: '',
-        cardNumber: '',
-        cardExpiry: '',
-        cardCvv: ''
+        transactionId: '', buyerName: '', paymentMethod: '',
+        cardNumber: '', cardExpiry: '', cardCvv: ''
       },
       paymentMethods: [
         { label: 'Tarjeta de crédito/débito', value: 'Card' },
@@ -151,43 +117,23 @@ export default {
         { label: 'Apple Pay', value: 'ApplePay' }
       ],
       processing: false,
-      showPopup: false,
-      popupType: 'success',
-      popupTitle: '',
-      popupMessage: '',
-      popupActionText: '',
-      popupAction: null,
-
-      selectedPurchase: null,
-      luggageData: []
+      showPopup: false, popupType: 'success', popupTitle: '', popupMessage: '', popupActionText: '', popupAction: null,
+      selectedPurchase: null, luggageData: []
     }
   },
   computed: {
-    transactionId() {
-      return this.payment.transactionId
-    },
+    transactionId() { return this.payment.transactionId },
     seatClassLabel() {
       if (!this.selectedPurchase) return ''
       return this.selectedPurchase.seatClass === 'FirstClass' ? 'Primera clase' : 'Turista'
     },
-    passengerCount() {
-      return this.selectedPurchase?.passengerCount || 1
-    },
-    pricePerPassenger() {
-      return Number(this.selectedPurchase?.price || 0)
-    },
-    flightSubtotal() {
-      return this.passengerCount * this.pricePerPassenger
-    },
+    passengerCount() { return this.selectedPurchase?.passengerCount || 1 },
+    pricePerPassenger() { return Number(this.selectedPurchase?.price || 0) },
+    flightSubtotal() { return this.passengerCount * this.pricePerPassenger },
     luggageTotal() {
-      return this.luggageData.reduce((total, item) => {
-        const passengerLuggage = item.luggageItems?.reduce((sum, luggage) => sum + (luggage.subtotal || 0), 0) || 0
-        return total + passengerLuggage
-      }, 0)
+      return this.luggageData.reduce((total, item) => total + (item.passengerTotal || 0), 0)
     },
-    grandTotal() {
-      return this.flightSubtotal + this.luggageTotal
-    },
+    grandTotal() { return this.flightSubtotal + this.luggageTotal },
     flightDescription() {
       const p = this.selectedPurchase
       if (p) {
@@ -198,10 +144,7 @@ export default {
       return `#${this.transactionId}`
     }
   },
-  created() {
-    this.loadTransactionId()
-    this.loadPurchaseData()
-  },
+  created() { this.loadTransactionId(); this.loadPurchaseData(); },
   methods: {
     loadTransactionId() {
       let txId = this.$route.query.transactionId;
@@ -213,26 +156,18 @@ export default {
     },
     loadPurchaseData() {
       const savedPurchase = sessionStorage.getItem('selectedFlightPurchase')
-      if (savedPurchase) {
-        this.selectedPurchase = JSON.parse(savedPurchase)
-      }
+      if (savedPurchase) this.selectedPurchase = JSON.parse(savedPurchase)
       const savedLuggage = sessionStorage.getItem('purchaseLuggage')
-      if (savedLuggage) {
-        this.luggageData = JSON.parse(savedLuggage)
-      }
+      if (savedLuggage) this.luggageData = JSON.parse(savedLuggage)
     },
     onMethodChange() {
       if (this.payment.paymentMethod !== 'Card') {
-        this.payment.cardNumber = ''
-        this.payment.cardExpiry = ''
-        this.payment.cardCvv = ''
+        this.payment.cardNumber = ''; this.payment.cardExpiry = ''; this.payment.cardCvv = ''
       }
     },
     formatCardNumber(event) {
-      let value = event.target.value.replace(/\D/g, '')
-      value = value.substring(0, 16)
-      value = value.replace(/(.{4})/g, '$1 ').trim()
-      this.payment.cardNumber = value
+      let value = event.target.value.replace(/\D/g, '').substring(0, 16)
+      this.payment.cardNumber = value.replace(/(.{4})/g, '$1 ').trim()
     },
     formatExpiry(event) {
       let value = event.target.value.replace(/\D/g, '')
@@ -240,10 +175,7 @@ export default {
       this.payment.cardExpiry = value
     },
     formatCurrency(value) {
-      return new Intl.NumberFormat('en-US', {
-        style: 'currency',
-        currency: 'USD'
-      }).format(Number(value || 0))
+      return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(Number(value || 0))
     },
     async processPayment() {
       this.processing = true
@@ -263,7 +195,8 @@ export default {
             flightNumber: (s.flightNumber || '').trim().substring(0, 10),
             routeId: s.routeId || s.idRoute || null,
             checkedPrice: s.checkedPrice || 0,
-            carryOnPrice: s.carryOnPrice || 0
+            carryOnPrice: s.carryOnPrice || 0,
+            multiplier: s.porcentageMultiplier || 0.2
           })),
           seatClass: purchase.seatClass,
           pricePerPassenger: purchase.price,
@@ -282,7 +215,6 @@ export default {
         }
 
         await axios.post('http://localhost:5276/api/payment', payload)
-
         sessionStorage.removeItem('transactionId')
 
         this.popupType = 'success'

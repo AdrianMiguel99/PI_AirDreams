@@ -97,6 +97,7 @@ builder.Services.AddScoped<IPurchaseService, PurchaseService>();
 builder.Services.AddScoped<ISecurityRepository, SecurityRepository>();
 builder.Services.AddScoped<ISecurityService, SecurityService>();
 
+
 var app = builder.Build();
 
 

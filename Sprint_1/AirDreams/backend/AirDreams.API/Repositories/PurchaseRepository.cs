@@ -13,7 +13,7 @@ namespace AirDreams.API.Repositories
             _connection = connection;
         }
 
-        public async Task ConfirmPurchaseAsync(ConfirmPurchaseDto dto, decimal amount, string? cardLastFour)
+        public async Task ConfirmPurchaseAsync(ConfirmPurchaseDto dto, string? cardLastFour)
         {
             _connection.Open();
             using var transaction = _connection.BeginTransaction();
@@ -43,6 +43,32 @@ namespace AirDreams.API.Repositories
 
                     passengerIds.Add(newId);
                 }
+
+                decimal flightCost = dto.PassengerCount * dto.PricePerPassenger;
+                decimal luggageCost = 0;
+
+                if (dto.Luggage != null)
+                {
+                    foreach (var lp in dto.Luggage)
+                    {
+                        foreach (var item in lp.LuggageItems)
+                        {
+                            foreach (var seg in dto.Segments)
+                            {
+                                decimal basePrice = item.Type == "checked" ? seg.CheckedPrice : seg.CarryOnPrice;
+                                decimal multiplier = seg.Multiplier;
+                                int quantity = item.Quantity;
+
+                                var cost = await _connection.ExecuteScalarAsync<decimal>(
+                                    "SELECT dbo.fn_TotalLuggageCost(@basePrice, @multiplier, @quantity)",
+                                    new { basePrice, multiplier, quantity }, transaction);
+                                luggageCost += cost;
+                            }
+                        }
+                    }
+                }
+
+                decimal amount = flightCost + luggageCost;
 
                 var sqlItinerary = @"
                     INSERT INTO Itinerary (transactionId, idPassenger, purchaseDate, amount)
@@ -114,6 +140,7 @@ namespace AirDreams.API.Repositories
                     }
                 }
 
+                // 7. Pago
                 var sqlPayment = @"
                     UPDATE Itinerary
                     SET paymentMethod = @PaymentMethod,
