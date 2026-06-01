@@ -1,10 +1,11 @@
 using AirDreams.API.DTOs;
+using AirDreams.ExternalAPI.DTOs;
 
 namespace AirDreams.API.Services.Interfaces
 {
     public interface IFlightService
     {
-        Task<List<FlightDTO>> SearchFlightsAsync(
+        Task<List<FlightItineraryDTO>> SearchFlightsAsync(
             string origin,
             string destination,
             DateTime earliestDeparture,
@@ -12,6 +13,11 @@ namespace AirDreams.API.Services.Interfaces
             int quantityOfPassengers
         );
 
-        Task ValidateApiKeyAsync(string apiKey);
+        Task<List<ExternalResponseFlightDTO>> SearchFlightsByDestinationAsync(
+            string destination,
+            DateTime earliestDeparture,
+            DateTime latestDeparture,
+            int quantityOfPassengers
+        );
     }
 }

@@ -1,7 +1,9 @@
 using AirDreams.API.Models;
+using AirDreams.API.Models.Entities;
 using AirDreams.API.DTOs;
 using Dapper;
 using System.Data;
+using System.Text;
 using System.Threading.Tasks;
 
 namespace AirDreams.API.Repositories
@@ -235,19 +237,22 @@ namespace AirDreams.API.Repositories
         public async Task<UserModel?> GetUserByEmail(string email)
         {
             var sql = @"
-        --Seleccione el ID de AirlineEmployee, junte el nombre y apellido y tratelo como Fullname y el Email.
-        SELECT ae.employeeID AS Id, ae.nameEmployee + ' ' + ae.lastnames AS FullName, iu.emailUser AS Email,
-            CASE
-                WHEN ae.isAdmin = 1 THEN 'Admin'
-                WHEN ae.isOperator = 1 THEN 'Operator'
-                ELSE 'User'
-            END AS Role,
-                iu.hashPasswordUser AS PasswordHash,  1 AS IsActive
-            FROM InternalUser iu
-            INNER JOIN AirlineEmployee ae
-                ON ae.emailInternalUser = iu.emailUser
-            WHERE iu.emailUser = @Email;
-        ";
+                SELECT 
+                    ae.employeeID AS Id,
+                    ae.nameEmployee + ' ' + ae.lastnames AS FullName,
+                    iu.emailUser AS Email,
+                    CASE
+                        WHEN ae.isAdmin = 1 THEN 'Admin'
+                        WHEN ae.isOperator = 1 THEN 'Operator'
+                        ELSE 'User'
+                    END AS Role,
+                    iu.hashPasswordUser AS PasswordHash,
+                    iu.isActive AS IsActive
+                FROM InternalUser iu
+                INNER JOIN AirlineEmployee ae
+                    ON ae.emailInternalUser = iu.emailUser
+                WHERE iu.emailUser = @Email;
+            ";
 
             return await _dbConnection.QueryFirstOrDefaultAsync<UserModel>(
                 sql,
@@ -280,5 +285,76 @@ namespace AirDreams.API.Repositories
                 new { Id = id }
             );
         }
+        public async Task<AirlineEmployee?> GetAirlineEmployeeByIdAsync(byte employeeId)
+        {
+            const string sql = @"
+                SELECT employeeID, emailInternalUser, lastnames, nameEmployee, isAdmin, isOperator
+                FROM AirlineEmployee
+                WHERE employeeID = @employeeId";
+            
+            return await _dbConnection.QueryFirstOrDefaultAsync<AirlineEmployee>(sql, new { employeeId });
+        }
+
+        public async Task UpdateAirlineEmployeeAsync(byte employeeId, string? firstName, string? lastName, bool? isAdmin, bool? isOperator)
+        {
+            var sql = new StringBuilder("UPDATE AirlineEmployee SET ");
+            var parameters = new DynamicParameters();
+            parameters.Add("@employeeId", employeeId);
+            
+            if (firstName != null)
+            {
+                sql.Append("nameEmployee = @firstName, ");
+                parameters.Add("@firstName", firstName);
+            }
+            
+            if (lastName != null)
+            {
+                sql.Append("lastnames = @lastName, ");
+                parameters.Add("@lastName", lastName);
+            }
+            
+            if (isAdmin.HasValue)
+            {
+                sql.Append("isAdmin = @isAdmin, ");
+                parameters.Add("@isAdmin", isAdmin.Value);
+            }
+            
+            if (isOperator.HasValue)
+            {
+                sql.Append("isOperator = @isOperator, ");
+                parameters.Add("@isOperator", isOperator.Value);
+            }
+            
+            var finalSql = sql.ToString().TrimEnd(',', ' ');
+            finalSql += " WHERE employeeID = @employeeId";
+            
+            await _dbConnection.ExecuteAsync(finalSql, parameters);
+        }
+
+        public async Task UpdateInternalUserActiveStatusAsync(byte employeeId, bool? isActive)
+        {
+            if (!isActive.HasValue) return;
+            
+            const string sql = @"
+                UPDATE InternalUser 
+                SET isActive = @isActive
+                WHERE userID = (SELECT userID FROM AirlineEmployee WHERE employeeID = @employeeId)";
+            
+            await _dbConnection.ExecuteAsync(sql, new { employeeId, isActive = isActive.Value });
+        }
+
+        public async Task<byte> GetCurrentUserIdFromEmailAsync(string email)
+        {
+            const string sql = @"
+                SELECT ae.employeeID
+                FROM AirlineEmployee ae
+                WHERE ae.emailInternalUser = @email";
+            
+            return await _dbConnection.QueryFirstOrDefaultAsync<byte>(sql, new { email });
+        }
+
     }
 }
+
+
+

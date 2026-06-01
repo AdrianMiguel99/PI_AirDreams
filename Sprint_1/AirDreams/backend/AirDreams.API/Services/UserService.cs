@@ -22,14 +22,90 @@ namespace AirDreams.API.Services
             _configuration = configuration;
         }
 
-        public List<UserDTO> GetAll()
+        public async Task<List<UserDTO>> GetAll(string currentUserEmail)
         {
-            return _userRepository.GetAll();
+            var currentUser = await _userRepository.GetUserByEmail(currentUserEmail);
+
+            if (currentUser == null)
+            {
+                throw new UnauthorizedAccessException("Usuario no encontrado");
+            }
+
+            if (currentUser.Role == "Admin")
+            {
+                return _userRepository.GetAll();
+            }
+
+            var ownUser = await _userRepository.GetUserById(currentUser.Id);
+
+            return ownUser != null
+                ? new List<UserDTO>
+                {
+                    new UserDTO
+                    {
+                        Id = ownUser.Id,
+                        FullName = ownUser.FullName,
+                        Email = ownUser.Email,
+                        Role = ownUser.Role
+                    }
+                }
+                : new List<UserDTO>();
         }
 
-        public List<UserDTO> Search(string searchTerm)
+        public async Task<List<UserDTO>> Search(string searchTerm, string currentUserEmail)
         {
-            return _userRepository.Search(searchTerm);
+            var currentUser = await _userRepository.GetUserByEmail(currentUserEmail);
+
+            if (currentUser == null)
+            {
+                throw new UnauthorizedAccessException("Usuario no encontrado");
+            }
+
+            if (currentUser.Role == "Admin")
+            {
+                return _userRepository.Search(searchTerm);
+            }
+
+            var ownUser = await _userRepository.GetUserById(currentUser.Id);
+
+            if (ownUser == null)
+            {
+                return new List<UserDTO>();
+            }
+
+            if (string.IsNullOrWhiteSpace(searchTerm))
+            {
+                return new List<UserDTO>
+                {
+                    new UserDTO
+                    {
+                        Id = ownUser.Id,
+                        FullName = ownUser.FullName,
+                        Email = ownUser.Email,
+                        Role = ownUser.Role
+                    }
+                };
+            }
+
+            bool matches =
+                ownUser.FullName.Contains(searchTerm, StringComparison.OrdinalIgnoreCase)
+                || ownUser.Email.Contains(searchTerm, StringComparison.OrdinalIgnoreCase);
+
+            if (!matches)
+            {
+                return new List<UserDTO>();
+            }
+
+            return new List<UserDTO>
+            {
+                new UserDTO
+                {
+                    Id = ownUser.Id,
+                    FullName = ownUser.FullName,
+                    Email = ownUser.Email,
+                    Role = ownUser.Role
+                }
+            };
         }
 
         public async Task<(bool success, string message)> SendInvitation(InvitationModel model)
@@ -120,19 +196,7 @@ namespace AirDreams.API.Services
             try
             {
                 var user = await _userRepository.GetUserByEmail(model.Email);
-                Console.WriteLine($"EMAIL RECIBIDO: {model.Email}");
 
-                if (user == null)
-                {
-                    Console.WriteLine("USUARIO NO ENCONTRADO");
-                }
-                else
-                {
-                    Console.WriteLine($"USUARIO ENCONTRADO: {user.Email}");
-                    Console.WriteLine($"IS ACTIVE: {user.IsActive}");
-                    Console.WriteLine($"HASH BD: {user.PasswordHash}");
-                    Console.WriteLine($"HASH INPUT: {HashPassword(model.Password)}");
-                }
                 if (user == null)
                 {
                     return (false, "Email o contraseña incorrecta", null);
@@ -270,5 +334,44 @@ namespace AirDreams.API.Services
             var hashOfInput = HashPassword(password);
             return hashOfInput == hash;
         }
+
+        public async Task<bool> UpdateUserAsync(byte employeeId, UpdateUserDto updateDto, string currentUserEmail)
+        {
+            var currentUserId = await _userRepository.GetCurrentUserIdFromEmailAsync(currentUserEmail);
+            var currentUser = await _userRepository.GetAirlineEmployeeByIdAsync(currentUserId);
+            
+            if (currentUser == null)
+            {
+                throw new UnauthorizedAccessException("Usuario no encontrado");
+            }
+            
+            var targetUser = await _userRepository.GetAirlineEmployeeByIdAsync(employeeId);
+            
+            if (targetUser == null)
+            {
+                return false;
+            }
+            
+            bool isAdmin = currentUser.IsAdmin;
+            bool isEditingSelf = currentUserId == employeeId;
+            
+            if (!isAdmin && !isEditingSelf)
+            {
+                throw new UnauthorizedAccessException("No tienes permiso para editar otros usuarios");
+            }
+            
+            string? firstName = updateDto.FirstName;
+            string? lastName = updateDto.LastName;
+            bool? isAdminUpdate = isAdmin ? updateDto.IsAdmin : null;
+            bool? isOperatorUpdate = isAdmin ? updateDto.IsOperator : null;
+            bool? isActiveUpdate = isAdmin ? updateDto.IsActive : null;
+            
+            await _userRepository.UpdateAirlineEmployeeAsync(employeeId, firstName, lastName, isAdminUpdate, isOperatorUpdate);
+            await _userRepository.UpdateInternalUserActiveStatusAsync(employeeId, isActiveUpdate);
+            
+            return true;
+        }
     }
 }
+
+
