@@ -14,9 +14,9 @@ namespace AirDreams.API.Services
         
         Task<InvitationValidationResult?> ValidateInvitationToken(string token);
 
-        List<UserDTO> GetAll();
+        Task<List<UserDTO>> GetAll(string currentUserEmail);
 
-        List<UserDTO> Search(string searchTerm);
+        Task<List<UserDTO>> Search(string searchTerm, string currentUserEmail);
 
         Task<bool> UpdateUserAsync(byte employeeId, UpdateUserDto updateDto, string currentUserEmail);
 
