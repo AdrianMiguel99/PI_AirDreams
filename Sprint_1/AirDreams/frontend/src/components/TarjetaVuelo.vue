@@ -3,10 +3,6 @@
     <div class="card-content">
       <div class="card-main">
         <div class="left-section">
-          <div class="flight-number">
-            <span class="label">Vuelo:</span>
-            <span class="value">#{{ flight.itineraryId }}</span>
-          </div>
 
           <div class="stops-info">
             <span v-if="flight.stops === 0">Directo</span>
@@ -21,7 +17,7 @@
               class="segment"
             >
               <div class="segment-header">
-                <strong>Segmento {{ index + 1 }}</strong>
+                <strong>Vuelo #{{ segment.flightNumber }}</strong>
               </div>
 
               <div class="segment-body">
@@ -70,6 +66,24 @@
             </div>
           </div>
 
+          <div class="card-actions">
+            <button
+              type="button"
+              class="buy-button tourist-button"
+              @click="buyFlight('Tourist', flight.touristPrice)"
+            >
+              Comprar turista
+            </button>
+
+            <button
+              type="button"
+              class="buy-button first-class-button"
+              @click="buyFlight('FirstClass', flight.firstClassPrice)"
+            >
+              Comprar primera clase
+            </button>
+          </div>
+
         </div>
       </div>
     </div>
@@ -82,7 +96,16 @@ export default {
     flight: Object,
     departureDate: String
   },
+  emits: ['buy'],
   methods: {
+    buyFlight(seatClass, price) {
+      this.$emit('buy', {
+        flight: this.flight,
+        seatClass,
+        price
+      });
+    },
+
     formatDate(dateStr) {
       if (!dateStr) return '';
 
@@ -261,5 +284,45 @@ export default {
   font-weight: 700;
   color: #2e7d32;
   white-space: nowrap;
+}
+
+.card-actions {
+  display: flex;
+  gap: 10px;
+  justify-content: flex-end;
+  margin-top: 8px;
+  flex-wrap: wrap;
+}
+
+.buy-button {
+  border: none;
+  border-radius: 8px;
+  background: #032056;
+  color: white;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 700;
+  padding: 10px 18px;
+  transition: background 0.2s ease, transform 0.2s ease;
+}
+
+.buy-button:hover {
+  transform: translateY(-1px);
+}
+
+.tourist-button {
+  background: #032056;
+}
+
+.tourist-button:hover {
+  background: #06357e;
+}
+
+.first-class-button {
+  background: #2e7d32;
+}
+
+.first-class-button:hover {
+  background: #256829;
 }
 </style>

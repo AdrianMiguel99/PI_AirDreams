@@ -1,4 +1,5 @@
 using AirDreams.API.DTOs;
+using AirDreams.ExternalAPI.DTOs;
 using AirDreams.API.Repositories;
 using AirDreams.API.Services.Interfaces;
 
@@ -63,21 +64,32 @@ namespace AirDreams.API.Services
             .ToList();
         }
 
-        public async Task ValidateApiKeyAsync(string apiKey)
+        public async Task<List<ExternalResponseFlightDTO>> SearchFlightsByDestinationAsync(
+            string destination,
+            DateTime earliestDeparture,
+            DateTime latestDeparture,
+            int quantityOfPassengers
+        )
         {
-            if (string.IsNullOrWhiteSpace(apiKey))
+            destination = destination.Trim().ToUpper();
+
+            var flights = await _flightRepository.SearchFlightsByDestinationAsync(
+                destination,
+                earliestDeparture,
+                latestDeparture,
+                quantityOfPassengers
+            );
+
+            var result = new List<ExternalResponseFlightDTO>();
+
+            foreach (var flight in flights)
             {
-                throw new UnauthorizedAccessException("INVALID_API_KEY: La API key es requerida.");
+                var flightDto = MapToExternalResponseFlight(flight);
+                result.Add(flightDto);
             }
 
-            var airline = await _flightRepository.ValidateApiKeyAsync(apiKey);
-
-            if (string.IsNullOrEmpty(airline))
-            {
-                throw new UnauthorizedAccessException("INVALID_API_KEY: La API key proporcionada no es válida.");
-            }
+            return result.ToList();
         }
-        
 
         private void ValidateParameters(string origin, string destination, DateTime earliestDeparture, DateTime latestDeparture, int quantityOfPassengers)
         {
@@ -116,11 +128,14 @@ namespace AirDreams.API.Services
                 {
                     new FlightSegmentDTO
                     {
+                        FlightNumber = flight.FlightNumber,
                         RouteId = flight.RouteId,
                         DepartureDate = flight.DepartureDate,
                         ArrivalDate = flight.ArrivalDate,
                         DepartureTime = flight.DepartureTime,
                         ArrivalTime = flight.ArrivalTime,
+                        CarryOnPrice = flight.CarryOnPrice,
+                        CheckedPrice = flight.CheckedPrice,
                         Duration = flight.Duration,
 
                         DepartureAirport = new AirportDTO
@@ -143,7 +158,7 @@ namespace AirDreams.API.Services
         {
             return new FlightItineraryDTO
             {
-                ItineraryId = flight.FlightNumber,
+                ItineraryId = $"{flight.FirstFlightNumber}-{flight.SecondFlightNumber}",
                 Stops = 1,
                 TouristPrice = flight.TouristPrice,
                 FirstClassPrice = flight.FirstClassPrice,
@@ -151,11 +166,14 @@ namespace AirDreams.API.Services
                 {
                     new FlightSegmentDTO
                     {
+                        FlightNumber = flight.FirstFlightNumber,
                         RouteId = flight.FirstRouteID,
                         DepartureDate = flight.FirstDepartureDate,
                         DepartureTime = flight.FirstDepartureTime,
                         ArrivalDate = flight.FirstArrivalDate,
                         ArrivalTime = flight.FirstArrivalTime,
+                        CarryOnPrice = flight.FirstCarryOnPrice,
+                        CheckedPrice = flight.FirstCheckedPrice,
                         Duration = flight.FirstDuration,
                         DepartureAirport = new AirportDTO
                         {
@@ -172,11 +190,14 @@ namespace AirDreams.API.Services
                     },
                     new FlightSegmentDTO
                     {
+                        FlightNumber = flight.SecondFlightNumber,
                         RouteId = flight.SecondRouteID,
                         DepartureDate = flight.SecondDepartureDate,
                         DepartureTime = flight.SecondDepartureTime,
                         ArrivalDate = flight.SecondArrivalDate,
                         ArrivalTime = flight.SecondArrivalTime,
+                        CarryOnPrice = flight.SecondCarryOnPrice,
+                        CheckedPrice = flight.SecondCheckedPrice,
                         Duration = flight.SecondDuration,
                         DepartureAirport = new AirportDTO
                         {
@@ -192,6 +213,33 @@ namespace AirDreams.API.Services
                         }
                     }
                 }
+            };
+        }
+
+        private ExternalResponseFlightDTO MapToExternalResponseFlight(dynamic flight)
+        {
+            return new ExternalResponseFlightDTO
+            {
+                flightGUID = flight.FlightNumber,
+                departureTime = flight.DepartureTime,
+                arrivalTime = flight.ArrivalTime,
+                duration = flight.Duration != null ? ((TimeSpan)flight.Duration).ToString(@"hh\-mm") : string.Empty,
+                departureAirport = new ExternalResponseAirportDTO
+                {
+                    code = flight.DepartureAirportCode,
+                    name = flight.DepartureAirportName,
+                    city = flight.DepartureCity
+                },
+                arrivalAirport = new ExternalResponseAirportDTO
+                {
+                    code = flight.ArrivalAirportCode,
+                    name = flight.ArrivalAirportName,
+                    city = flight.ArrivalCity
+                },
+                touristPrice = flight.TouristPrice,
+                firstClassPrice = flight.FirstClassPrice,
+                carryOnPrice = flight.CarryOnPrice,
+                checkedPrice = flight.CheckedPrice
             };
         }
     }

@@ -85,6 +85,18 @@ builder.Services.AddScoped<IAircraftService, AircraftService>();
 builder.Services.AddScoped<IFlightRepository, FlightRepository>();
 builder.Services.AddScoped<IFlightService, FlightService>();
 
+builder.Services.AddScoped<ILuggageRepository, LuggageRepository>();
+builder.Services.AddScoped<ILuggageService, LuggageService>();
+builder.Services.AddScoped<IPassengerRepository, PassengerRepository>();
+builder.Services.AddScoped<IPassengerService, PassengerService>();
+builder.Services.AddScoped<IPaymentRepository, PaymentRepository>();
+builder.Services.AddScoped<IPaymentService, PaymentService>();
+builder.Services.AddScoped<IPurchaseRepository, PurchaseRepository>();
+builder.Services.AddScoped<IPurchaseService, PurchaseService>();
+
+builder.Services.AddScoped<ISecurityRepository, SecurityRepository>();
+builder.Services.AddScoped<ISecurityService, SecurityService>();
+
 var app = builder.Build();
 
 
@@ -94,7 +106,7 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
-//app.UseHttpsRedirection();
+
 app.UseCors("AllowVueApp");
 
 app.UseAuthentication();

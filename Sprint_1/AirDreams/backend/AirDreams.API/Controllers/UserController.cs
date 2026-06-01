@@ -19,16 +19,38 @@ namespace AirDreams.API.Controllers
         }
 
         [HttpGet]
-        public ActionResult<List<UserDTO>> GetAll()
+        public async Task<ActionResult<List<UserDTO>>> GetAll()
         {
-            var users = _userService.GetAll();
+            var currentUserEmail = User.FindFirst(ClaimTypes.Email)?.Value;
+
+            if (string.IsNullOrEmpty(currentUserEmail))
+            {
+                return Unauthorized(new
+                {
+                    message = "No se pudo identificar al usuario"
+                });
+            }
+
+            var users = await _userService.GetAll(currentUserEmail);
+
             return Ok(users);
         }
 
         [HttpGet("search")]
-        public ActionResult<List<UserDTO>> Search([FromQuery] string searchTerm)
+        public async Task<ActionResult<List<UserDTO>>> Search([FromQuery] string searchTerm)
         {
-            var users = _userService.Search(searchTerm);
+            var currentUserEmail = User.FindFirst(ClaimTypes.Email)?.Value;
+
+            if (string.IsNullOrEmpty(currentUserEmail))
+            {
+                return Unauthorized(new
+                {
+                    message = "No se pudo identificar al usuario"
+                });
+            }
+
+            var users = await _userService.Search(searchTerm, currentUserEmail);
+
             return Ok(users);
         }
 

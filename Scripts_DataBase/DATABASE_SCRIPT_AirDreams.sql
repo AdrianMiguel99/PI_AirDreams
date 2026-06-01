@@ -247,7 +247,6 @@ CREATE TABLE Itinerary(
 );
 GO
 
-
 CREATE TABLE Realiza(
 	idPassenger INT NOT NULL,
 	passportPassenger VARCHAR(8) NOT NULL,
@@ -264,7 +263,6 @@ CREATE TABLE Realiza(
     REFERENCES CheckIn(checkInNumber)
 );
 GO
-
 
 CREATE TABLE Tiene(
 	-- pk, fk
@@ -291,7 +289,6 @@ CREATE TABLE Luggage(
 	quantity TINYINT
 );
 GO
-
 
 CREATE TABLE Registra(
 	-- pk, fk

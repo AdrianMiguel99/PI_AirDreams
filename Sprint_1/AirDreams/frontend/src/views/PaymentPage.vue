@@ -1,0 +1,474 @@
+<template>
+  <StepperLayout :currentStep="3">
+    <div class="page-header">
+      <h2 class="section-title">Pago</h2>
+      <p class="section-subtitle">
+        Revisa el detalle de tu compra y selecciona un método de pago.
+      </p>
+    </div>
+
+    <div class="purchase-summary">
+      <h3>Resumen de compra</h3>
+      <div class="summary-grid">
+        <div class="summary-item">
+          <span class="summary-label">Vuelo</span>
+          <strong>{{ flightDescription }}</strong>
+        </div>
+        <div class="summary-item">
+          <span class="summary-label">Clase</span>
+          <strong>{{ seatClassLabel }}</strong>
+        </div>
+        <div class="summary-item">
+          <span class="summary-label">Pasajeros</span>
+          <strong>{{ passengerCount }}</strong>
+        </div>
+        <div class="summary-item">
+          <span class="summary-label">Precio por pasajero</span>
+          <strong>{{ formatCurrency(pricePerPassenger) }}</strong>
+        </div>
+        <div class="summary-item">
+          <span class="summary-label">Subtotal vuelo</span>
+          <strong>{{ formatCurrency(flightSubtotal) }}</strong>
+        </div>
+        <div class="summary-item">
+          <span class="summary-label">Equipaje</span>
+          <strong>{{ formatCurrency(luggageTotal) }}</strong>
+        </div>
+        <div class="summary-item total">
+          <span class="summary-label">Total a pagar</span>
+          <strong>{{ formatCurrency(grandTotal) }}</strong>
+        </div>
+      </div>
+    </div>
+
+    <form @submit.prevent="processPayment">
+      <div class="form-grid">
+        <label class="form-field">
+          Nombre del comprador
+          <input v-model="payment.buyerName" type="text" required maxlength="100" />
+        </label>
+      </div>
+
+      <div class="payment-methods">
+        <h3>Método de pago</h3>
+        <div class="method-options">
+          <label
+            v-for="method in paymentMethods"
+            :key="method.value"
+            class="method-label"
+          >
+            <input
+              type="radio"
+              v-model="payment.paymentMethod"
+              :value="method.value"
+              @change="onMethodChange"
+            />
+            <span>{{ method.label }}</span>
+          </label>
+        </div>
+      </div>
+
+      <div v-if="payment.paymentMethod === 'Card'" class="card-fields">
+        <label class="form-field">
+          Número de tarjeta
+          <input
+            v-model="payment.cardNumber"
+            type="text"
+            maxlength="19"
+            placeholder="0000 0000 0000 0000"
+            @input="formatCardNumber"
+          />
+        </label>
+
+        <div class="card-row">
+          <label class="form-field">
+            Vencimiento (MM/YY)
+            <input
+              v-model="payment.cardExpiry"
+              type="text"
+              maxlength="5"
+              placeholder="MM/YY"
+              @input="formatExpiry"
+            />
+          </label>
+
+          <label class="form-field">
+            CVV
+            <input
+              v-model="payment.cardCvv"
+              type="password"
+              maxlength="4"
+              placeholder="123"
+            />
+          </label>
+        </div>
+      </div>
+
+      <div class="footer-actions">
+        <button type="button" class="btn-back" @click="$router.push({ name: 'luggage' })">
+          ← Volver a equipaje
+        </button>
+        <button type="submit" class="btn-continue" :disabled="processing">
+          {{ processing ? 'Procesando...' : 'Confirmar pago' }}
+        </button>
+      </div>
+    </form>
+
+    <PopupMessage
+      :show="showPopup"
+      :type="popupType"
+      :title="popupTitle"
+      :message="popupMessage"
+      :actionText="popupActionText"
+      @close="showPopup = false"
+      @action="popupAction"
+    />
+  </StepperLayout>
+</template>
+
+<script>
+import axios from 'axios'
+import StepperLayout from '../components/StepperLayout.vue'
+import PopupMessage from '../components/PopupMessage.vue'
+
+export default {
+  name: 'PaymentPage',
+  components: { StepperLayout, PopupMessage },
+  data() {
+    return {
+      payment: {
+        transactionId: '',
+        buyerName: '',
+        paymentMethod: '',
+        cardNumber: '',
+        cardExpiry: '',
+        cardCvv: ''
+      },
+      paymentMethods: [
+        { label: 'Tarjeta de crédito/débito', value: 'Card' },
+        { label: 'PayPal', value: 'PayPal' },
+        { label: 'Google Pay', value: 'GooglePay' },
+        { label: 'Apple Pay', value: 'ApplePay' }
+      ],
+      processing: false,
+      showPopup: false,
+      popupType: 'success',
+      popupTitle: '',
+      popupMessage: '',
+      popupActionText: '',
+      popupAction: null,
+
+      selectedPurchase: null,
+      luggageData: []
+    }
+  },
+  computed: {
+    transactionId() {
+      return this.payment.transactionId
+    },
+    seatClassLabel() {
+      if (!this.selectedPurchase) return ''
+      return this.selectedPurchase.seatClass === 'FirstClass' ? 'Primera clase' : 'Turista'
+    },
+    passengerCount() {
+      return this.selectedPurchase?.passengerCount || 1
+    },
+    pricePerPassenger() {
+      return Number(this.selectedPurchase?.price || 0)
+    },
+    flightSubtotal() {
+      return this.passengerCount * this.pricePerPassenger
+    },
+    luggageTotal() {
+      return this.luggageData.reduce((total, item) => {
+        const passengerLuggage = item.luggageItems?.reduce((sum, luggage) => sum + (luggage.subtotal || 0), 0) || 0
+        return total + passengerLuggage
+      }, 0)
+    },
+    grandTotal() {
+      return this.flightSubtotal + this.luggageTotal
+    },
+    flightDescription() {
+      const p = this.selectedPurchase
+      if (p) {
+        if (p.origin && p.destination) return `${p.origin} → ${p.destination}`
+        if (p.flightNumber) return `Vuelo ${p.flightNumber}`
+        if (p.itinerary?.itineraryId) return `Vuelo #${p.itinerary.itineraryId}`
+      }
+      return `#${this.transactionId}`
+    }
+  },
+  created() {
+    this.loadTransactionId()
+    this.loadPurchaseData()
+  },
+  methods: {
+    loadTransactionId() {
+      let txId = this.$route.query.transactionId;
+      if (!txId || txId === 'TXN-DEFAULT') {
+        txId = 'TXN-' + crypto.randomUUID().substring(0, 8);
+        sessionStorage.setItem('transactionId', txId);
+      }
+      this.payment.transactionId = txId;
+    },
+    loadPurchaseData() {
+      const savedPurchase = sessionStorage.getItem('selectedFlightPurchase')
+      if (savedPurchase) {
+        this.selectedPurchase = JSON.parse(savedPurchase)
+      }
+      const savedLuggage = sessionStorage.getItem('purchaseLuggage')
+      if (savedLuggage) {
+        this.luggageData = JSON.parse(savedLuggage)
+      }
+    },
+    onMethodChange() {
+      if (this.payment.paymentMethod !== 'Card') {
+        this.payment.cardNumber = ''
+        this.payment.cardExpiry = ''
+        this.payment.cardCvv = ''
+      }
+    },
+    formatCardNumber(event) {
+      let value = event.target.value.replace(/\D/g, '')
+      value = value.substring(0, 16)
+      value = value.replace(/(.{4})/g, '$1 ').trim()
+      this.payment.cardNumber = value
+    },
+    formatExpiry(event) {
+      let value = event.target.value.replace(/\D/g, '')
+      if (value.length > 2) value = value.substring(0,2) + '/' + value.substring(2,4)
+      this.payment.cardExpiry = value
+    },
+    formatCurrency(value) {
+      return new Intl.NumberFormat('en-US', {
+        style: 'currency',
+        currency: 'USD'
+      }).format(Number(value || 0))
+    },
+    async processPayment() {
+      this.processing = true
+      try {
+        const purchase = JSON.parse(sessionStorage.getItem('selectedFlightPurchase'))
+        const passengers = JSON.parse(sessionStorage.getItem('purchasePassengers'))
+        const luggage = JSON.parse(sessionStorage.getItem('purchaseLuggage'))
+
+        const payload = {
+          transactionId: this.payment.transactionId,
+          buyerName: this.payment.buyerName,
+          paymentMethod: this.payment.paymentMethod,
+          cardNumber: this.payment.cardNumber?.replace(/\s/g, '') || null,
+          cardExpiry: this.payment.cardExpiry || null,
+          cardCvv: this.payment.cardCvv || null,
+          segments: purchase.itinerary.segments.map(s => ({
+            flightNumber: (s.flightNumber || '').trim().substring(0, 10),
+            routeId: s.routeId || s.idRoute || null,
+            checkedPrice: s.checkedPrice || 0,
+            carryOnPrice: s.carryOnPrice || 0
+          })),
+          seatClass: purchase.seatClass,
+          pricePerPassenger: purchase.price,
+          passengerCount: purchase.passengerCount,
+          passengers: passengers.map(p => ({
+            namePassenger: p.namePassenger,
+            lastnamesPassenger: p.lastnamesPassenger,
+            emailPassenger: p.emailPassenger || '',
+            telephone: p.telephone || '',
+            country: p.country || ''
+          })),
+          luggage: luggage ? luggage.map(l => ({
+            passengerIndex: l.passenger.index,
+            luggageItems: l.luggageItems
+          })) : []
+        }
+
+        await axios.post('http://localhost:5276/api/payment', payload)
+
+        sessionStorage.removeItem('transactionId')
+
+        this.popupType = 'success'
+        this.popupTitle = 'Pago exitoso'
+        this.popupMessage = 'Tu compra ha sido confirmada. ¡Gracias por volar con Air Dreams!'
+        this.popupActionText = 'Volver al inicio'
+        this.popupAction = () => this.$router.push({ name: 'home' })
+        this.showPopup = true
+      } catch (error) {
+        console.error(error)
+        this.popupType = 'error'
+        this.popupTitle = 'Error en el pago'
+        if (error.response?.data?.error) {
+          this.popupMessage = error.response.data.error
+        } else if (error.response?.data?.errors) {
+          const messages = Object.values(error.response.data.errors).flat().join(', ')
+          this.popupMessage = messages || 'Datos inválidos.'
+        } else {
+          this.popupMessage = 'No se pudo procesar el pago.'
+        }
+        this.popupActionText = ''
+        this.showPopup = true
+      } finally {
+        this.processing = false
+      }
+    }
+  }
+}
+</script>
+
+<style scoped>
+.page-header { margin-bottom: 24px; }
+.section-title { font-size: 20px; font-weight: 700; color: #032056; margin: 0 0 6px; }
+.section-subtitle { color: #667085; font-size: 14px; margin: 0; }
+
+.purchase-summary {
+  background: #ffffff;
+  border: 1px solid #e8ecf4;
+  border-radius: 12px;
+  padding: 20px;
+  margin-bottom: 24px;
+  box-shadow: 0 1px 4px rgba(3, 32, 86, 0.06);
+}
+.purchase-summary h3 {
+  color: #032056;
+  margin: 0 0 16px;
+  font-size: 16px;
+}
+.summary-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
+}
+.summary-item {
+  display: flex;
+  justify-content: space-between;
+  color: #334155;
+  font-size: 14px;
+}
+.summary-label { color: #8a94a8; }
+.summary-item.total { border-top: 1px solid #e8ecf4; padding-top: 12px; margin-top: 4px; font-weight: 700; }
+
+.form-grid { display: grid; grid-template-columns: 1fr; gap: 16px; }
+
+.form-field {
+  color: #032056;
+  display: flex;
+  flex-direction: column;
+  font-size: 13px;
+  font-weight: 600;
+  gap: 6px;
+}
+
+.form-field input,
+.form-field select {
+  border: 1px solid #c8d0de;
+  border-radius: 8px;
+  color: #032056;
+  font-size: 14px;
+  padding: 11px 12px;
+  outline: none;
+  transition: border 0.2s ease, box-shadow 0.2s ease;
+}
+
+.form-field input:focus,
+.form-field select:focus {
+  border-color: #032056;
+  box-shadow: 0 0 0 3px rgba(3, 32, 86, 0.1);
+}
+
+.payment-methods {
+  margin: 24px 0;
+}
+
+.payment-methods h3 {
+  font-size: 16px;
+  font-weight: 600;
+  color: #032056;
+  margin-bottom: 12px;
+}
+
+.method-options {
+  display: flex;
+  gap: 20px;
+  flex-wrap: wrap;
+}
+
+.method-label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: #334155;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.method-label input[type="radio"] {
+  accent-color: #032056;
+}
+
+.card-fields {
+  background: #f8fafc;
+  border-radius: 12px;
+  padding: 20px;
+  margin-bottom: 24px;
+}
+
+.card-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  margin-top: 16px;
+}
+
+.footer-actions {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 32px;
+}
+
+.btn-back {
+  background: transparent;
+  border: none;
+  color: #032056;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  padding: 0;
+  transition: opacity 0.15s ease;
+}
+
+.btn-back:hover {
+  opacity: 0.7;
+}
+
+.btn-continue {
+  background: #032056;
+  color: #ffffff;
+  border: none;
+  border-radius: 10px;
+  padding: 14px 36px;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s ease, transform 0.1s ease;
+}
+
+.btn-continue:hover {
+  background: #0a3a7a;
+  transform: translateY(-1px);
+}
+
+.btn-continue:active {
+  transform: translateY(0);
+}
+
+@media (max-width: 720px) {
+  .summary-grid,
+  .card-row {
+    grid-template-columns: 1fr;
+  }
+
+  .footer-actions {
+    flex-direction: column;
+    gap: 18px;
+  }
+}
+</style>
