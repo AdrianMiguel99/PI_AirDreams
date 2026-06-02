@@ -42,7 +42,7 @@ namespace AirDreams.API.Controllers
                 return BadRequest(ModelState);
             }
 
-            var result = await _luggageService.CheckAvailabilityAsync(dto.flightId, dto.LuggageWeight, dto.CarryOnWeight);
+            var result = await _luggageService.CheckAvailabilityAsync(dto.flightId, dto.routeId, dto.LuggageWeight, dto.CarryOnWeight);
 
             if (result.success)
             {

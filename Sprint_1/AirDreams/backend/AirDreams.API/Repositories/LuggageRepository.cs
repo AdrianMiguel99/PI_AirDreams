@@ -58,15 +58,16 @@ namespace AirDreams.API.Repositories
             }
         }
 
-        public async Task<bool> CheckLuggageWeightAsync(string flightId, decimal luggageWeight)
+        public async Task<bool> CheckLuggageWeightAsync(string flightId, int routeId, decimal luggageWeight)
         {
             try
             {
-                string query = "SELECT dbo.CheckLuggageWeight(@flightId, @luggageWeight)";
+                string query = "SELECT dbo.CheckLuggageWeight(@flightId, @routeId, @luggageWeight)";
 
                 var result = await _connection.ExecuteScalarAsync<int>(query, new 
                 { 
                     flightId, 
+                    routeId, 
                     luggageWeight 
                 });
 
@@ -78,15 +79,16 @@ namespace AirDreams.API.Repositories
             }
         }
 
-        public async Task<bool> CheckCarryOnWeightAsync(string flightId, decimal carryOnWeight)
+        public async Task<bool> CheckCarryOnWeightAsync(string flightId, int routeId, decimal carryOnWeight)
         {
             try
             {
-                string query = "SELECT dbo.CheckCarryOnWeight(@flightId, @carryOnWeight)";
+                string query = "SELECT dbo.CheckCarryOnWeight(@flightId, @routeId, @carryOnWeight)";
 
                 var result = await _connection.ExecuteScalarAsync<int>(query, new 
                 { 
                     flightId, 
+                    routeId,
                     carryOnWeight 
                 });
 

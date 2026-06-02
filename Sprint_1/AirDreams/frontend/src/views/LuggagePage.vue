@@ -17,8 +17,8 @@
 
     <div class="footer-actions">
       <button class="btn-back" @click="$router.push({ name: 'passengers' })">← Volver</button>
-      <button class="btn-continue" @click="continueToPay" :disabled="loading">
-        {{ loading ? 'Guardando equipaje...' : 'Continuar al pago' }}
+      <button class="btn-continue" @click="continueToPay">
+        Continuar al pago
       </button>
     </div>
 
@@ -50,6 +50,8 @@ export default {
     return {
       checkedBagPrice: 0,
       carryOnBagPrice: 0,
+      checkedBagWeight: 23,
+      carryOnBagWeight: 10,
 
       passengers: [],
 
@@ -78,6 +80,18 @@ export default {
         return total +
           (selection.checkedCount * this.checkedBagPrice) +
           (selection.carryOnCount * this.carryOnBagPrice);
+      }, 0);
+    },
+
+    totalCheckedWeight() {
+      return Object.values(this.luggageSelections).reduce((total, selection) => {
+        return total + (selection.checkedCount * this.checkedBagWeight);
+      }, 0);
+    },
+
+    totalCarryOnWeight() {
+      return Object.values(this.luggageSelections).reduce((total, selection) => {
+        return total + (selection.carryOnCount * this.carryOnBagWeight);
       }, 0);
     }
   },
@@ -173,34 +187,110 @@ export default {
       this.loading = true;
       
       try {
+        const savedPurchase = sessionStorage.getItem('selectedFlightPurchase');
+        if (!savedPurchase) {
+          throw new Error('No hay selección de vuelo');
+        }
+
+        const purchase = JSON.parse(savedPurchase);
+        const segments = purchase.itinerary?.segments || [];
+
+        if (segments.length === 0) {
+          throw new Error('No se encontraron segmentos de vuelo');
+        }
+
         const luggageByPassenger = this.passengers.map((passenger) => ({
           passenger,
           luggageItems: this.buildLuggageItems(passenger.index)
         }));
 
-        sessionStorage.setItem(
-          'purchaseLuggage',
-          JSON.stringify(luggageByPassenger)
-        );
+        const totalCheckedWeight = this.totalCheckedWeight;
+        const totalCarryOnWeight = this.totalCarryOnWeight;
 
-        this.popupType = 'success';
-        this.popupTitle = 'Equipaje registrado';
-        this.popupMessage = 'Equipaje guardado exitosamente. Continuando al pago...';
-        this.showPopup = true;
+        if (totalCheckedWeight === 0 && totalCarryOnWeight === 0) {
+          sessionStorage.setItem('purchaseLuggage', JSON.stringify(luggageByPassenger));
 
-        setTimeout(() => {
-          this.$router.push({ 
-            name: 'payment', 
-            query: { transactionId: this.transactionIdItinerary } 
+          this.$router.push({
+            name: 'payment',
+            query: { transactionId: this.transactionIdItinerary }
           });
-        }, 2000);
+
+          return;
+        }
+
+        for (const segment of segments) {
+          const flightId = (segment.flightNumber || '').trim();
+          const routeId = segment.routeId;
+          
+          if (!flightId) {
+            throw new Error('No se encontró el número de vuelo');
+          }
+
+          const validation = await this.validateWeights(
+            flightId,
+            routeId,
+            totalCheckedWeight,
+            totalCarryOnWeight
+          );
+
+          if (!validation.success) {
+            this.popupType = 'error';
+            this.popupTitle = 'Equipaje no válido';
+            this.popupMessage = `${flightId}: ${validation.message}`;
+            this.showPopup = true;
+            return;
+          }
+        }
+
+        sessionStorage.setItem('purchaseLuggage', JSON.stringify(luggageByPassenger));
+
+        this.$router.push({
+          name: 'payment',
+          query: { transactionId: this.transactionIdItinerary }
+        });
       } catch (error) {
         this.popupType = 'error';
         this.popupTitle = 'Error';
-        this.popupMessage = error.message || 'Error de conexión al registrar equipaje';
+        this.popupMessage = error.message || 'Error al validar equipaje';
         this.showPopup = true;
       } finally {
         this.loading = false;
+      }
+    },
+
+    async validateWeights(flightId, routeId, checkedWeight, carryOnWeight) {
+      try {
+        const response = await fetch('http://localhost:5276/api/luggage/availability', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            flightId,
+            routeId,
+            luggageWeight: checkedWeight || 0,
+            carryOnWeight: carryOnWeight || 0
+          })
+        });
+
+        const data = await response.json();
+
+        if (!response.ok) {
+          return {
+            success: false,
+            message: data.message || 'Error en la validación'
+          };
+        }
+
+        return {
+          success: data.success,
+          message: data.message || 'Validación exitosa'
+        };
+      } catch (error) {
+        return {
+          success: false,
+          message: 'Error de conexión: ' + error.message
+        };
       }
     }
   }

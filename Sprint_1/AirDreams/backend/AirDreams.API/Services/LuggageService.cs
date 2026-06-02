@@ -65,12 +65,12 @@ namespace AirDreams.API.Services
             }
         }
 
-        public async Task<(bool success, string message)> CheckAvailabilityAsync(string flightId, decimal luggageWeight, decimal carryOnWeight)
+        public async Task<(bool success, string message)> CheckAvailabilityAsync(string flightId, int routeId, decimal luggageWeight, decimal carryOnWeight)
         {
             try
             {
-                var luggageCheck = await _luggageRepository.CheckLuggageWeightAsync(flightId, luggageWeight);
-                var carryOnCheck = await _luggageRepository.CheckCarryOnWeightAsync(flightId, carryOnWeight);
+                var luggageCheck = await _luggageRepository.CheckLuggageWeightAsync(flightId, routeId, luggageWeight);
+                var carryOnCheck = await _luggageRepository.CheckCarryOnWeightAsync(flightId, routeId, carryOnWeight);
 
                 if (!luggageCheck && !carryOnCheck)
                 {
