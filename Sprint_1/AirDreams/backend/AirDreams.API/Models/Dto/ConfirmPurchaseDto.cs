@@ -42,11 +42,29 @@ namespace AirDreams.API.Models.Dtos
 
     public class FlightSegmentDto
     {
-        public string FlightNumber { get; set; }
+        public string FlightNumber { get; set; } = string.Empty;
         public int? RouteId { get; set; }
+
+        public DateTime? DepartureDate { get; set; }
+        public DateTime? ArrivalDate { get; set; }
+
+        public string DepartureTime { get; set; } = string.Empty;
+        public string ArrivalTime { get; set; } = string.Empty;
+        public string Duration { get; set; } = string.Empty;
+
+        public AirportInfoDto DepartureAirport { get; set; } = new();
+        public AirportInfoDto ArrivalAirport { get; set; } = new();
+
         public decimal CheckedPrice { get; set; }
         public decimal CarryOnPrice { get; set; }
         public decimal Multiplier { get; set; }
+    }
+
+    public class AirportInfoDto
+    {
+        public string Name { get; set; } = string.Empty;
+        public string Code { get; set; } = string.Empty;
+        public string City { get; set; } = string.Empty;
     }
 
     public class LuggagePerPassengerDto
