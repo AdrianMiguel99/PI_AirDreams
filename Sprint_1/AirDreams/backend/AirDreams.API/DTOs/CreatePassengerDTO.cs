@@ -15,10 +15,9 @@ namespace AirDreams.API.DTOs
         [StringLength(30)]
         public string LastnamesPassenger { get; set; } = string.Empty;
 
-        [Required]
         [EmailAddress]
         [StringLength(50)]
-        public string EmailPassenger { get; set; } = string.Empty;
+        public string? EmailPassenger { get; set; }
 
         public long? Telephone { get; set; }
 

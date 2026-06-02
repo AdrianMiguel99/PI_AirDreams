@@ -17,10 +17,9 @@ namespace AirDreams.API.Models.Entities
         [StringLength(30, ErrorMessage = "Los apellidos del pasajero no pueden superar los 30 caracteres.")]
         public string LastnamesPassenger { get; set; } = string.Empty;
 
-        [Required(ErrorMessage = "El correo del pasajero es requerido.")]
         [EmailAddress(ErrorMessage = "El correo del pasajero no tiene un formato valido.")]
         [StringLength(50, ErrorMessage = "El correo del pasajero no puede superar los 50 caracteres.")]
-        public string EmailPassenger { get; set; } = string.Empty;
+        public string? EmailPassenger { get; set; }
 
         [Range(1, 999999999999999, ErrorMessage = "El telefono del pasajero debe ser un numero valido.")]
         public long? Telephone { get; set; }
