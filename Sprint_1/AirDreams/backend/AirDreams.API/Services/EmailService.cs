@@ -3,6 +3,7 @@ using MailKit.Security;
 using Microsoft.Extensions.Options;
 using MimeKit;
 using AirDreams.API.Models;
+using AirDreams.API.Models.Dtos;
 
 namespace AirDreams.API.Services
 {
@@ -19,48 +20,132 @@ namespace AirDreams.API.Services
             _logger = logger;
         }
 
-        public async Task SendInvitationEmail(string toEmail, string token, string role)
+        public async Task SendInvitationEmail(
+            string toEmail,
+            string token,
+            string role)
         {
             var frontendUrl = "http://localhost:5173";
-            var registerLink = $"{frontendUrl}/completar-registro?token={token}";
+
+            var registerLink =
+                $"{frontendUrl}/completar-registro?token={token}";
 
             var subject = "Invitación a AirDreams";
+
             var body = $@"
                 <h1>¡Bienvenido a AirDreams!</h1>
-                <p>Has sido invitado como <strong>{role}</strong>.</p>
-                <p>Haz clic en el siguiente enlace para completar tu registro:</p>
-                <a href='{registerLink}' style='background-color:#4CAF50;color:white;padding:10px 20px;text-decoration:none;border-radius:5px;'>
+
+                <p>
+                    Has sido invitado como
+                    <strong>{role}</strong>.
+                </p>
+
+                <a href='{registerLink}'>
                     Completar registro
                 </a>
-                <p>El enlace expirará en 48 horas.</p>
-                <p>Si no solicitaste esta invitación, ignora este correo.</p>
             ";
 
-            await SendEmailAsync(toEmail, subject, body);
+            await SendEmailAsync(
+                toEmail,
+                subject,
+                body
+            );
         }
 
-        public async Task SendWelcomeEmail(string toEmail, string fullName)
+        public async Task SendWelcomeEmail(
+            string toEmail,
+            string fullName)
         {
-            var subject = "Bienvenido a AirDreams";
+            var subject =
+                "Bienvenido a AirDreams";
+
             var body = $@"
-                <h1>¡Bienvenido {fullName}!</h1>
-                <p>Tu registro se ha completado exitosamente.</p>
-                <p>Ya puedes iniciar sesión en nuestra plataforma con tu correo y contraseña.</p>
-                <a href='http://localhost:5173/login' style='background-color:#4CAF50;color:white;padding:10px 20px;text-decoration:none;border-radius:5px;'>
-                    Iniciar sesión
-                </a>
+                <h1>
+                    ¡Bienvenido {fullName}!
+                </h1>
+
+                <p>
+                    Tu registro fue completado.
+                </p>
             ";
 
-            await SendEmailAsync(toEmail, subject, body);
+            await SendEmailAsync(
+                toEmail,
+                subject,
+                body
+            );
         }
 
-        private async Task SendEmailAsync(string toEmail, string subject, string body)
+        public async Task SendPurchaseConfirmationEmail(
+            string toEmail,
+            ConfirmPurchaseDto purchase,
+            byte[] invoicePdf,
+            byte[] itineraryPdf
+        )
         {
-            if (string.IsNullOrEmpty(_emailSettings.Username) ||
-                string.IsNullOrEmpty(_emailSettings.Password))
+            var subject =
+                $"Confirmación de compra - {purchase.TransactionId}";
+
+            var body = $@"
+                <h1>
+                    ¡Compra confirmada!
+                </h1>
+
+                <p>
+                    Hola {purchase.BuyerName},
+                </p>
+
+                <p>
+                    Gracias por comprar con AirDreams.
+                </p>
+
+                <p>
+                    Adjuntamos:
+                </p>
+
+                <ul>
+                    <li>Factura (PDF)</li>
+                    <li>Itinerario (PDF)</li>
+                </ul>
+
+                <p>
+                    Transacción:
+                    <strong>
+                        {purchase.TransactionId}
+                    </strong>
+                </p>
+
+                <p>
+                    ¡Buen viaje!
+                </p>
+            ";
+
+            await SendEmailWithAttachmentsAsync(
+                toEmail,
+                subject,
+                body,
+                invoicePdf,
+                itineraryPdf
+            );
+        }
+
+        private async Task SendEmailAsync(
+            string toEmail,
+            string subject,
+            string body)
+        {
+            if (
+                string.IsNullOrWhiteSpace(
+                    _emailSettings.Username
+                )
+                ||
+                string.IsNullOrWhiteSpace(
+                    _emailSettings.Password
+                )
+            )
             {
                 _logger.LogInformation(
-                    $"[EMAIL SIMULADO] Para: {toEmail} | Asunto: {subject} | Body: {body}"
+                    $"[EMAIL SIMULADO] {toEmail}"
                 );
 
                 return;
@@ -68,7 +153,8 @@ namespace AirDreams.API.Services
 
             try
             {
-                var message = new MimeMessage();
+                var message =
+                    new MimeMessage();
 
                 message.From.Add(
                     new MailboxAddress(
@@ -77,18 +163,27 @@ namespace AirDreams.API.Services
                     )
                 );
 
-                message.To.Add(new MailboxAddress("", toEmail));
-                message.Subject = subject;
+                message.To.Add(
+                    new MailboxAddress(
+                        "",
+                        toEmail
+                    )
+                );
 
-                var bodyBuilder = new BodyBuilder
-                {
-                    HtmlBody = body,
-                    TextBody = "Versión en texto plano del mensaje"
-                };
+                message.Subject =
+                    subject;
 
-                message.Body = bodyBuilder.ToMessageBody();
+                var builder =
+                    new BodyBuilder
+                    {
+                        HtmlBody = body
+                    };
 
-                using var client = new SmtpClient();
+                message.Body =
+                    builder.ToMessageBody();
+
+                using var client =
+                    new SmtpClient();
 
                 await client.ConnectAsync(
                     _emailSettings.SmtpServer,
@@ -103,14 +198,109 @@ namespace AirDreams.API.Services
                     _emailSettings.Password
                 );
 
-                await client.SendAsync(message);
-                await client.DisconnectAsync(true);
+                await client.SendAsync(
+                    message
+                );
 
-                _logger.LogInformation($"Correo enviado exitosamente a {toEmail}");
+                await client.DisconnectAsync(
+                    true
+                );
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, $"Error al enviar correo a {toEmail}");
+                _logger.LogError(
+                    ex,
+                    "Error enviando correo"
+                );
+
+                throw;
+            }
+        }
+
+        private async Task SendEmailWithAttachmentsAsync(
+            string toEmail,
+            string subject,
+            string body,
+            byte[] invoicePdf,
+            byte[] itineraryPdf
+        )
+        {
+            try
+            {
+                var message =
+                    new MimeMessage();
+
+                message.From.Add(
+                    new MailboxAddress(
+                        _emailSettings.FromName,
+                        _emailSettings.FromEmail
+                    )
+                );
+
+                message.To.Add(
+                    new MailboxAddress(
+                        "",
+                        toEmail
+                    )
+                );
+
+                message.Subject =
+                    subject;
+
+                var builder =
+                    new BodyBuilder
+                    {
+                        HtmlBody = body
+                    };
+
+                builder.Attachments.Add(
+                    "Factura-AirDreams.pdf",
+                    invoicePdf
+                );
+
+                builder.Attachments.Add(
+                    "Itinerario-AirDreams.pdf",
+                    itineraryPdf
+                );
+
+                message.Body =
+                    builder.ToMessageBody();
+
+                using var client =
+                    new SmtpClient();
+
+                await client.ConnectAsync(
+                    _emailSettings.SmtpServer,
+                    _emailSettings.Port,
+                    _emailSettings.EnableSsl
+                        ? SecureSocketOptions.SslOnConnect
+                        : SecureSocketOptions.StartTls
+                );
+
+                await client.AuthenticateAsync(
+                    _emailSettings.Username,
+                    _emailSettings.Password
+                );
+
+                await client.SendAsync(
+                    message
+                );
+
+                await client.DisconnectAsync(
+                    true
+                );
+
+                _logger.LogInformation(
+                    $"Correo enviado con adjuntos a {toEmail}"
+                );
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(
+                    ex,
+                    "Error enviando correo con PDFs"
+                );
+
                 throw;
             }
         }
