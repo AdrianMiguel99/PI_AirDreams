@@ -28,7 +28,7 @@ public class PurchaseService : IPurchaseService
             lastFour = digits.Length >= 4 ? digits[^4..] : null;
         }
 
-        await _repository.ConfirmPurchaseAsync(dto, lastFour);
+        //await _repository.ConfirmPurchaseAsync(dto, lastFour);
 
         // generar PDFs
         var invoicePdf =
