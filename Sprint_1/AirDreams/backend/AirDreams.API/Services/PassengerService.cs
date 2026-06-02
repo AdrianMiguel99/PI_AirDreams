@@ -23,7 +23,9 @@ namespace AirDreams.API.Services
                 IdPassenger = dto.IdPassenger,
                 NamePassenger = dto.NamePassenger.Trim(),
                 LastnamesPassenger = dto.LastnamesPassenger.Trim(),
-                EmailPassenger = dto.EmailPassenger.Trim().ToLower(),
+                EmailPassenger = string.IsNullOrWhiteSpace(dto.EmailPassenger)
+                    ? null
+                    : dto.EmailPassenger.Trim().ToLower(),
                 Telephone = dto.Telephone,
                 Country = dto.Country.Trim()
             };
