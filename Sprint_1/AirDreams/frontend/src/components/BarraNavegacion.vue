@@ -1,9 +1,13 @@
 <template>
   <nav class="navbar">
-    <div class="logo-section">
-      <img src="../assets/logo.png" alt="Air Dreams Logo" class="logo-img" />
+    <router-link to="/" class="logo-section">
+      <img
+        src="../assets/logo.png"
+        alt="Air Dreams Logo"
+        class="logo-img"
+      />
       <span class="logo-text">Air Dreams</span>
-    </div>
+    </router-link>
 
     <button
       v-if="isLoggedIn"
@@ -17,9 +21,9 @@
     
 
     <div class="links">
-      <a href="#">Buscar Vuelos</a>
-      <a href="#">Consultar Vuelos</a>
-      <a href="#">Contacto</a>
+      <a href="/">Buscar Vuelos</a>
+      <a href="/">Consultar Vuelos</a>
+      <a href="/">Contacto</a>
 
       <router-link v-if="!usuario" to="/login">
         <button class="login-btn">Iniciar Sesión</button>
@@ -140,4 +144,12 @@ export default {
     background: #e0ecff;
 }
 
+.logo-section {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  text-decoration: none; /* quita la línea */
+  color: inherit;        /* mantiene el color actual */
+  cursor: pointer;
+}
 </style>
