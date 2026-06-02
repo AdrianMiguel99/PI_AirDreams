@@ -120,10 +120,15 @@
             class="ticket-info"
           >
             <p><strong>Vuelo 1:</strong> {{ purchase.firstFlightCode }}</p>
-            <p><strong>Salida:</strong> {{ purchase.firstDepartureTime }}</p>
+            <p><strong>Fecha vuelo 1:</strong> {{ purchase.firstDepartureDate }}</p>
+            <p><strong>Salida vuelo 1:</strong> {{ purchase.firstDepartureTime }}</p>
+            <p><strong>Llegada vuelo 1:</strong> {{ purchase.firstArrivalTime }}</p>
+
             <p><strong>Vuelo 2:</strong> {{ purchase.secondFlightCode }}</p>
-            <p><strong>Conexión:</strong> {{ purchase.secondDepartureTime }}</p>
-            <p><strong>Fecha:</strong> {{ purchase.departureDate }}</p>
+            <p><strong>Fecha vuelo 2:</strong> {{ purchase.secondDepartureDate }}</p>
+            <p><strong>Salida vuelo 2:</strong> {{ purchase.secondDepartureTime }}</p>
+            <p><strong>Llegada vuelo 2:</strong> {{ purchase.secondArrivalTime }}</p>
+
             <p><strong>Clase:</strong> {{ ticket.classType }}</p>
             <p><strong>Asiento:</strong> {{ ticket.seatNumber }}</p>
             <p><strong>Precio:</strong> ${{ ticket.price }}</p>
@@ -135,7 +140,8 @@
           >
             <p><strong>Vuelo:</strong> {{ purchase.flightCode }}</p>
             <p><strong>Fecha:</strong> {{ purchase.departureDate }}</p>
-            <p><strong>Hora:</strong> {{ purchase.departureTime }}</p>
+            <p><strong>Salida:</strong> {{ purchase.departureTime }}</p>
+            <p><strong>Llegada:</strong> {{ purchase.arrivalTime }}</p>
             <p><strong>Clase:</strong> {{ ticket.classType }}</p>
             <p><strong>Asiento:</strong> {{ ticket.seatNumber }}</p>
             <p><strong>Precio:</strong> ${{ ticket.price }}</p>
@@ -237,14 +243,45 @@ export default {
           purchase.departureTime ||
           "Hora no disponible",
 
+        firstDepartureDate: this.formatDate(
+          firstSegment.departureDate ||
+          "Fecha no disponible"
+        ), 
+
+        firstArrivalDate: this.formatDate(
+          firstSegment.arrivalDate ||
+          "Fecha no disponible"
+        ),
+
+        firstArrivalTime:
+          firstSegment.arrivalTime ||
+          "Hora no disponible",
+
+
         firstDepartureTime:
           firstSegment.departureTime ||
           "Hora no disponible",
 
+        secondDepartureDate: this.formatDate(
+          secondSegment.departureDate ||
+          "Fecha no disponible"
+        ),
+
+        secondArrivalDate: this.formatDate(
+          secondSegment.arrivalDate ||
+          "Fecha no disponible"
+        ),
+
+        secondArrivalTime:
+          secondSegment.arrivalTime ||
+          "Hora no disponible",
+          
         secondDepartureTime:
           secondSegment.departureTime ||
           "Hora no disponible",
 
+          arrivalDate: this.formatDate( firstSegment.arrivalDate || "Fecha no disponible" ),
+          arrivalTime: firstSegment.arrivalTime || "Hora no disponible",
         total: Number(successData.grandTotal || 0)
       };
 
