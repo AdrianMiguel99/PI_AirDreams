@@ -57,5 +57,45 @@ namespace AirDreams.API.Repositories
                 return false;
             }
         }
+
+        public async Task<bool> CheckLuggageWeightAsync(string flightId, decimal luggageWeight)
+        {
+            try
+            {
+                string query = "SELECT dbo.CheckLuggageWeight(@flightId, @luggageWeight)";
+
+                var result = await _connection.ExecuteScalarAsync<int>(query, new 
+                { 
+                    flightId, 
+                    luggageWeight 
+                });
+
+                return result == 1;
+            }
+            catch (Exception ex)
+            {
+                return false;
+            }
+        }
+
+        public async Task<bool> CheckCarryOnWeightAsync(string flightId, decimal carryOnWeight)
+        {
+            try
+            {
+                string query = "SELECT dbo.CheckCarryOnWeight(@flightId, @carryOnWeight)";
+
+                var result = await _connection.ExecuteScalarAsync<int>(query, new 
+                { 
+                    flightId, 
+                    carryOnWeight 
+                });
+
+                return result == 1;
+            }
+            catch (Exception ex)
+            {
+                return false;
+            }
+        }
     }
 }

@@ -64,5 +64,35 @@ namespace AirDreams.API.Services
                 return (false, $"Error durante el registro de equipaje: {ex.Message}");
             }
         }
+
+        public async Task<(bool success, string message)> CheckAvailabilityAsync(string flightId, decimal luggageWeight, decimal carryOnWeight)
+        {
+            try
+            {
+                var luggageCheck = await _luggageRepository.CheckLuggageWeightAsync(flightId, luggageWeight);
+                var carryOnCheck = await _luggageRepository.CheckCarryOnWeightAsync(flightId, carryOnWeight);
+
+                if (!luggageCheck && !carryOnCheck)
+                {
+                    return (false, "No hay espacio suficiente para el equipaje y el equipaje de mano");
+                }
+
+                if (!luggageCheck)
+                {
+                    return (false, "No hay espacio suficiente para el equipaje");
+                }
+
+                if (!carryOnCheck)
+                {
+                    return (false, "No hay espacio suficiente para el equipaje de mano");
+                }
+
+                return (true, "Hay espacio suficiente para el equipaje y el equipaje de mano");
+            }
+            catch (Exception ex)
+            {
+                return (false, $"Error al validar la disponibilidad: {ex.Message}");
+            }
+        }
     }
 }

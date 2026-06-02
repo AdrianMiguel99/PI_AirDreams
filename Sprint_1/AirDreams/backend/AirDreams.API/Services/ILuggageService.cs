@@ -5,5 +5,6 @@ namespace AirDreams.API.Services.Interfaces
     public interface ILuggageService
     {
         Task<(bool success, string message)> RegisterLuggageAsync(LuggageRegistrationModel model);
+        Task<(bool success, string message)> CheckAvailabilityAsync(string flightId, decimal luggageWeight, decimal carryOnWeight);
     }
 }
