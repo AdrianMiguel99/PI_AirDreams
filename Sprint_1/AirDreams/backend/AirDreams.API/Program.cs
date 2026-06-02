@@ -15,7 +15,6 @@ using QuestPDF.Infrastructure;
 
 var builder = WebApplication.CreateBuilder(args);
 
-
 QuestPDF.Settings.License = LicenseType.Community;
 
 var emailSettings = builder.Configuration.GetSection("EmailSettings");
