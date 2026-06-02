@@ -78,6 +78,9 @@ builder.Services.AddScoped<IAirportService, AirportService>();
 builder.Services.AddScoped<IRouteRepository, RouteRepository>();
 builder.Services.AddScoped<IRouteService, RouteService>();
 builder.Services.AddScoped<IEmailService, EmailService>();
+builder.Services.AddScoped<IPdfService, PdfService>();
+builder.Services.AddScoped<IPurchaseService,PurchaseService>();
+builder.Services.AddScoped<IPurchaseRepository,PurchaseRepository>();
 
 builder.Services.AddScoped<AircraftRepository>();
 builder.Services.AddScoped<IAircraftService, AircraftService>();
