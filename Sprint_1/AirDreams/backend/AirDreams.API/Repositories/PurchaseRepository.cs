@@ -41,6 +41,9 @@ namespace AirDreams.API.Repositories
 
         public async Task ConfirmPurchaseAsync(ConfirmPurchaseDto dto, string? cardLastFour)
         {
+            Console.WriteLine("=== PURCHASE REPOSITORY ===");
+            Console.WriteLine($"TransactionId: {dto.TransactionId}");
+            Console.WriteLine($"Segments: {dto.Segments?.Count}");
             if (_connection.State == ConnectionState.Closed)
                 _connection.Open();
 
@@ -102,9 +105,11 @@ namespace AirDreams.API.Repositories
                         dto.TransactionId
                     }, transaction);
                 }
+                Console.WriteLine("=== ANTES DEL FOREACH SEGMENTS ===");
 
                 foreach (var segment in dto.Segments)
                 {
+                    Console.WriteLine($"Procesando segment: {segment.FlightNumber}, routeId: {segment.RouteId}");
                     await EnsureFlightExistsAsync(transaction, segment.FlightNumber, segment.RouteId);
 
                     var sqlTiene = @"
@@ -265,6 +270,7 @@ namespace AirDreams.API.Repositories
         private async Task EnsureFlightExistsAsync(IDbTransaction transaction,
             string flightNumber, int? routeId)
         {
+            Console.WriteLine($"[EnsureFlightExists] Flight={flightNumber} Route={routeId}");
             var exists = await _connection.ExecuteScalarAsync<bool>(
                 "SELECT COUNT(1) FROM Flight WHERE numberFlight = @FlightNumber",
                 new { FlightNumber = flightNumber }, transaction);
@@ -273,8 +279,8 @@ namespace AirDreams.API.Repositories
             {
                 int resolvedRouteId = routeId ?? 1;
                 var sqlInsertFlight = @"
-                    INSERT INTO Flight (numberFlight, routeId, boardingGate, departureDate, flightState)
-                    VALUES (@FlightNumber, @RouteId, 1, CAST(GETDATE() AS DATE), 'On-time')";
+                    INSERT INTO Flight (numberFlight, routeId, boardingGate, departureDate, flightState, occupiedFirstclass, occupiedTurist)
+                    VALUES (@FlightNumber, @RouteId, 1, CAST(GETDATE() AS DATE), 'On-time', 0, 0)";
 
                 await _connection.ExecuteAsync(sqlInsertFlight, new
                 {

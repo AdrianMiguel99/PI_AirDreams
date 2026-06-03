@@ -77,9 +77,36 @@ export default {
       this.currentPage = page;
     },
 
-    handleBuyFlight(selection) {
+    async handleBuyFlight(selection) {
+      console.log("SEGMENTO REAL:", selection.flight.segments[0]);
+      const numberFlight = selection.flight.segments?.[0]?.flightNumber;
+      console.log(numberFlight);
+      const seatClass = 
+        selection.seatClass === "FirstClass" || selection.seatClass === "firstClass" 
+          ? "FirstClass" 
+          : "Turist";
+      const response = await fetch("http://localhost:5276/api/payment/check-availability", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          numberFlight: numberFlight,
+          seatClass: seatClass,
+          requestedSeats: this.passengersCount
+        })
+      });
+
+      const result = await response.json();
+
+      if (!result.isAvailable) {
+        
+        alert("No hay campos disponibles para este vuelo.");
+        return;
+      }
+
       const purchaseSelection = {
-        seatClass: selection.seatClass,
+        seatClass: seatClass,
         price: selection.price,
         passengerCount: this.passengersCount,
         itinerary: selection.flight,

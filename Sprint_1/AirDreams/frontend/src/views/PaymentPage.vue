@@ -268,7 +268,8 @@ export default {
             luggageItems: l.luggageItems
           })) : []
         }
-
+        console.log("Payload enviado al backend:", payload)
+console.log("Segments enviados:", payload.segments)
         await axios.post('http://localhost:5276/api/payment', payload)
         const purchasewindowData = this.createStructForPage()
         sessionStorage.removeItem('transactionId')
