@@ -18,7 +18,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\AirDreams.API\AirDreams.API.csproj" />
+    <ProjectReference Include="..\..\AirDreams.API\AirDreams.API.csproj" />
   </ItemGroup>
 
   <ItemGroup>
