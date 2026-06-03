@@ -215,6 +215,37 @@ export default {
     
     async processPayment() {
       this.processing = true
+      if (!this.payment.paymentMethod) {
+        this.showPopup = true;
+        this.popupType = 'error';
+        this.popupTitle = 'Método de pago requerido';
+        this.popupMessage = 'Debes seleccionar un método de pago antes de continuar.';
+        this.popupActionText = '';
+        this.processing = false;
+        return;
+      }
+
+    if (this.payment.paymentMethod === 'Card') {
+      const cardNumberClean = this.payment.cardNumber?.replace(/\s/g, '') || '';
+      if (!cardNumberClean || !this.payment.cardExpiry || !this.payment.cardCvv) {
+        this.showPopup = true;
+        this.popupType = 'error';
+        this.popupTitle = 'Datos de tarjeta incompletos';
+        this.popupMessage = 'Por favor, completa todos los campos de la tarjeta.';
+        this.popupActionText = '';
+        this.processing = false;
+        return;
+      }
+      if (cardNumberClean.length < 13) {
+        this.showPopup = true;
+        this.popupType = 'error';
+        this.popupTitle = 'Número de tarjeta inválido';
+        this.popupMessage = 'El número de tarjeta es demasiado corto.';
+        this.popupActionText = '';
+        this.processing = false;
+        return;
+      }
+    }
       try {
         const purchase = JSON.parse(sessionStorage.getItem('selectedFlightPurchase'))
         const passengers = JSON.parse(sessionStorage.getItem('purchasePassengers'))
@@ -269,13 +300,36 @@ export default {
           })) : []
         }
 
+        for (const segment of payload.segments) {
+          const availabilityResponse = await axios.post('http://localhost:5276/api/payment/check-availability', {
+            numberFlight: segment.flightNumber,
+            seatClass: payload.seatClass,
+            requestedSeats: payload.passengerCount
+          })
+          
+          if (!availabilityResponse.data.isAvailable) {
+            this.popupType = 'error'
+            this.popupTitle = 'Asientos no disponibles'
+            this.popupMessage = `No hay asientos disponibles para el vuelo ${segment.flightNumber} en clase ${payload.seatClass}. Por favor, regresa y selecciona otro vuelo o clase.`
+            this.popupActionText = 'Volver a selección de vuelo'
+            this.popupAction = () => {
+              sessionStorage.removeItem('selectedFlightPurchase')
+              sessionStorage.removeItem('purchasePassengers')
+              sessionStorage.removeItem('purchaseLuggage')
+              this.$router.push({ name: 'home' })
+            }
+            this.showPopup = true
+            return
+          };
+        }
         await axios.post('http://localhost:5276/api/payment', payload)
+        await this.updateFlightWeight(this.payment.transactionId)
         const purchasewindowData = this.createStructForPage()
         sessionStorage.removeItem('transactionId')
+        sessionStorage.removeItem('luggageWeights')
 
         this.callPurchaseSuccess(purchasewindowData)
       } catch (error) {
-        console.error(error)
         this.popupType = 'error'
         this.popupTitle = 'Error en el pago'
         if (error.response?.data?.error) {
@@ -290,6 +344,28 @@ export default {
         this.showPopup = true
       } finally {
         this.processing = false
+      }
+    },
+
+    async updateFlightWeight(transactionId) {
+      const weights = JSON.parse(
+        sessionStorage.getItem('luggageWeights') || '{}'
+      )
+
+      if (!weights.luggageWeight && !weights.carryOnWeight)
+        return
+
+      try {
+        await axios.post(
+          'http://localhost:5276/api/luggage/update',
+          {
+            transactionId,
+            luggageWeight: weights.luggageWeight || 0,
+            carryOnWeight: weights.carryOnWeight || 0
+          }
+        )
+      } catch (error) {
+        console.error('Ha ocurrido un error al actualizar el peso del equipaje:', error)
       }
     }
   }

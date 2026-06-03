@@ -1,16 +1,18 @@
 <template>
   <div class="d-flex align-items-center gap-2 w-100 position-relative">
 
-    <img 
-      src="https://i.ibb.co/MxwJ1Y9m/Chat-GPT-Image-7-abr-2026-01-52-40.png"
-      class="img-fluid"
-      alt="imagen de aerolinea"
-      style="width:50px"
-    >
+    <div class="logoContainer" @click="$router.push('/')">
+      <img 
+        src="https://i.ibb.co/MxwJ1Y9m/Chat-GPT-Image-7-abr-2026-01-52-40.png"
+        class="img-fluid"
+        alt="imagen de aerolinea"
+        style="width:50px"
+      >
 
-    <h2 class="letra_logo m-0" style="font-size: 1.3rem;">
-      Air Dreams
-    </h2>
+      <h2 class="letra_logo m-0" style="font-size: 1.3rem;">
+        Air Dreams
+      </h2>
+    </div>
 
     <button class="userButton ms-auto" @click="toggleUserMenu">
       Usuario
@@ -21,9 +23,8 @@
       <button @click="navigateTo('/admin')" class="menuItem">
         Perfil
       </button>
-
-      <!--TODO: Implementar funcionalidad real de LOGOUT-->
-      <button @click="navigateTo('/login')" class="menuItem">
+      
+      <button @click="cerrarSesion" class="menuItem">
         Cerrar sesión
       </button>
     </div>
@@ -46,6 +47,13 @@ export default {
 
     navigateTo(route) {
       this.$router.push(route)
+    },
+
+    cerrarSesion() {
+      localStorage.removeItem('user');
+      localStorage.removeItem('token');
+      this.usuario = null;
+      this.$router.push('/login');
     }
   }
 }
@@ -88,5 +96,12 @@ export default {
   font-family: 'Inter', sans-serif;
   color: #384467;
   font-weight: bold;
+}
+
+.logoContainer {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
 }
 </style>

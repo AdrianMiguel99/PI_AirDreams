@@ -17,6 +17,14 @@ public class PurchaseService : IPurchaseService
             _emailService = emailService;
             _pdfService = pdfService;
         }
+    public async Task<bool> CheckFlightAvailabilityAsync( string numberFlight, string seatClass, int requestedSeats)
+    {
+        return await _repository.CheckFlightAvailabilityAsync(
+            numberFlight,
+            seatClass,
+            requestedSeats
+        );
+    }
 
     public async Task<PaymentResponseDto> ConfirmPurchaseAsync(ConfirmPurchaseDto dto)
     {
@@ -28,7 +36,7 @@ public class PurchaseService : IPurchaseService
             lastFour = digits.Length >= 4 ? digits[^4..] : null;
         }
 
-        //await _repository.ConfirmPurchaseAsync(dto, lastFour);
+        await _repository.ConfirmPurchaseAsync(dto, lastFour);
 
         // generar PDFs
         var invoicePdf =

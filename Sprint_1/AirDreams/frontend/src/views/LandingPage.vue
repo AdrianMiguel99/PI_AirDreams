@@ -26,7 +26,17 @@
       :perPage="flightsPerPage"
       @changePage="changePage"
     />
-  </div>
+    </div>
+
+    <PopupMessage
+      :show="showPopup"
+      :type="popupType"
+      :title="popupTitle"
+      :message="popupMessage"
+      :actionText="popupActionText"
+      @close="showPopup = false"
+      @action="popupAction"
+    />
 </template>
 
 <script>
@@ -35,6 +45,7 @@ import SeccionHero from "../components/SeccionHero.vue";
 import FormularioBusqueda from "../components/FormularioBusqueda.vue";
 import ListaVuelos from "../components/ListaVuelos.vue";
 import Paginacion from "../components/Paginacion.vue";
+import PopupMessage from "../components/PopupMessage.vue";
 
 export default {
   components: {
@@ -42,7 +53,8 @@ export default {
     SeccionHero,
     FormularioBusqueda,
     ListaVuelos,
-    Paginacion
+    Paginacion,
+    PopupMessage
   },
 
   data() {
@@ -53,7 +65,13 @@ export default {
       searchPerformed: false,
       departureDate: '',
       passengersCount: 1,
-      selectedPurchase: null
+      selectedPurchase: null,
+      showPopup: false,
+      popupType: '',
+      popupTitle: '',
+      popupMessage: '',
+      popupActionText: '',
+      popupAction: null
     };
   },
 
@@ -77,9 +95,40 @@ export default {
       this.currentPage = page;
     },
 
-    handleBuyFlight(selection) {
+    async handleBuyFlight(selection) {
+      const seatClass = 
+        selection.seatClass === "FirstClass" || selection.seatClass === "firstClass" 
+          ? "FirstClass" 
+          : "Turist";
+
+      for (const segment of selection.flight.segments) {
+        
+        const response = await fetch("http://localhost:5276/api/payment/check-availability", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({
+            numberFlight: segment.flightNumber,
+            seatClass: seatClass,
+            requestedSeats: this.passengersCount
+          })
+        });
+
+        const result = await response.json();
+
+        if (!result.isAvailable) {
+          this.popupType = 'error'
+          this.popupTitle = 'Sin disponibilidad'
+          this.popupMessage = `No hay campos disponibles para el vuelo ${segment.flightNumber}.`
+          this.popupActionText = ''
+          this.showPopup = true
+          return
+        }
+      }
+
       const purchaseSelection = {
-        seatClass: selection.seatClass,
+        seatClass: seatClass,
         price: selection.price,
         passengerCount: this.passengersCount,
         itinerary: selection.flight,

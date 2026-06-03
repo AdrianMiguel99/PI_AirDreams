@@ -6,9 +6,9 @@ namespace AirDreams.API.Services
 {
     public class AircraftService : IAircraftService
     {
-        private readonly AircraftRepository aircraftRepository;
+        private readonly IAircraftRepository aircraftRepository;
 
-        public AircraftService(AircraftRepository aircraftRepository)
+        public AircraftService(IAircraftRepository aircraftRepository)
         {
             this.aircraftRepository = aircraftRepository;
         }

@@ -12,7 +12,7 @@
           <span class="luggage-type">Equipaje documentado</span>
           <span class="luggage-price">{{ formatCurrency(checkedPrice) }}</span>
           <span class="luggage-per">por pieza</span>
-          <span class="luggage-extra-warning">+20% por cada pieza extra</span>
+          <span class="luggage-extra-warning">+50% por cada pieza extra</span>
         </div>
         <div class="counter">
           <button class="counter-btn" @click="decrement('checked')" :disabled="checkedCount <= 0">−</button>
@@ -26,7 +26,7 @@
           <span class="luggage-type">Carry on</span>
           <span class="luggage-price">{{ formatCurrency(carryOnPrice) }}</span>
           <span class="luggage-per">por pieza</span>
-          <span class="luggage-extra-warning">+20% por cada pieza extra</span>
+          <span class="luggage-extra-warning">+50% por cada pieza extra</span>
         </div>
         <div class="counter">
           <button class="counter-btn" @click="decrement('carryOn')" :disabled="carryOnCount <= 0">−</button>

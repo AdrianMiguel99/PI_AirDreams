@@ -1,6 +1,7 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using AirDreams.API.DTOs;
 using AirDreams.API.Models.Dtos;
 using AirDreams.API.Services;
+using Microsoft.AspNetCore.Mvc;
 
 namespace AirDreams.API.Controllers
 {
@@ -31,5 +32,20 @@ namespace AirDreams.API.Controllers
                 return BadRequest(new { error = ex.Message });
             }
         }
+
+        [HttpPost("check-availability")]
+        public async Task<IActionResult> CheckAvailability([FromBody] CheckFlightAvailabilityDto dto)
+        {
+            var available = await _purchaseService.CheckFlightAvailabilityAsync(
+                dto.NumberFlight,
+                dto.SeatClass,
+                dto.RequestedSeats);
+
+            return Ok(new
+            {
+                isAvailable = available
+            });
+        }
+
     }
 }

@@ -92,7 +92,7 @@ builder.Services.AddScoped<IPdfService, PdfService>();
 builder.Services.AddScoped<IPurchaseService, PurchaseService>();
 builder.Services.AddScoped<IPurchaseRepository, PurchaseRepository>();
 
-builder.Services.AddScoped<AircraftRepository>();
+builder.Services.AddScoped<IAircraftRepository,AircraftRepository>();
 builder.Services.AddScoped<IAircraftService, AircraftService>();
 
 builder.Services.AddScoped<IFlightRepository, FlightRepository>();
@@ -112,6 +112,9 @@ builder.Services.AddScoped<ISecurityService, SecurityService>();
 
 builder.Services.AddScoped<ILuggageCalculationRepository, LuggageCalculationRepository>();
 builder.Services.AddScoped<ILuggageCalculationService, LuggageCalculationService>();
+
+builder.Services.AddScoped<IPassengerValidationRepository, PassengerValidationRepository>();
+builder.Services.AddScoped<IPassengerValidationService, PassengerValidationService>();
 
 var app = builder.Build();
 

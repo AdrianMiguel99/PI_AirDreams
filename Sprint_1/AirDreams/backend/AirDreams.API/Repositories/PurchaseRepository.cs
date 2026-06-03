@@ -1,7 +1,8 @@
-using System.Data;
-using Dapper;
 using AirDreams.API.DTOs;
 using AirDreams.API.Models.Dtos;
+using Dapper;
+using Microsoft.Data.SqlClient;
+using System.Data;
 
 namespace AirDreams.API.Repositories
 {
@@ -12,6 +13,30 @@ namespace AirDreams.API.Repositories
         public PurchaseRepository(IDbConnection connection)
         {
             _connection = connection;
+        }
+        public async Task<bool> CheckFlightAvailabilityAsync( string numberFlight, string seatClass, int requestedSeats)
+        {
+            var result = await _connection.ExecuteScalarAsync<int>(
+                "CheckFlightAvailability",
+                new { NumberFlight = numberFlight, SeatClass = seatClass, RequestedSeats = requestedSeats}, commandType: CommandType.StoredProcedure 
+            );
+
+            return result == 1;
+        }
+
+        public async Task ReserveFlightSeatsAsync(string numberFlight, string seatClass, int requestedSeats, IDbTransaction transaction)
+        {
+            await _connection.ExecuteAsync(
+                "ReserveFlightSeats",
+                new
+                {
+                    NumberFlight = numberFlight,
+                    SeatClass = seatClass,
+                    RequestedSeats = requestedSeats
+                },
+                transaction,
+                commandType: CommandType.StoredProcedure
+            );
         }
 
         public async Task ConfirmPurchaseAsync(ConfirmPurchaseDto dto, string? cardLastFour)
@@ -91,6 +116,12 @@ namespace AirDreams.API.Repositories
                         dto.TransactionId,
                         segment.FlightNumber
                     }, transaction);
+
+                    await ReserveFlightSeatsAsync(
+                        segment.FlightNumber,
+                        dto.SeatClass,
+                        dto.PassengerCount,
+                        transaction);
                 }
 
                 foreach (var luggage in luggageMappings)
@@ -242,8 +273,8 @@ namespace AirDreams.API.Repositories
             {
                 int resolvedRouteId = routeId ?? 1;
                 var sqlInsertFlight = @"
-                    INSERT INTO Flight (numberFlight, routeId, boardingGate, departureDate, flightState)
-                    VALUES (@FlightNumber, @RouteId, 1, CAST(GETDATE() AS DATE), 'On-time')";
+                    INSERT INTO Flight (numberFlight, routeId, boardingGate, departureDate, flightState, occupiedFirstclass, occupiedTurist)
+                    VALUES (@FlightNumber, @RouteId, 1, CAST(GETDATE() AS DATE), 'On-time', 0, 0)";
 
                 await _connection.ExecuteAsync(sqlInsertFlight, new
                 {

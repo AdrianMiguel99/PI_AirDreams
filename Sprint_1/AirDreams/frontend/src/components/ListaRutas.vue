@@ -1,45 +1,47 @@
 <template>
-    <div class=" container">
-    <AdminHeader />
-
+  <div class="routes-list-container">
     <div class="header-section">
-        <h2>Rutas registradas</h2>
-        <button class="btn btn_listar" @click="irARegistro">
-            Registrar vuelo
-        </button>
+      <h2>Rutas registradas</h2>
     </div>
 
-    <div v-if="loading" class="state-message">Cargando rutas...</div>
-    <div v-else-if="errorMessage" class="state-message error">{{ errorMessage }}</div>
+    <div v-if="loading" class="state-message">
+      Cargando rutas...
+    </div>
+
+    <div v-else-if="errorMessage" class="state-message error">
+      {{ errorMessage }}
+    </div>
 
     <div v-else-if="routes.length === 0" class="state-message">
-        No hay rutas registradas.
+      No hay rutas registradas.
     </div>
 
-    <div v-else class="d-flex table-wrapper">
-        <table>
+    <div v-else class="table-wrapper">
+      <table>
         <thead>
-            <tr>
-                <th>ID Ruta</th>
-                <th>Aeropuerto salida</th>
-                <th>Aeropuerto llegada</th>
-                <th>Duración</th>
-                <th>Precio base</th>
-            </tr>
-            </thead>
+          <tr>
+            <th>ID Ruta</th>
+            <th>Aeropuerto salida</th>
+            <th>Aeropuerto llegada</th>
+            <th>Duración</th>
+            <th>Precio base</th>
+          </tr>
+        </thead>
+
         <tbody>
-            <tr v-for="route in routes" :key="route.routeID">
-                <td>{{ route.routeID }}</td>
-                <td>{{ route.codeAirportSalida }}</td>
-                <td>{{ route.codeAirportLlegada }}</td>
-                <td>{{ route.flightDuration }} min</td>
-                <td>${{ Number(route.basePrice).toFixed(2) }}</td>
-            </tr>
-            </tbody>
-        </table>
-        </div>
+          <tr v-for="route in routes" :key="route.routeID">
+            <td>{{ route.routeID }}</td>
+            <td>{{ route.codeAirportSalida }}</td>
+            <td>{{ route.codeAirportLlegada }}</td>
+            <td>{{ route.flightDuration }} min</td>
+            <td>${{ Number(route.basePrice).toFixed(2) }}</td>
+          </tr>
+        </tbody>
+      </table>
     </div>
+  </div>
 </template>
+
 
 <script>
 import axios from 'axios'
@@ -127,53 +129,71 @@ async fetchRoutes() {
 </script>
 
 <style scoped>
-.container {
-    padding: 20px;
+.routes-list-container {
+  padding: 10px 20px;
+  width: 100%;
+  max-width: 1150px;
+  margin: 0 auto;
 }
 
 .header-section {
-    margin-bottom: 24px;
+  margin-bottom: 20px;
 }
 
 .header-section h2 {
-    margin: 0;
-    font-size: 28px;
-    color: #333;
+  margin: 0;
+  font-family: 'Inter', sans-serif;
+  font-size: 32px;
+  font-weight: bold;
+  color: #384467;
+}
+
+.subtitle {
+  margin-top: 6px;
+  margin-bottom: 0;
+  font-family: 'Inter', sans-serif;
+  color: #6b7280;
+  font-size: 15px;
 }
 
 .state-message {
-    text-align: center;
-    color: #666;
-    padding: 20px;
-    font-size: 16px;
+  text-align: center;
+  color: #384467;
+  padding: 20px;
+  font-size: 16px;
+  font-family: 'Inter', sans-serif;
 }
 
 .state-message.error {
-    color: #b42318;
+  color: #b42318;
 }
 
 .table-wrapper {
-    overflow-x: auto;
-    background: #fff;
-    border-radius: 8px;
-    border: 1px solid #e5e7eb;
+  overflow-x: auto;
+  background: #fff;
+  border-radius: 16px;
+  border: 1px solid #e5e7eb;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.10);
 }
 
 table {
-    width: 100%;
-    border-collapse: collapse;
+  width: 100%;
+  border-collapse: collapse;
+  font-family: 'Inter', sans-serif;
+  color: #384467;
+  font-size: 14px;
 }
 
 th,
 td {
-    text-align: left;
-    padding: 12px 16px;
-    border-bottom: 1px solid #f1f5f9;
+  text-align: left;
+  padding: 10px 14px;
+  border-bottom: 1px solid #f1f5f9;
 }
 
 th {
-    background: #f8fafc;
-    color: #334155;
-    font-weight: 600;
+  background: #f8fafc;
+  color: #384467;
+  font-weight: bold;
 }
 </style>

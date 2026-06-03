@@ -16,14 +16,9 @@
                 </div>
             </div>
         </div>
-        <AdminHeader />
         <div class="page">
             <div class="content">
-        <h1 class="page-title m3b-2">Gestión de Vuelos</h1>
-        <p class="page-subtitle mb-4">
-            Registra nuevos vuelos y consulta los vuelos existentes.
-        </p>
-
+        <h1 class="title">Registrar Ruta</h1>
 
         <div v-if="successMessage" class="alert alert-success">
             {{ successMessage }}
@@ -32,16 +27,6 @@
         <div v-if="errorMessage" class="alert alert-danger">
             {{ errorMessage }}
         </div>
-
-        <div class="d-flex justify-content-between align-items-center mb-3">
-            <button class="btn boton_listar" @click="volverAlPanel">
-                ← Volver al panel
-            </button>
-            <button class="btn boton_listar" @click="irALista">
-                Listar Rutas
-            </button>
-        </div>
-
 
         <div class="card flight-card p-4 shadow-sm mb-5">
             <h3 class="d-flex section-title mb-3">Registrar Vuelo</h3>
@@ -330,7 +315,7 @@
                 id="aircraftModel"
                 @focus="showAircraftResults = true"
                 @input="onAircraftInput"
-                placeholder="Ej: TI-BFJ o Boeing 737"
+                placeholder="Ej: Boeing 737"
                 autocomplete="off"
                 class="form-control"
                 required
@@ -369,10 +354,9 @@
 </template>
     <script>
     import axios from "axios";
-    import AdminHeader from "./AdminHeader.vue";
 
     export default {
-    components: { AdminHeader },
+    components: { },
     name: "FlightRegister",
     data() {
         return {
@@ -517,7 +501,7 @@
             this.showDestinationResults = false;
         },
         irALista() {
-        this.$router.push('/admin/routesList')
+        this.$emit('change-view', 'list')
         },
         volverAlPanel() {
         this.$router.push('/admin')
@@ -691,5 +675,56 @@
     .boton_registrar {
         background-color: #384467;
         border-color: #384467;
+    }
+
+    .container {
+        padding: 20px;
+        width: 100%;
+    }
+
+    .content {
+        width: 100%;
+        max-width: 1150px;
+        margin: 0 auto;
+    }
+
+    .title {
+        text-align: left;
+        font-family: 'Inter', sans-serif;
+        color: #384467;
+        font-weight: bold;
+        font-size: 40px;
+        margin-bottom: 24px;
+    }
+
+    .flight-card {
+        border-radius: 20px;
+        border: 1px solid #e5e7eb;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.10);
+    }
+
+    .section-title {
+        font-family: 'Inter', sans-serif;
+        color: #384467;
+        font-weight: bold;
+    }
+
+    .form-label {
+        font-family: 'Inter', sans-serif;
+        color: #384467;
+        font-weight: 600;
+    }
+
+    .form-control {
+        font-family: 'Inter', sans-serif;
+        color: #384467;
+    }
+
+    .boton_registrar {
+        background-color: #384467;
+        border-color: #384467;
+        color: white;
+        font-family: 'Inter', sans-serif;
+        font-weight: 600;
     }
 </style>
