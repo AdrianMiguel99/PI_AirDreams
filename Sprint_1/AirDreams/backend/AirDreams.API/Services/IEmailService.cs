@@ -1,9 +1,25 @@
+using AirDreams.API.Models.Dtos;
+
 namespace AirDreams.API.Services
 {
     public interface IEmailService
     {
-        Task SendInvitationEmail(string toEmail, string token, string role);
-        
-        Task SendWelcomeEmail(string toEmail, string fullName);
+    Task SendInvitationEmail(
+        string toEmail,
+        string token,
+        string role
+    );
+
+    Task SendWelcomeEmail(
+        string toEmail,
+        string fullName
+    );
+
+    Task SendPurchaseConfirmationEmail(
+        string toEmail,
+        ConfirmPurchaseDto purchase,
+        byte[] invoicePdf,
+        byte[] itineraryPdf
+    );
     }
 }

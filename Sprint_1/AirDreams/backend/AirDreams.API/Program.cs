@@ -1,6 +1,6 @@
 using System.Data;
 using System.Text;
-using Microsoft.Data.SqlClient; 
+using Microsoft.Data.SqlClient;
 using Dapper;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
@@ -11,7 +11,11 @@ using AirDreams.API.Services.Interfaces;
 using AirDreams.API.DTOs;
 using AirDreams.API.Models;
 
+using QuestPDF.Infrastructure;
+
 var builder = WebApplication.CreateBuilder(args);
+
+QuestPDF.Settings.License = LicenseType.Community;
 
 var emailSettings = builder.Configuration.GetSection("EmailSettings");
 builder.Services.Configure<EmailSettings>(emailSettings);
@@ -70,14 +74,23 @@ builder.Services.AddCors(options =>
 
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IUserService, UserService>();
+
 builder.Services.AddScoped<IDbConnection>(sp =>
-    new SqlConnection(builder.Configuration.GetConnectionString("DefaultConnection")));
+    new SqlConnection(
+        builder.Configuration.GetConnectionString("DefaultConnection")));
 
 builder.Services.AddScoped<IAirportRepository, AirportRepository>();
 builder.Services.AddScoped<IAirportService, AirportService>();
+
 builder.Services.AddScoped<IRouteRepository, RouteRepository>();
 builder.Services.AddScoped<IRouteService, RouteService>();
+
 builder.Services.AddScoped<IEmailService, EmailService>();
+
+builder.Services.AddScoped<IPdfService, PdfService>();
+
+builder.Services.AddScoped<IPurchaseService, PurchaseService>();
+builder.Services.AddScoped<IPurchaseRepository, PurchaseRepository>();
 
 builder.Services.AddScoped<AircraftRepository>();
 builder.Services.AddScoped<IAircraftService, AircraftService>();
@@ -87,12 +100,12 @@ builder.Services.AddScoped<IFlightService, FlightService>();
 
 builder.Services.AddScoped<ILuggageRepository, LuggageRepository>();
 builder.Services.AddScoped<ILuggageService, LuggageService>();
+
 builder.Services.AddScoped<IPassengerRepository, PassengerRepository>();
 builder.Services.AddScoped<IPassengerService, PassengerService>();
+
 builder.Services.AddScoped<IPaymentRepository, PaymentRepository>();
 builder.Services.AddScoped<IPaymentService, PaymentService>();
-builder.Services.AddScoped<IPurchaseRepository, PurchaseRepository>();
-builder.Services.AddScoped<IPurchaseService, PurchaseService>();
 
 builder.Services.AddScoped<ISecurityRepository, SecurityRepository>();
 builder.Services.AddScoped<ISecurityService, SecurityService>();
@@ -102,13 +115,11 @@ builder.Services.AddScoped<ILuggageCalculationService, LuggageCalculationService
 
 var app = builder.Build();
 
-
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI();
 }
-
 
 app.UseCors("AllowVueApp");
 
@@ -116,4 +127,5 @@ app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
+
 app.Run();

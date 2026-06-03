@@ -228,8 +228,27 @@ export default {
           cardExpiry: this.payment.cardExpiry || null,
           cardCvv: this.payment.cardCvv || null,
           segments: purchase.itinerary.segments.map(s => ({
-            flightNumber: (s.flightNumber || '').trim().substring(0, 10),
+            flightNumber: (s.flightNumber || '').trim().substring(0, 20),
             routeId: s.routeId || s.idRoute || null,
+
+            departureDate: s.departureDate || null,
+            arrivalDate: s.arrivalDate || null,
+            departureTime: s.departureTime || '',
+            arrivalTime: s.arrivalTime || '',
+            duration: s.duration || '',
+
+            departureAirport: {
+              name: s.departureAirport?.name || '',
+              code: s.departureAirport?.code || '',
+              city: s.departureAirport?.city || ''
+            },
+
+            arrivalAirport: {
+              name: s.arrivalAirport?.name || '',
+              code: s.arrivalAirport?.code || '',
+              city: s.arrivalAirport?.city || ''
+            },
+
             checkedPrice: s.checkedPrice || 0,
             carryOnPrice: s.carryOnPrice || 0,
             multiplier: s.porcentageMultiplier || 0.2
