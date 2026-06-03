@@ -254,6 +254,14 @@ export default {
           JSON.stringify(luggageByPassenger)
         );
 
+        sessionStorage.setItem(
+          'luggageWeights',
+          JSON.stringify({
+            luggageWeight: this.totalCheckedWeight,
+            carryOnWeight: this.totalCarryOnWeight
+          })
+        );
+
         this.$router.push({
           name: 'payment',
           query: {

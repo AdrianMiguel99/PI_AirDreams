@@ -99,5 +99,33 @@ namespace AirDreams.API.Repositories
                 return false;
             }
         }
+
+        public async Task<bool> UpdateFlightWeightAsync(string transactionId, decimal luggageWeight, decimal carryOnWeight)
+        {
+            try
+            {
+                string query = @"
+                    UPDATE f
+                    SET
+                        occupiedLuggage = occupiedLuggage + @luggageWeight,
+                        occupiedCarryOn = occupiedCarryOn + @carryOnWeight
+                    FROM Flight f
+                    INNER JOIN Tiene t
+                        ON t.flightNumber = f.numberFlight
+                    WHERE t.transactionId = @transactionId";
+
+                var rows = await _connection.ExecuteAsync(query, new {
+                        transactionId,
+                        luggageWeight,
+                        carryOnWeight
+                    });
+
+                return rows > 0;
+            }
+            catch
+            {
+                return false;
+            }
+        }
     }
 }

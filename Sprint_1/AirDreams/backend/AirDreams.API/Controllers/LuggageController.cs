@@ -51,5 +51,29 @@ namespace AirDreams.API.Controllers
 
             return BadRequest(new { success = false, message = result.message });
         }
+
+        [HttpPost("update")]
+        public async Task<IActionResult> UpdateFlightWeight([FromBody] UpdateFlightWeightDto dto)
+        {
+            var result = await _luggageService.UpdateFlightWeightAsync(
+                dto.TransactionId,
+                dto.LuggageWeight,
+                dto.CarryOnWeight);
+
+            if (result.success)
+            {
+                return Ok(new
+                {
+                    success = true,
+                    message = result.message
+                });
+            }
+
+            return BadRequest(new
+            {
+                success = false,
+                message = result.message
+            });
+        }
     }
 }

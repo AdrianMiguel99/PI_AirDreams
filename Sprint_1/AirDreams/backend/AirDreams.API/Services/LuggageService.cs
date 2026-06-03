@@ -94,5 +94,24 @@ namespace AirDreams.API.Services
                 return (false, $"Error al validar la disponibilidad: {ex.Message}");
             }
         }
+
+        public async Task<(bool success, string message)> UpdateFlightWeightAsync(string transactionId, decimal luggageWeight, decimal carryOnWeight)
+        {
+            try
+            {
+                var updated = await _luggageRepository.UpdateFlightWeightAsync(transactionId, luggageWeight, carryOnWeight);
+
+                if (!updated)
+                {
+                    return (false, "No fue posible actualizar el peso del vuelo");
+                }
+
+                return (true, "Peso actualizado correctamente");
+            }
+            catch (Exception ex)
+            {
+                return (false, ex.Message);
+            }
+        }
     }
 }
