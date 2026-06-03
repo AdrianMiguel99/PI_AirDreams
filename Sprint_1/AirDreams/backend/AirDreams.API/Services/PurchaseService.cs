@@ -67,7 +67,7 @@ public class PurchaseService : IPurchaseService
             Success = true,
             Message =
                 //"Correo enviado (prueba)"
-               "Compra confirmada, pago procesado y correo enviado."
+            "Compra confirmada, pago procesado y correo enviado."
         };
     }
 }

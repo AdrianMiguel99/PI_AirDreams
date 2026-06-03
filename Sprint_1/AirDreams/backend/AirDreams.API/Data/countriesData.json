@@ -30,5 +30,26 @@
   {
     "name": "Brasil",
     "cities": [ "São Paulo", "Rio de Janeiro" ]
+  },
+  {
+    "name": "Francia",
+    "cities": [ "París" ]
+  },
+  {
+    "name": "Australia",
+    "cities": [ "Melbourne", "Sydney" ]
+  },
+  {
+    "name": "Belaraus",
+    "cities": [ "Minsk" ]
+  },
+    {
+    "name": "Alemania",
+    "cities": [ "Berlín", "Múnich" ]
+  },
+  {
+    "name": "Paises Bajos",
+    "cities": [ "Ámsterdam" ]
   }
+  
 ]

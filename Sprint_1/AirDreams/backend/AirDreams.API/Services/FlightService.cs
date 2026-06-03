@@ -95,7 +95,8 @@ namespace AirDreams.API.Services
         {
             if (string.IsNullOrWhiteSpace(origin) ||
                 string.IsNullOrWhiteSpace(destination) ||
-                quantityOfPassengers < 1)
+                quantityOfPassengers < 1 ||
+                quantityOfPassengers > 10)
             {
                 throw new ArgumentException("INVALID_PARAMETERS: Parámetros inválidos o faltantes.");
             }
