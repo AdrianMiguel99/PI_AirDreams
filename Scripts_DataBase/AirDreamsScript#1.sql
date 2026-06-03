@@ -382,3 +382,34 @@ VALUES (
     0
 );
 GO
+
+INSERT INTO SystemUser DEFAULT VALUES;
+INSERT INTO SystemUser DEFAULT VALUES;
+INSERT INTO SystemUser DEFAULT VALUES;
+
+INSERT INTO ExternalUser (
+    airlineName,
+    airlineEmail,
+    userID,
+    secretKey
+)
+
+VALUES (
+    'Snoopy Airlines',
+    'snoopyAirline@gmail.com',
+    2,
+    'TfWcIHIKq7n4Rl8ahULmiXac3SnSrx6yy7tJM4374sObLvxDV0e7Hu50FH9qz7k04pGzrSxGbTQnR9iq4S3Z6o0WuKK189X9BlQdwfq3cqFIFc9HhjlM27staPwWbxbjiwNV1gv9zSVmvnIGzKZQL86PEr9zZD25896opxwEwvGbLucvlXeFK2Z4XuVaDbYul0fIngvu7k6Hk92Td4EbPDtykOMPkWlsJMVKq1BL1OWtlmfB9nhHXTWlagvdICjl'
+),
+(
+    'Mushu Airlines',
+    'mushuAirline@gmail.com',
+    3,
+    'IDgmiRR3QxZGHFH0xjjksUkcSZMQqFZI8ASsdy2X0mfN3ZYnZulYLqcsvrhjfmRma29N5WxKtmb1ixTqbtQ76NlmoliVTWwA0zHB74OjxjfpOIogZfMMpBW4waUw8aWSpvF6VU3JSqvCuvt7qriEEhFMeC1Vjp7DRfB0a1YupwU7HVaN9QBw0O4XbbQJb2MX02y4DOqnB0kyExnAgB9yIm69AAlGDwW573fd0Li2JDcnXVHPi1smW5O4S2IcuhkZ'
+),
+(
+    'Zuli Airlines',
+    'zuliAirline@gmail.com',
+    4,
+    'SDIiE8dzYJSdyI6Uxi2n3GgJ5sgnNUlJxe07EvbiqHoO2FYz0mllpyF0dK3TJN4nCmJHmD4lv0MQgb2BM0qA2pPBF0vdOnWE1hnkiBqvi3uNXjIdz1KVGZ25ZXU8XwWlu0Uzu88JmUVGE6BW64fywMG4oNe9mECdcHdI3zXTUcqTkVJP9KiPbWGw1g71JK3EL9V0qs7R2veM8jk0ZHLfFRllt80J0G26OAq6oiB7W3FWP8NT84L7CMJyKTnv6r2o'
+);
+GO
