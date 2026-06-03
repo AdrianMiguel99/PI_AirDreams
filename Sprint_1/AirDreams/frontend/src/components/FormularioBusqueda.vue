@@ -76,23 +76,44 @@
           <span v-if="errors.passengers" class="error-message">Espacio requerido</span>
         </div>
       </div>
+        <div class="input-group">
+            <label>
+              <input 
+                v-model="searchForm.includeStops"
+                type="checkbox"
+              />
+              Incluir vuelos con escalas
+            </label>
+          </div>
     </div>
 
     <button class="search-btn" @click="searchFlights">
       Buscar Vuelos
     </button>
+
+        <PopupMessage
+      :show="showPopup"
+      :title="popupTitle"
+      :message="popupMessage"
+      :type="popupType"
+      @close="showPopup = false"
+    />
   </div>
 </template>
 
 <script>
+import PopupMessage from './PopupMessage.vue';
+
 export default {
   data() {
+    
     return {
       searchForm: {
         origin: '',
         destination: '',
         departureDate: '',
-        passengers: 1
+        passengers: 1,
+        includeStops: true
       },
       originAirportQuery: '',
       destinationAirportQuery: '',
@@ -104,8 +125,14 @@ export default {
         destination: false,
         departureDate: false,
         passengers: false
-      }
+      },
+      showPopup: false,
+      popupTitle: '',
+      popupMessage: '',
+      popupType: 'error'
     };
+
+    
   },
   computed: {
     filteredOriginAirports() {
@@ -115,10 +142,19 @@ export default {
       return this.filterAirports(this.destinationAirportQuery);
     }
   },
+  components: {
+    PopupMessage
+  },
   created() {
     this.loadAirports();
   },
   methods: {
+    showError(title, message) {
+      this.popupType = 'error';
+      this.popupTitle = title;
+      this.popupMessage = message;
+      this.showPopup = true;
+    },
     async loadAirports() {
       try {
         const response = await fetch('http://localhost:5276/api/airports');
@@ -210,10 +246,17 @@ export default {
     },
     async searchFlights() {
       if (Number(this.searchForm.passengers) < 1 || Number(this.searchForm.passengers) > 10) {
-        alert('El número de pasajeros debe ser entre 1 y 10');
+        this.showError(
+          'Cantidad de pasajeros invalida',
+          'El numero de pasajeros debe ser entre 1 y 10.'
+        );
         return;
       }
       if (!this.validateForm()) {
+        this.showError(
+          'Datos incompletos',
+          'Selecciona origen, destino, fecha de salida y una cantidad valida de pasajeros.'
+        );
         return;
       }
 
@@ -225,7 +268,8 @@ export default {
           destination: data.destination,
           departureDate: this.formatDateWithTime(data.departureDate, 'start'),
           returnDate: this.formatDateWithTime(data.departureDate, 'end'),
-          passengers: data.passengers
+          passengers: data.passengers,
+          includeStops: data.includeStops
         });
 
         const response = await fetch(`http://localhost:5276/api/flights/search?${params.toString()}`);
@@ -233,7 +277,10 @@ export default {
 
         if (!response.ok) {
           console.error('Backend response:', result);
-          alert(result.detail || result.description || 'Error al buscar vuelos');
+          this.showError(
+            'No se pudo buscar vuelos',
+            result.detail || result.description || 'Intenta de nuevo mas tarde.'
+          );
           return;
         }
 
@@ -244,7 +291,10 @@ export default {
         });
       } catch (error) {
         console.error('Error:', error);
-        alert('Error de conexión al buscar vuelos');
+        this.showError(
+          'Error de conexion',
+          'No se pudo conectar con el servidor. Intenta de nuevo.'
+        );
       }
     }
   }

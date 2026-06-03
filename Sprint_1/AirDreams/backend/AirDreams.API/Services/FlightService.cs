@@ -19,7 +19,8 @@ namespace AirDreams.API.Services
             string destination,
             DateTime earliestDeparture,
             DateTime latestDeparture,
-            int quantityOfPassengers
+            int quantityOfPassengers,
+            bool includeStops
         )
         {
             ValidateParameters(origin, destination, earliestDeparture, latestDeparture, quantityOfPassengers);
@@ -34,15 +35,18 @@ namespace AirDreams.API.Services
                 latestDeparture,
                 quantityOfPassengers
             );
-            
 
-            var oneStopFlightsList = await _flightRepository.SearchOneStopFlightsAsync(
-                origin,
-                destination,
-                earliestDeparture,
-                latestDeparture,
-                quantityOfPassengers
-            );
+            IEnumerable<dynamic> oneStopFlightsList = Enumerable.Empty<dynamic>();
+
+            if (includeStops){
+                    oneStopFlightsList = await _flightRepository.SearchOneStopFlightsAsync(
+                    origin,
+                    destination,
+                    earliestDeparture,
+                    latestDeparture,
+                    quantityOfPassengers
+                );
+            }
             
             var result = new List<FlightItineraryDTO>();
 
