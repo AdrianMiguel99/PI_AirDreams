@@ -113,6 +113,9 @@ builder.Services.AddScoped<ISecurityService, SecurityService>();
 builder.Services.AddScoped<ILuggageCalculationRepository, LuggageCalculationRepository>();
 builder.Services.AddScoped<ILuggageCalculationService, LuggageCalculationService>();
 
+builder.Services.AddScoped<IPassengerValidationRepository, PassengerValidationRepository>();
+builder.Services.AddScoped<IPassengerValidationService, PassengerValidationService>();
+
 var app = builder.Build();
 
 if (app.Environment.IsDevelopment())
