@@ -292,8 +292,10 @@ export default {
           };
         }
         await axios.post('http://localhost:5276/api/payment', payload)
+        await this.updateFlightWeight(this.payment.transactionId)
         const purchasewindowData = this.createStructForPage()
         sessionStorage.removeItem('transactionId')
+        sessionStorage.removeItem('luggageWeights')
 
         this.callPurchaseSuccess(purchasewindowData)
       } catch (error) {
@@ -311,6 +313,28 @@ export default {
         this.showPopup = true
       } finally {
         this.processing = false
+      }
+    },
+
+    async updateFlightWeight(transactionId) {
+      const weights = JSON.parse(
+        sessionStorage.getItem('luggageWeights') || '{}'
+      )
+
+      if (!weights.luggageWeight && !weights.carryOnWeight)
+        return
+
+      try {
+        await axios.post(
+          'http://localhost:5276/api/luggage/update',
+          {
+            transactionId,
+            luggageWeight: weights.luggageWeight || 0,
+            carryOnWeight: weights.carryOnWeight || 0
+          }
+        )
+      } catch (error) {
+        console.error('Ha ocurrido un error al actualizar el peso del equipaje:', error)
       }
     }
   }
