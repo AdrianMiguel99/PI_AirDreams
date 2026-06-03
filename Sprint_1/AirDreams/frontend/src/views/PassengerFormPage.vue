@@ -133,6 +133,7 @@
 </template>
 
 <script>
+import axios from 'axios'; 
 import StepperLayout from '../components/StepperLayout.vue';
 import PopupMessage from '../components/PopupMessage.vue';
 
@@ -174,8 +175,8 @@ export default {
   methods: {
     async loadCountries() {
       try {
-        const response = await fetch('http://localhost:5276/api/locations/countries');
-        this.countries = await response.json();
+        const response = await axios.get('http://localhost:5276/api/locations/countries');
+        this.countries = response.data;
       } catch (error) {
         console.error('Error al cargar paises:', error);
         this.popupTitle = 'No se pudieron cargar los paises';
@@ -252,28 +253,58 @@ export default {
       return index === 0;
     },
 
-    continueToLuggage() {
+    formatCurrency(value) {  
+      return new Intl.NumberFormat('en-US', {
+        style: 'currency',
+        currency: 'USD'
+      }).format(value || 0);
+    },
+
+    async continueToLuggage() {
       if (!this.selectedPurchase) {
         this.popupMessage = 'Primero debes seleccionar un vuelo para comprar.';
         this.showPopup = true;
         return;
       }
 
+      const segments = this.selectedPurchase.itinerary?.segments || [];
+      const flightNumbers = segments.map(s => s.flightNumber?.trim()).filter(Boolean);
+
+      const passengersToCheck = this.passengers.map(p => ({
+        namePassenger: p.namePassenger.trim(),
+        lastnamesPassenger: p.lastnamesPassenger.trim(),
+        country: p.country.trim()
+      }));
+
+      try {
+        const res = await axios.post('http://localhost:5276/api/passengers/validate-duplicate', {
+          passengers: passengersToCheck,
+          flightNumbers: flightNumbers
+        });
+        
+        console.log(res)
+
+        const duplicates = res.data.duplicates || [];
+        if (duplicates.length > 0) {
+          const nombres = duplicates.join(', ');
+          this.popupTitle = 'Pasajero(s) ya registrado(s)';
+          this.popupMessage = `Los siguientes pasajeros ya existen en este vuelo: ${nombres}.`;
+          this.popupType = 'error';
+          this.showPopup = true;
+          return;
+        }
+      } catch (error) {
+        console.error('Error al validar pasajeros:', error);
+        this.popupTitle = 'Error de conexión';
+        this.popupMessage = 'No se pudo verificar la duplicidad de pasajeros. Intenta de nuevo.';
+        this.popupType = 'error';
+        this.showPopup = true;
+        return;
+      }
+
       const normalizedPassengers = this.normalizePassengers();
-
-      sessionStorage.setItem(
-        'purchasePassengers',
-        JSON.stringify(normalizedPassengers)
-      );
-
+      sessionStorage.setItem('purchasePassengers', JSON.stringify(normalizedPassengers));
       this.$router.push({ name: 'luggage' });
-    },
-
-    formatCurrency(value) {
-      return new Intl.NumberFormat('en-US', {
-        style: 'currency',
-        currency: 'USD'
-      }).format(value || 0);
     }
   }
 };

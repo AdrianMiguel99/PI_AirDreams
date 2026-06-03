@@ -215,6 +215,37 @@ export default {
     
     async processPayment() {
       this.processing = true
+      if (!this.payment.paymentMethod) {
+        this.showPopup = true;
+        this.popupType = 'error';
+        this.popupTitle = 'Método de pago requerido';
+        this.popupMessage = 'Debes seleccionar un método de pago antes de continuar.';
+        this.popupActionText = '';
+        this.processing = false;
+        return;
+      }
+
+    if (this.payment.paymentMethod === 'Card') {
+      const cardNumberClean = this.payment.cardNumber?.replace(/\s/g, '') || '';
+      if (!cardNumberClean || !this.payment.cardExpiry || !this.payment.cardCvv) {
+        this.showPopup = true;
+        this.popupType = 'error';
+        this.popupTitle = 'Datos de tarjeta incompletos';
+        this.popupMessage = 'Por favor, completa todos los campos de la tarjeta.';
+        this.popupActionText = '';
+        this.processing = false;
+        return;
+      }
+      if (cardNumberClean.length < 13) {
+        this.showPopup = true;
+        this.popupType = 'error';
+        this.popupTitle = 'Número de tarjeta inválido';
+        this.popupMessage = 'El número de tarjeta es demasiado corto.';
+        this.popupActionText = '';
+        this.processing = false;
+        return;
+      }
+    }
       try {
         const purchase = JSON.parse(sessionStorage.getItem('selectedFlightPurchase'))
         const passengers = JSON.parse(sessionStorage.getItem('purchasePassengers'))
