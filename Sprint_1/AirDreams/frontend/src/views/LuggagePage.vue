@@ -242,7 +242,7 @@ export default {
 
           if (!validation.success) {
             this.popupType = 'error';
-            this.popupTitle = 'Equipaje no válido';
+            this.popupTitle = 'No hay espacio suficiente';
             this.popupMessage = `${flightId}: ${validation.message}`;
             this.showPopup = true;
             return;
