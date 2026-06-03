@@ -57,5 +57,75 @@ namespace AirDreams.API.Repositories
                 return false;
             }
         }
+
+        public async Task<bool> CheckLuggageWeightAsync(string flightId, int routeId, decimal luggageWeight)
+        {
+            try
+            {
+                string query = "SELECT dbo.CheckLuggageWeight(@flightId, @routeId, @luggageWeight)";
+
+                var result = await _connection.ExecuteScalarAsync<int>(query, new 
+                { 
+                    flightId, 
+                    routeId, 
+                    luggageWeight 
+                });
+
+                return result == 1;
+            }
+            catch (Exception ex)
+            {
+                return false;
+            }
+        }
+
+        public async Task<bool> CheckCarryOnWeightAsync(string flightId, int routeId, decimal carryOnWeight)
+        {
+            try
+            {
+                string query = "SELECT dbo.CheckCarryOnWeight(@flightId, @routeId, @carryOnWeight)";
+
+                var result = await _connection.ExecuteScalarAsync<int>(query, new 
+                { 
+                    flightId, 
+                    routeId,
+                    carryOnWeight 
+                });
+
+                return result == 1;
+            }
+            catch (Exception ex)
+            {
+                return false;
+            }
+        }
+
+        public async Task<bool> UpdateFlightWeightAsync(string transactionId, decimal luggageWeight, decimal carryOnWeight)
+        {
+            try
+            {
+                string query = @"
+                    UPDATE f
+                    SET
+                        occupiedLuggage = occupiedLuggage + @luggageWeight,
+                        occupiedCarryOn = occupiedCarryOn + @carryOnWeight
+                    FROM Flight f
+                    INNER JOIN Tiene t
+                        ON t.flightNumber = f.numberFlight
+                    WHERE t.transactionId = @transactionId";
+
+                var rows = await _connection.ExecuteAsync(query, new {
+                        transactionId,
+                        luggageWeight,
+                        carryOnWeight
+                    });
+
+                return rows > 0;
+            }
+            catch
+            {
+                return false;
+            }
+        }
     }
 }
