@@ -1,5 +1,9 @@
 <template>
   <div class="login-container">
+    <button class="back-button" @click="$router.push('/')">
+      Volver al inicio
+    </button>
+
     <div class="login-card">
       <h2>Iniciar Sesión</h2>
 
@@ -109,6 +113,7 @@ export default {
   display: flex;
   justify-content: center;
   align-items: center;
+  position: relative;
   background: #f5f5f5;
 }
 
@@ -123,6 +128,24 @@ export default {
 
 .login-card h2 {
   margin-bottom: 20px;
+}
+
+.back-button {
+  position: absolute;
+  top: 24px;
+  left: 24px;
+  padding: 10px;
+  border-radius: 20px;
+  border: 1px solid #2f3e5c;
+  background: transparent;
+  color: #2f3e5c;
+  cursor: pointer;
+  font-weight: 600;
+  z-index: 1;
+}
+
+.back-button:hover {
+  background: #eef2f7;
 }
 
 .login-card input {

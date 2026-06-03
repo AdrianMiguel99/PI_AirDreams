@@ -297,11 +297,19 @@ export default {
 }
 
 .btn-edit {
-  padding: 5px 12px;
-  background-color: #4caf50;
+  background-color: #3E4B78;
   color: white;
   border: none;
-  border-radius: 4px;
+  border-radius: 999px;          
+  padding: 6px 16px;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  text-decoration: none;
+  font-family: 'Inter', sans-serif;
+  font-size: 14px;
+  font-weight: 400;
+  transition: 0.3s;
   cursor: pointer;
 }
 
