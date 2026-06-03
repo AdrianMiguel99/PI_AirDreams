@@ -4,7 +4,7 @@ using Dapper;
 
 namespace AirDreams.API.Repositories
 {
-    public class AircraftRepository
+    public class AircraftRepository : IAircraftRepository
     {
         private readonly IDbConnection _connection;
 
