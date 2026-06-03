@@ -28,9 +28,6 @@ public class PurchaseService : IPurchaseService
 
     public async Task<PaymentResponseDto> ConfirmPurchaseAsync(ConfirmPurchaseDto dto)
     {
-        Console.WriteLine("=== PURCHASE SERVICE ===");
-        Console.WriteLine($"TransactionId: {dto.TransactionId}");
-        Console.WriteLine($"Segments: {dto.Segments?.Count}");
         string? lastFour = null;
         if (dto.PaymentMethod.Equals("Card", StringComparison.OrdinalIgnoreCase) &&
             !string.IsNullOrWhiteSpace(dto.CardNumber))

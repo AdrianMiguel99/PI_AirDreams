@@ -14,10 +14,10 @@ IF EXISTS (SELECT * FROM sys.foreign_keys WHERE name = 'fk_tiene_flight')
 IF EXISTS (SELECT * FROM sys.foreign_keys WHERE name = 'fk_checkin_flight')
     ALTER TABLE CheckIn DROP CONSTRAINT fk_checkin_flight;
 
--- Paso 2: Alterar todas las columnas involucradas a VARCHAR(10) para que coincidan
-ALTER TABLE Flight ALTER COLUMN numberFlight VARCHAR(10) NOT NULL;
-ALTER TABLE Tiene ALTER COLUMN flightNumber VARCHAR(10) NOT NULL;
-ALTER TABLE CheckIn ALTER COLUMN flightNumber VARCHAR(10) NOT NULL;
+-- Paso 2: Alterar todas las columnas involucradas a VARCHAR(20) para que coincidan
+ALTER TABLE Flight ALTER COLUMN numberFlight VARCHAR(20) NOT NULL;
+ALTER TABLE Tiene ALTER COLUMN flightNumber VARCHAR(20) NOT NULL;
+ALTER TABLE CheckIn ALTER COLUMN flightNumber VARCHAR(20) NOT NULL;
 
 -- Paso 3: Recrear las restricciones de clave foránea
 ALTER TABLE Tiene ADD CONSTRAINT fk_tiene_flight FOREIGN KEY (flightNumber) REFERENCES Flight(numberFlight);

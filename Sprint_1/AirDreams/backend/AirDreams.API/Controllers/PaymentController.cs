@@ -19,9 +19,6 @@ namespace AirDreams.API.Controllers
         [HttpPost]
         public async Task<IActionResult> ProcessPayment([FromBody] ConfirmPurchaseDto dto)
         {
-            Console.WriteLine("=== PAYMENT CONTROLLER ===");
-            Console.WriteLine($"TransactionId: {dto.TransactionId}");
-            Console.WriteLine($"Segments: {dto.Segments?.Count}");
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
