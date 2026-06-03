@@ -10,6 +10,14 @@ public class PurchaseService : IPurchaseService
     {
         _repository = repository;
     }
+    public async Task<bool> CheckFlightAvailabilityAsync( string numberFlight, string seatClass, int requestedSeats)
+    {
+        return await _repository.CheckFlightAvailabilityAsync(
+            numberFlight,
+            seatClass,
+            requestedSeats
+        );
+    }
 
     public async Task<PaymentResponseDto> ConfirmPurchaseAsync(ConfirmPurchaseDto dto)
     {
