@@ -1,12 +1,10 @@
 <template>
+  <HeaderLogo/>
   <div class="container">
-    <AdminHeader />
-
-    <div class="header-section">
-      <h2>Aeropuertos registrados</h2>
-    </div>
-
     <ButtomNavigationAirports currentView="list" />
+      <div class="d-flex justify-content-between align-items-center mb-5">
+        <h1 class="title"> Aeropuertos Registrados </h1>
+      </div>
 
     <div v-if="loading" class="state-message">Cargando aeropuertos...</div>
     <div v-else-if="errorMessage" class="state-message error">{{ errorMessage }}</div>
@@ -56,12 +54,12 @@
 
 <script>
 import axios from 'axios'
-import AdminHeader from './AdminHeader.vue'
 import ButtomNavigationAirports from './ButtomNavigationAirports.vue'
+import HeaderLogo from '../components/HeaderLogo.vue'
 
 export default {
   name: 'AirportList',
-  components: { AdminHeader, ButtomNavigationAirports },
+  components: { ButtomNavigationAirports, HeaderLogo },
   data() {
     return {
       airports: [],
@@ -159,5 +157,14 @@ th {
 .btn-editar img {
   width: 22px;
   height: 22px;
+}
+
+.title {
+  text-align: left;
+  font-family: 'Inter', sans-serif;
+  color: #384467;
+  font-weight: bold;
+  font-size: 40px;
+  margin: 0;
 }
 </style>

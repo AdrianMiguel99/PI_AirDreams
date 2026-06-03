@@ -6,6 +6,7 @@ import routeIcon from '../../assets/icons/route.svg'
 import airportIcon from '../../assets/icons/airport.svg'
 import usersIcon from '../../assets/icons/users.svg'
 import reportsIcon from '../../assets/icons/reports.svg'
+import HeaderLogo from '../HeaderLogo.vue'
 
 const router = useRouter()
 
@@ -15,8 +16,9 @@ const navigateTo = (path) => {
 </script>
 
 <template>
+    <HeaderLogo />
     <div class="container">
-        <AdminHeader />
+        
         <div class="page">
             <div class="content">
         <h1>Bienvenido a Air Dreams</h1>
@@ -24,7 +26,7 @@ const navigateTo = (path) => {
             Seleccione una opción para gestionar el sistema
         </p>
 
-        <button class="back-button" type="button" @click="navigateTo('/')">
+        <button class="back-button mb-5" type="button" @click="navigateTo('/')">
             Volver al inicio
         </button>
 
@@ -41,7 +43,7 @@ const navigateTo = (path) => {
                 <span class="arrow">›</span>
             </div>
 
-            <div class="card" @click="navigateTo('/admin/routesList')">
+            <div class="card" @click="navigateTo('/admin/routes')">
                 <img :src="routeIcon" alt="Route" class="icon blue">
                 <div>
                 <h3>Administración de rutas</h3>
@@ -114,6 +116,7 @@ const navigateTo = (path) => {
     display: flex;
     flex-direction: column;
     background-color: #F4F5F9;
+    border-radius: 16px;
 }
 
 .page {

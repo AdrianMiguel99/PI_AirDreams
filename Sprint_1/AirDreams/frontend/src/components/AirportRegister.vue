@@ -1,16 +1,15 @@
 <template>
+  <HeaderLogo />
   <div class="container">
-    <AdminHeader />
+    
     <div class="page">
       <div class="content">
-        <h1>Gestión de Aeropuertos</h1>
-        <p class="subtitle">Registra un nuevo aeropuerto.</p>
-
         <!-- Barra de navegación unificada -->
         <ButtomNavigationAirports currentView="register" />
-
+        <div class="d-flex justify-content-between align-items-center mb-5">
+          <h1 class="title">Registrar Aeropuerto</h1>
+        </div>
         <section class="form-section">
-          <h2>Registrar Aeropuerto</h2>
           <form @submit.prevent="registrarAeropuerto" class="airport-form">
             <div class="row">
               <div class="col-md-4 mb-3">
@@ -87,13 +86,13 @@
 
 <script>
 import axios from 'axios'
-import AdminHeader from './AdminHeader.vue'
+import HeaderLogo from '../components/HeaderLogo.vue'
 import PopupMessage from './PopupMessage.vue'
 import ButtomNavigationAirports from './ButtomNavigationAirports.vue'
 
 export default {
   name: 'AirportRegister',
-  components: { AdminHeader, PopupMessage, ButtomNavigationAirports },
+  components: { HeaderLogo, PopupMessage, ButtomNavigationAirports },
   data() {
     return {
       paises: [],
@@ -219,7 +218,6 @@ export default {
 }
 .page {
   flex: 1;
-  background-color: #F4F5F9;
 }
 .content {
   padding: 40px;
@@ -227,8 +225,14 @@ export default {
   margin: 0 auto;
   width: 100%;
 }
-h1, h2 {
-  color: #032056;
+
+.title {
+  text-align: left;
+  font-family: 'Inter', sans-serif;
+  color: #384467;
+  font-weight: bold;
+  font-size: 40px;
+  margin: 0;
 }
 .subtitle {
   color: #6b7280;
@@ -237,7 +241,8 @@ h1, h2 {
 .form-section {
   background: white;
   padding: 30px;
-  border-radius: 12px;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+  border-radius: 20px;
+  border: 1px solid #e5e7eb;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.10);
 }
 </style>

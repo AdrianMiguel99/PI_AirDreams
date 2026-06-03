@@ -21,6 +21,7 @@ import PurchaseSuccess from '../views/PurchaseSuccess.vue'
 import LuggagePage from '../views/LuggagePage.vue'
 import PassengerFormPage from '../views/PassengerFormPage.vue'
 import PaymentPage from '../views/PaymentPage.vue'
+import RoutesManagement from '../views/RoutesManagement.vue'
 
 const routes = [
   
@@ -37,8 +38,7 @@ const routes = [
   { path: '/admin', name: 'admin', component: LandingPageAdmin, meta: { requiresAdmin: true }},
   { path: '/adminHome', name: 'adminHome', component: LandingPageAdmin, meta: { requiresAdmin: true }},
 
-  { path: '/admin/flightsRegister', name: 'flightsRegister', component: RegistroVuelos },
-  { path: '/admin/routesList', name: 'routesList', component: ListaRutas },
+  { path: '/admin/routes', name: 'routesManagement', component: RoutesManagement },
 
   { path: '/admin/usuarios', name: 'adminUsuarios', component: ListaUsuarios, meta: { requiresAdmin: true }},
   { path: '/managementPlanes', name: 'managementPlanes', component: AirplaneManagement },
