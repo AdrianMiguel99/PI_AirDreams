@@ -92,7 +92,7 @@ builder.Services.AddScoped<IPdfService, PdfService>();
 builder.Services.AddScoped<IPurchaseService, PurchaseService>();
 builder.Services.AddScoped<IPurchaseRepository, PurchaseRepository>();
 
-builder.Services.AddScoped<AircraftRepository>();
+builder.Services.AddScoped<IAircraftRepository,AircraftRepository>();
 builder.Services.AddScoped<IAircraftService, AircraftService>();
 
 builder.Services.AddScoped<IFlightRepository, FlightRepository>();

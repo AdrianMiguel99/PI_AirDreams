@@ -1,0 +1,10 @@
+USE AirDreams
+GO
+
+ALTER TABLE Route
+ALTER COLUMN luggagePrice DECIMAL(6,3) NOT NULL;
+GO
+
+ALTER TABLE Passenger
+ALTER COLUMN emailPassenger VARCHAR(50) NULL;
+GO
