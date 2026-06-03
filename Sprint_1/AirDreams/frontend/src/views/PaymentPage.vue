@@ -269,6 +269,28 @@ export default {
           })) : []
         }
 
+        for (const segment of payload.segments) {
+          const availabilityResponse = await axios.post('http://localhost:5276/api/payment/check-availability', {
+            numberFlight: segment.flightNumber,
+            seatClass: payload.seatClass,
+            requestedSeats: payload.passengerCount
+          })
+          
+          if (!availabilityResponse.data.isAvailable) {
+            this.popupType = 'error'
+            this.popupTitle = 'Asientos no disponibles'
+            this.popupMessage = `No hay asientos disponibles para el vuelo ${segment.flightNumber} en clase ${payload.seatClass}. Por favor, regresa y selecciona otro vuelo o clase.`
+            this.popupActionText = 'Volver a selección de vuelo'
+            this.popupAction = () => {
+              sessionStorage.removeItem('selectedFlightPurchase')
+              sessionStorage.removeItem('purchasePassengers')
+              sessionStorage.removeItem('purchaseLuggage')
+              this.$router.push({ name: 'home' })
+            }
+            this.showPopup = true
+            return
+          };
+        }
         await axios.post('http://localhost:5276/api/payment', payload)
         await this.updateFlightWeight(this.payment.transactionId)
         const purchasewindowData = this.createStructForPage()
@@ -277,7 +299,6 @@ export default {
 
         this.callPurchaseSuccess(purchasewindowData)
       } catch (error) {
-        console.error(error)
         this.popupType = 'error'
         this.popupTitle = 'Error en el pago'
         if (error.response?.data?.error) {
