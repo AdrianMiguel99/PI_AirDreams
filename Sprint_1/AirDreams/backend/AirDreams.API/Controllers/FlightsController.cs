@@ -22,7 +22,8 @@ namespace AirDreams.API.Controllers
             [FromQuery] string destination,
             [FromQuery] DateTime departureDate,
             [FromQuery] DateTime returnDate,
-            [FromQuery] int passengers
+            [FromQuery] int passengers,
+            [FromQuery] bool includeStops = true
         )
         {
             try
@@ -45,7 +46,7 @@ namespace AirDreams.API.Controllers
                     });
                 }
 
-                var flights = await _flightService.SearchFlightsAsync(origin, destination, departureDate, returnDate, passengers);
+                var flights = await _flightService.SearchFlightsAsync(origin, destination, departureDate, returnDate, passengers, includeStops);
                 
                 var response = new { flights };
                 return Ok(response);

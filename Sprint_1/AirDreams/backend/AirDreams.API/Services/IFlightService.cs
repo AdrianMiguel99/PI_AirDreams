@@ -10,7 +10,8 @@ namespace AirDreams.API.Services.Interfaces
             string destination,
             DateTime earliestDeparture,
             DateTime latestDeparture,
-            int quantityOfPassengers
+            int quantityOfPassengers,
+            bool includeStops
         );
 
         Task<List<ExternalResponseFlightDTO>> SearchFlightsByDestinationAsync(
@@ -18,6 +19,7 @@ namespace AirDreams.API.Services.Interfaces
             DateTime earliestDeparture,
             DateTime latestDeparture,
             int quantityOfPassengers
+            
         );
     }
 }

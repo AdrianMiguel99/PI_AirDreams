@@ -2,10 +2,10 @@ Use AirDreams
 GO
 
 Alter Table Route
-ALTER COLUMN carryOnMaxWeight DECIMAL(6, 2) NOT NULL;
+ALTER COLUMN carryOnMaxWeight DECIMAL(6, 2);
 
 Alter Table Route
-ALTER COLUMN luggageMaxWeight DECIMAL(6, 2) NOT NULL;
+ALTER COLUMN luggageMaxWeight DECIMAL(6, 2);
 
 Alter Table Flight
 ADD occupiedLuggage DECIMAL(6, 2) NOT NULL DEFAULT 0;

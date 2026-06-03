@@ -5,21 +5,49 @@
         <div class="input-group">
           <label>Origen</label>
           <input 
-            v-model="searchForm.origin"
+            v-model="originAirportQuery"
             type="text"
             :class="['input-field', { 'input-error': errors.origin }]"
+            autocomplete="off"
+            @focus="showOriginResults = true"
+            @input="onOriginAirportInput"
             @blur="validateField('origin')"
           />
+          <ul v-if="showOriginResults && filteredOriginAirports.length > 0" class="airport-results">
+            <li
+              v-for="airport in filteredOriginAirports"
+              :key="airport.code"
+              @mousedown.prevent="selectOriginAirport(airport)"
+            >
+              <strong>{{ airport.code }}</strong>
+              <span>{{ airport.name }}</span>
+              <small>{{ airport.country }}</small>
+            </li>
+          </ul>
           <span v-if="errors.origin" class="error-message">Espacio requerido</span>
         </div>
         <div class="input-group">
           <label>Destino</label>
           <input 
-            v-model="searchForm.destination"
+            v-model="destinationAirportQuery"
             type="text"
             :class="['input-field', { 'input-error': errors.destination }]"
+            autocomplete="off"
+            @focus="showDestinationResults = true"
+            @input="onDestinationAirportInput"
             @blur="validateField('destination')"
           />
+          <ul v-if="showDestinationResults && filteredDestinationAirports.length > 0" class="airport-results">
+            <li
+              v-for="airport in filteredDestinationAirports"
+              :key="airport.code"
+              @mousedown.prevent="selectDestinationAirport(airport)"
+            >
+              <strong>{{ airport.code }}</strong>
+              <span>{{ airport.name }}</span>
+              <small>{{ airport.country }}</small>
+            </li>
+          </ul>
           <span v-if="errors.destination" class="error-message">Espacio requerido</span>
         </div>
       </div>
@@ -41,43 +69,162 @@
             v-model="searchForm.passengers"
             type="number"
             min="1"
+            max="10"
             :class="['input-field', { 'input-error': errors.passengers }]"
             @blur="validateField('passengers')"
           />
           <span v-if="errors.passengers" class="error-message">Espacio requerido</span>
         </div>
       </div>
+        <div class="input-group">
+            <label>
+              <input 
+                v-model="searchForm.includeStops"
+                type="checkbox"
+              />
+              Incluir vuelos con escalas
+            </label>
+          </div>
     </div>
 
     <button class="search-btn" @click="searchFlights">
       Buscar Vuelos
     </button>
+
+        <PopupMessage
+      :show="showPopup"
+      :title="popupTitle"
+      :message="popupMessage"
+      :type="popupType"
+      @close="showPopup = false"
+    />
   </div>
 </template>
 
 <script>
+import PopupMessage from './PopupMessage.vue';
+
 export default {
   data() {
+    
     return {
       searchForm: {
         origin: '',
         destination: '',
         departureDate: '',
-        passengers: 1
+        passengers: 1,
+        includeStops: true
       },
+      originAirportQuery: '',
+      destinationAirportQuery: '',
+      airports: [],
+      showOriginResults: false,
+      showDestinationResults: false,
       errors: {
         origin: false,
         destination: false,
         departureDate: false,
         passengers: false
-      }
+      },
+      showPopup: false,
+      popupTitle: '',
+      popupMessage: '',
+      popupType: 'error'
     };
+
+    
+  },
+  computed: {
+    filteredOriginAirports() {
+      return this.filterAirports(this.originAirportQuery);
+    },
+    filteredDestinationAirports() {
+      return this.filterAirports(this.destinationAirportQuery);
+    }
+  },
+  components: {
+    PopupMessage
+  },
+  created() {
+    this.loadAirports();
   },
   methods: {
+    showError(title, message) {
+      this.popupType = 'error';
+      this.popupTitle = title;
+      this.popupMessage = message;
+      this.showPopup = true;
+    },
+    async loadAirports() {
+      try {
+        const response = await fetch('http://localhost:5276/api/airports');
+        if (!response.ok) return;
+
+        const airports = await response.json();
+        this.airports = airports.map((airport) => ({
+          code: airport.code || airport.codeAirport || '',
+          name: airport.name || airport.nameAirport || '',
+          country: airport.country || ''
+        }));
+      } catch (error) {
+        console.error('Error cargando aeropuertos:', error);
+      }
+    },
+    filterAirports(queryValue) {
+      const query = (queryValue || '').trim().toLowerCase();
+      if (!query) return [];
+
+      return this.airports.filter((airport) => {
+        const code = String(airport.code || '').toLowerCase();
+        const name = String(airport.name || '').toLowerCase();
+        const country = String(airport.country || '').toLowerCase();
+        return code.includes(query) || name.includes(query) || country.includes(query);
+      }).slice(0, 8);
+    },
+    onOriginAirportInput() {
+      this.showOriginResults = true;
+      this.searchForm.origin = this.resolveAirportCode(this.originAirportQuery);
+    },
+    onDestinationAirportInput() {
+      this.showDestinationResults = true;
+      this.searchForm.destination = this.resolveAirportCode(this.destinationAirportQuery);
+    },
+    selectOriginAirport(airport) {
+      this.originAirportQuery = `${airport.code} - ${airport.name}`;
+      this.searchForm.origin = airport.code;
+      this.showOriginResults = false;
+      this.validateField('origin');
+    },
+    selectDestinationAirport(airport) {
+      this.destinationAirportQuery = `${airport.code} - ${airport.name}`;
+      this.searchForm.destination = airport.code;
+      this.showDestinationResults = false;
+      this.validateField('destination');
+    },
+    resolveAirportCode(value) {
+      const rawValue = (value || '').trim();
+      const possibleCode = rawValue.includes(' - ')
+        ? rawValue.split(' - ')[0].trim()
+        : rawValue;
+
+      const airport = this.airports.find(
+        item => item.code.toLowerCase() === possibleCode.toLowerCase()
+      );
+
+      return airport ? airport.code : '';
+    },
     validateField(field) {
+      if (field === 'origin') {
+        this.searchForm.origin = this.resolveAirportCode(this.originAirportQuery);
+      }
+
+      if (field === 'destination') {
+        this.searchForm.destination = this.resolveAirportCode(this.destinationAirportQuery);
+      }
+
       const value = this.searchForm[field];
       if (field === 'passengers') {
-        this.errors[field] = !value || value < 1;
+        this.errors[field] = !value || value < 1 || value > 10;
       } else {
         this.errors[field] = !value || value.toString().trim() === '';
       }
@@ -98,7 +245,18 @@ export default {
       return `${date}T${timeType === 'start' ? '00:00' : '23:59'}`;
     },
     async searchFlights() {
+      if (Number(this.searchForm.passengers) < 1 || Number(this.searchForm.passengers) > 10) {
+        this.showError(
+          'Cantidad de pasajeros invalida',
+          'El numero de pasajeros debe ser entre 1 y 10.'
+        );
+        return;
+      }
       if (!this.validateForm()) {
+        this.showError(
+          'Datos incompletos',
+          'Selecciona origen, destino, fecha de salida y una cantidad valida de pasajeros.'
+        );
         return;
       }
 
@@ -110,7 +268,8 @@ export default {
           destination: data.destination,
           departureDate: this.formatDateWithTime(data.departureDate, 'start'),
           returnDate: this.formatDateWithTime(data.departureDate, 'end'),
-          passengers: data.passengers
+          passengers: data.passengers,
+          includeStops: data.includeStops
         });
 
         const response = await fetch(`http://localhost:5276/api/flights/search?${params.toString()}`);
@@ -118,7 +277,10 @@ export default {
 
         if (!response.ok) {
           console.error('Backend response:', result);
-          alert(result.detail || result.description || 'Error al buscar vuelos');
+          this.showError(
+            'No se pudo buscar vuelos',
+            result.detail || result.description || 'Intenta de nuevo mas tarde.'
+          );
           return;
         }
 
@@ -129,7 +291,10 @@ export default {
         });
       } catch (error) {
         console.error('Error:', error);
-        alert('Error de conexión al buscar vuelos');
+        this.showError(
+          'Error de conexion',
+          'No se pudo conectar con el servidor. Intenta de nuevo.'
+        );
       }
     }
   }
@@ -161,6 +326,7 @@ export default {
   flex: 1;
   display: flex;
   flex-direction: column;
+  position: relative;
 }
 
 .input-group label {
@@ -207,6 +373,51 @@ export default {
 
 .input-field::placeholder {
   color: #999;
+}
+
+.airport-results {
+  position: absolute;
+  top: 72px;
+  left: 0;
+  right: 0;
+  z-index: 20;
+  max-height: 220px;
+  margin: 0;
+  padding: 0;
+  overflow-y: auto;
+  list-style: none;
+  background: white;
+  border: 1px solid #d0d0d0;
+  border-radius: 8px;
+  box-shadow: 0 8px 18px rgba(3, 32, 86, 0.16);
+}
+
+.airport-results li {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 4px 8px;
+  padding: 10px 12px;
+  color: #1f2937;
+  cursor: pointer;
+}
+
+.airport-results li:hover {
+  background: #f0f5ff;
+}
+
+.airport-results strong {
+  color: #032056;
+}
+
+.airport-results span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.airport-results small {
+  grid-column: 2;
+  color: #667085;
 }
 
 .search-btn {
