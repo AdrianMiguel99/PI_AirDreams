@@ -1,18 +1,68 @@
 USE AirDreams;
 GO
-DELETE FROM Tiene
+
+DELETE FROM PassengerItinerary;
+DELETE FROM Registra;
+DELETE FROM Realiza;
+DELETE FROM Tiene;
+DELETE FROM BoardingPass;
+DELETE FROM CheckIn;
 DELETE FROM Flight;
 DELETE FROM FlightFrequency;
-
 DELETE FROM Route;
-
+DELETE FROM Itinerary;
+DELETE FROM Passenger;
+DELETE FROM Luggage;
 DELETE FROM Aircraft;
 DELETE FROM Airport;
+DELETE FROM City;
+DELETE FROM Country;
+DELETE FROM AirlineEmployee;
+DELETE FROM InternalUser;
+DELETE FROM ExternalUser;
+DELETE FROM SystemUser;
 
-
-Select * FROM Route;
+DBCC CHECKIDENT ('SystemUser', RESEED, 0);
+DBCC CHECKIDENT ('Route', RESEED, 0);
+DBCC CHECKIDENT ('FlightFrequency', RESEED, 0);
 
 GO
+
+INSERT INTO SystemUser DEFAULT VALUES;
+
+INSERT INTO InternalUser (
+    emailUser,
+    userID,
+    hashPasswordUser,
+    isActive,
+    invitationToken,
+    invitationExpiryDate
+)
+VALUES (
+    'admin3@air.com',
+    1,
+    'A6xnQhbz4Vx2HuGl4lXwZ5U2I8iziLRFnhP5eNfIRvQ=',
+    1,
+    NULL,
+    NULL
+);
+
+INSERT INTO AirlineEmployee (
+    employeeID,
+    emailInternalUser,
+    lastnames,
+    nameEmployee,
+    isAdmin,
+    isOperator
+)
+VALUES (
+    1,
+    'admin3@air.com',
+    'Rodriguez',
+    'Carlos',
+    1,
+    0
+);
 
 INSERT INTO Aircraft (adminID, cant_Asientos_Fila_Firstclass, cant_Filas_Firstclass, cant_Asientos_Fila_Turista, cant_Filas_Turista, modelo, aircraftSize, maxWeight)
 VALUES 
@@ -45,30 +95,46 @@ Select * from Route
 INSERT INTO FlightFrequency (idRoute, dayOfWeek, departureTime, estimatedArrivalTime, startingDate, endingDate, active)
 VALUES 
 -- #1: SJO-CDG (L y J)
-(1074, 'Monday', '07:00:00', '23:00:00', '2026-06-01', '2026-12-31', 1),
-(1074, 'Thursday', '07:00:00', '23:00:00', '2026-06-01', '2026-12-31', 1),
+(1, 'Monday', '07:00:00', '23:00:00', '2026-06-01', '2026-12-31', 1),
+(1, 'Thursday', '07:00:00', '23:00:00', '2026-06-01', '2026-12-31', 1),
 -- #2: SJO-JFK (D y J)
-(1075, 'Sunday', '08:00:00', '13:00:00', '2026-06-01', '2026-12-31', 1),
-(1075, 'Thursday', '08:00:00', '13:00:00', '2026-06-01', '2026-12-31', 1),
+(2, 'Sunday', '08:00:00', '13:00:00', '2026-06-01', '2026-12-31', 1),
+(2, 'Thursday', '08:00:00', '13:00:00', '2026-06-01', '2026-12-31', 1),
 -- #3: JFK-CDG (L, J y S)
-(1076, 'Monday', '11:00:00', '18:00:00', '2026-06-01', '2026-12-31', 1),
-(1076, 'Thursday', '11:00:00', '18:00:00', '2026-06-01', '2026-12-31', 1),
-(1076, 'Saturday', '11:00:00', '18:00:00', '2026-06-01', '2026-12-31', 1),
+(3, 'Monday', '11:00:00', '18:00:00', '2026-06-01', '2026-12-31', 1),
+(3, 'Thursday', '11:00:00', '18:00:00', '2026-06-01', '2026-12-31', 1),
+(3, 'Saturday', '11:00:00', '18:00:00', '2026-06-01', '2026-12-31', 1),
 -- #4: JFK-CDG (L, J y S)
-(1077, 'Monday', '17:00:00', '00:00:00', '2026-06-01', '2026-12-31', 1),
-(1077, 'Thursday', '17:00:00', '00:00:00', '2026-06-01', '2026-12-31', 1),
-(1077, 'Saturday', '17:00:00', '00:00:00', '2026-06-01', '2026-12-31', 1),
+(4, 'Monday', '17:00:00', '00:00:00', '2026-06-01', '2026-12-31', 1),
+(4, 'Thursday', '17:00:00', '00:00:00', '2026-06-01', '2026-12-31', 1),
+(4, 'Saturday', '17:00:00', '00:00:00', '2026-06-01', '2026-12-31', 1),
 -- #5: CDG-MEL (V)
-(1078, 'Friday', '05:00:00', '08:00:00', '2026-06-01', '2026-12-31', 1),
+(5, 'Friday', '05:00:00', '08:00:00', '2026-06-01', '2026-12-31', 1),
 -- #6: MSQ-SJO (J)
-(1079, 'Thursday', '01:00:00', '04:00:00', '2026-06-01', '2026-12-31', 1),
+(6, 'Thursday', '01:00:00', '04:00:00', '2026-06-01', '2026-12-31', 1),
 -- #7: SJO-MAD (L y J)
-(1080, 'Monday', '06:30:00', '15:30:00', '2026-06-01', '2026-12-31', 1),
-(1080, 'Thursday', '06:30:00', '15:30:00', '2026-06-01', '2026-12-31', 1),
+(7, 'Monday', '06:30:00', '15:30:00', '2026-06-01', '2026-12-31', 1),
+(7, 'Thursday', '06:30:00', '15:30:00', '2026-06-01', '2026-12-31', 1),
 -- #8: SJO-FRA (L y J)
-(1081, 'Monday', '06:45:00', '15:45:00', '2026-06-01', '2026-12-31', 1),
-(1081, 'Thursday', '06:45:00', '15:45:00', '2026-06-01', '2026-12-31', 1),
+(8, 'Monday', '06:45:00', '15:45:00', '2026-06-01', '2026-12-31', 1),
+(8, 'Thursday', '06:45:00', '15:45:00', '2026-06-01', '2026-12-31', 1),
 -- #9: SJO-AMS (L y J)
-(1082, 'Monday', '07:15:00', '16:15:00', '2026-06-01', '2026-12-31', 1),
-(1082, 'Thursday', '07:15:00', '16:15:00', '2026-06-01', '2026-12-31', 1);
+(9, 'Monday', '07:15:00', '16:15:00', '2026-06-01', '2026-12-31', 1),
+(9, 'Thursday', '07:15:00', '16:15:00', '2026-06-01', '2026-12-31', 1);
 GO
+
+
+
+Select * from Aircraft;
+Select * from Luggage;
+Select * from Passenger;
+Select * from FlightFrequency;
+Select * from Flight;
+Select * from Route;
+Select * from Itinerary;
+Select * from Luggage;
+Select * from PassengerItinerary;
+Select * from Registra;
+
+Select * from Tiene;
+
