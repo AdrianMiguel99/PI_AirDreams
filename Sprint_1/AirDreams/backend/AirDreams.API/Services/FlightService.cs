@@ -1,5 +1,6 @@
 using AirDreams.API.DTOs;
 using AirDreams.ExternalAPI.DTOs;
+using AirDreams.API.Models.Dtos;
 using AirDreams.API.Repositories;
 using AirDreams.API.Services.Interfaces;
 
@@ -8,10 +9,14 @@ namespace AirDreams.API.Services
     public class FlightService : IFlightService
     {
         private readonly IFlightRepository _flightRepository;
+        private readonly IPartnerFlightService _partnerFlightService;
+        private readonly IFlightConnectorService _flightConnectorService;
 
-        public FlightService(IFlightRepository flightRepository)
+        public FlightService(IFlightRepository flightRepository, IPartnerFlightService partnerFlightService, IFlightConnectorService flightConnectorService)
         {
             _flightRepository = flightRepository;
+            _partnerFlightService = partnerFlightService;
+            _flightConnectorService = flightConnectorService;
         }
 
         public async Task<List<FlightItineraryDTO>> SearchFlightsAsync(
@@ -27,6 +32,8 @@ namespace AirDreams.API.Services
 
             origin = origin.Trim().ToUpper();
             destination = destination.Trim().ToUpper();
+
+            var result = new List<FlightItineraryDTO>();
 
             var directFlights = await _flightRepository.SearchFlightsAsync(
                 origin,
@@ -46,9 +53,39 @@ namespace AirDreams.API.Services
                     latestDeparture,
                     quantityOfPassengers
                 );
+
+                var internalOriginFlights = await _flightRepository.SearchFlightsByOriginAsync(
+                    origin,
+                    earliestDeparture,
+                    latestDeparture,
+                    quantityOfPassengers
+                );
+
+                if (internalOriginFlights.Any())
+                {
+                    var externalFlights = await _partnerFlightService.SearchPartnerFlightsAsync(
+                        destination,
+                        earliestDeparture,
+                        latestDeparture,
+                        quantityOfPassengers
+                    );
+
+                    var internalSegments = internalOriginFlights
+                        .Select(f => (FlightSegmentDTO)MapToFlightSegment(f))
+                        .ToList();
+
+                    var connectedFlights = _flightConnectorService.ConnectFlights(
+                        internalSegments,
+                        externalFlights
+                    );
+
+                    var connectedItineraries = connectedFlights
+                        .Select(c => MapConnectedFlightToItinerary(c))  // ✅ mapeo correcto
+                        .ToList();
+
+                    result.AddRange(connectedItineraries);
+                }
             }
-            
-            var result = new List<FlightItineraryDTO>();
 
             foreach (var flight in directFlights)
             {
@@ -123,43 +160,19 @@ namespace AirDreams.API.Services
 
         private FlightItineraryDTO MapToFlightItinerary(dynamic flight, string origin, string destination)
         {
+            var segment = MapToFlightSegment(flight);
+
             return new FlightItineraryDTO
             {
                 ItineraryId = flight.FlightNumber,
                 Stops = 0,
-                TouristPrice = flight.TouristPrice,
-                FirstClassPrice = flight.FirstClassPrice,
-                Segments = new List<FlightSegmentDTO>
-                {
-                    new FlightSegmentDTO
-                    {
-                        FlightNumber = flight.FlightNumber,
-                        RouteId = flight.RouteId,
-                        DepartureDate = flight.DepartureDate,
-                        ArrivalDate = flight.ArrivalDate,
-                        DepartureTime = flight.DepartureTime,
-                        ArrivalTime = flight.ArrivalTime,
-                        CarryOnPrice = flight.CarryOnPrice,
-                        CheckedPrice = flight.CheckedPrice,
-                        Duration = flight.Duration,
-
-                        DepartureAirport = new AirportDTO
-                        {
-                            Code = flight.DepartureAirportCode,
-                            Name = flight.DepartureAirportName,
-                            City = flight.DepartureCity
-                        },
-                        ArrivalAirport = new AirportDTO
-                        {
-                            Code = flight.ArrivalAirportCode,
-                            Name = flight.ArrivalAirportName,
-                            City = flight.ArrivalCity
-                        }
-                    }
-                }
+                TouristPrice = segment.TouristPrice,
+                FirstClassPrice = segment.FirstClassPrice,
+                Segments = new List<FlightSegmentDTO> { segment }
             };
         }
-                private FlightItineraryDTO MapOneStopFlightToItineraryDTO(dynamic flight)
+
+        private FlightItineraryDTO MapOneStopFlightToItineraryDTO(dynamic flight)
         {
             return new FlightItineraryDTO
             {
@@ -245,6 +258,69 @@ namespace AirDreams.API.Services
                 firstClassPrice = flight.FirstClassPrice,
                 carryOnPrice = flight.CarryOnPrice,
                 checkedPrice = flight.CheckedPrice
+            };
+        }
+
+        private FlightSegmentDTO MapToFlightSegment(dynamic flight)
+        {
+            return new FlightSegmentDTO
+            {
+                FlightNumber = flight.FlightNumber,
+                RouteId = flight.RouteId,
+                DepartureDate = flight.DepartureDate,
+                ArrivalDate = flight.ArrivalDate,
+                DepartureTime = flight.DepartureTime,
+                ArrivalTime = flight.ArrivalTime,
+                CarryOnPrice = flight.CarryOnPrice,
+                CheckedPrice = flight.CheckedPrice,
+                TouristPrice = flight.TouristPrice,
+                FirstClassPrice = flight.FirstClassPrice,
+                Duration = flight.Duration,
+                DepartureAirport = new AirportDTO
+                {
+                    Code = flight.DepartureAirportCode,
+                    Name = flight.DepartureAirportName,
+                    City = flight.DepartureCity
+                },
+                ArrivalAirport = new AirportDTO
+                {
+                    Code = flight.ArrivalAirportCode,
+                    Name = flight.ArrivalAirportName,
+                    City = flight.ArrivalCity
+                }
+            };
+        }
+
+        private FlightItineraryDTO MapConnectedFlightToItinerary(ConnectedFlightDto connected)
+        {
+            var externalSegment = new FlightSegmentDTO
+            {
+                FlightNumber = connected.ExternalFlight.flightGUID,
+                DepartureTime = connected.ExternalFlight.departureTime,
+                ArrivalTime = connected.ExternalFlight.arrivalTime,
+                CarryOnPrice = connected.ExternalFlight.carryOnPrice,
+                CheckedPrice = connected.ExternalFlight.checkedPrice,
+                DepartureAirport = new AirportDTO
+                {
+                    Code = connected.ExternalFlight.departureAirport.code,
+                    Name = connected.ExternalFlight.departureAirport.name,
+                    City = connected.ExternalFlight.departureAirport.city
+                },
+                ArrivalAirport = new AirportDTO
+                {
+                    Code = connected.ExternalFlight.arrivalAirport.code,
+                    Name = connected.ExternalFlight.arrivalAirport.name,
+                    City = connected.ExternalFlight.arrivalAirport.city
+                }
+            };
+
+            return new FlightItineraryDTO
+            {
+                ItineraryId = $"{connected.InternalFlight.FlightNumber}-{connected.ExternalFlight.flightGUID}",
+                Stops = 1,
+                TouristPrice = connected.TouristPrice,
+                FirstClassPrice = connected.FirstClassPrice,
+                Segments = new List<FlightSegmentDTO> { connected.InternalFlight, externalSegment }
             };
         }
     }
