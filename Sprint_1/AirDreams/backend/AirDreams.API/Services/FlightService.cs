@@ -63,27 +63,39 @@ namespace AirDreams.API.Services
 
                 if (internalOriginFlights.Any())
                 {
+                    var earliestArrival = internalOriginFlights
+                        .Min(f => (DateTime)f.ArrivalDateTime);
+
+                    var latestArrival = internalOriginFlights
+                        .Max(f => (DateTime)f.ArrivalDateTime);
+
+                    var earliestExternalDeparture = earliestArrival.AddHours(2);
+                    var latestExternalDeparture = latestArrival.AddHours(12);
+
                     var externalFlights = await _partnerFlightService.SearchPartnerFlightsAsync(
                         destination,
-                        earliestDeparture,
-                        latestDeparture,
+                        earliestExternalDeparture,
+                        latestExternalDeparture,
                         quantityOfPassengers
                     );
 
-                    var internalSegments = internalOriginFlights
+                    if(externalFlights.Any())
+                    {
+                        var internalSegments = internalOriginFlights
                         .Select(f => (FlightSegmentDTO)MapToFlightSegment(f))
                         .ToList();
 
-                    var connectedFlights = _flightConnectorService.ConnectFlights(
-                        internalSegments,
-                        externalFlights
-                    );
+                        var connectedFlights = _flightConnectorService.ConnectFlights(
+                            internalSegments,
+                            externalFlights
+                        );
 
-                    var connectedItineraries = connectedFlights
-                        .Select(c => MapConnectedFlightToItinerary(c))  // ✅ mapeo correcto
-                        .ToList();
+                        var connectedItineraries = connectedFlights
+                            .Select(c => MapConnectedFlightToItinerary(c))
+                            .ToList();
 
-                    result.AddRange(connectedItineraries);
+                        result.AddRange(connectedItineraries);
+                    }
                 }
             }
 

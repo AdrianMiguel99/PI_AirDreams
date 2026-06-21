@@ -397,51 +397,61 @@ namespace AirDreams.API.Repositories
                 WHERE SearchDate < CAST(@searchEndDate AS DATE)
             )
             SELECT
-                    CONCAT('AD', r.idRoute, ff.idFrequency, CONVERT(CHAR(8), sd.SearchDate, 112)) AS FlightNumber,
-                    r.idRoute AS RouteId,
-                    sd.SearchDate AS DepartureDate,
-                    CAST(searchedFlight.ArrivalDateTime AS DATE) AS ArrivalDate,
-                    CONVERT(VARCHAR(8), ff.departureTime, 108) AS DepartureTime,
-                    CONVERT(VARCHAR(8), ff.estimatedArrivalTime, 108) AS ArrivalTime,
-                    r.stimatedTime AS Duration,
-                    r.turistClassPrice AS TouristPrice,
-                    r.firstClassPrice AS FirstClassPrice,
-                    r.carryOnPrice AS CarryOnPrice,
-                    r.luggagePrice AS CheckedPrice,
-                    a1.codeAirport AS DepartureAirportCode,
-                    a1.nameAirport AS DepartureAirportName,
-                    a1.city AS DepartureCity,
-                    a2.codeAirport AS ArrivalAirportCode,
-                    a2.nameAirport AS ArrivalAirportName,
-                    a2.city AS ArrivalCity,
-                    ac.cantPasajeros AS AvailableSeats
+                CONCAT('AD', r.idRoute, ff.idFrequency, CONVERT(CHAR(8), sd.SearchDate, 112)) AS FlightNumber,
+                r.idRoute AS RouteId,
+                sd.SearchDate AS DepartureDate,
+                CAST(searchedFlight.ArrivalDateTime AS DATE) AS ArrivalDate,
+                searchedFlight.DepartureDateTime AS DepartureDateTime,
+                searchedFlight.ArrivalDateTime AS ArrivalDateTime,
+                CONVERT(VARCHAR(8), ff.departureTime, 108) AS DepartureTime,
+                CONVERT(VARCHAR(8), ff.estimatedArrivalTime, 108) AS ArrivalTime,
+                r.stimatedTime AS Duration,
+                r.turistClassPrice AS TouristPrice,
+                r.firstClassPrice AS FirstClassPrice,
+                r.carryOnPrice AS CarryOnPrice,
+                r.luggagePrice AS CheckedPrice,
+                a1.codeAirport AS DepartureAirportCode,
+                a1.nameAirport AS DepartureAirportName,
+                a1.city AS DepartureCity,
+                a2.codeAirport AS ArrivalAirportCode,
+                a2.nameAirport AS ArrivalAirportName,
+                a2.city AS ArrivalCity,
+                ac.cantPasajeros AS AvailableSeats
 
-                FROM SearchDates sd
-                INNER JOIN Route r ON 1=1
-                INNER JOIN FlightFrequency ff ON r.idRoute = ff.idRoute
-                INNER JOIN Airport a1 ON r.codeAirportSalida = a1.codeAirport
-                INNER JOIN Airport a2 ON r.codeAirportLlegada = a2.codeAirport
-                INNER JOIN AircraftView ac ON r.modelo = ac.modelo
-                CROSS APPLY (
-                    SELECT DATEADD(
-                        SECOND,
-                        DATEDIFF(SECOND, CAST('00:00:00' AS TIME), ff.departureTime),
-                        CAST(sd.SearchDate AS DATETIME)
-                    ) AS DepartureDateTime,
+            FROM SearchDates sd
+            INNER JOIN Route r ON 1=1
+            INNER JOIN FlightFrequency ff ON r.idRoute = ff.idRoute
+            INNER JOIN Airport a1 ON r.codeAirportSalida = a1.codeAirport
+            INNER JOIN Airport a2 ON r.codeAirportLlegada = a2.codeAirport
+            INNER JOIN AircraftView ac ON r.modelo = ac.modelo
+            CROSS APPLY (
+                SELECT 
                     DATEADD(
                         SECOND,
-                        DATEDIFF(SECOND, CAST('00:00:00' AS TIME), ff.departureTime) + 
-                        DATEDIFF(SECOND, CAST('00:00:00' AS TIME), CAST(r.stimatedTime AS TIME)),
+                        DATEDIFF(SECOND, '00:00:00', ff.departureTime),
                         CAST(sd.SearchDate AS DATETIME)
+                    ) AS DepartureDateTime,
+                    
+                    DATEADD(
+                        DAY,
+                        CASE
+                            WHEN ff.estimatedArrivalTime < ff.departureTime THEN 1
+                            ELSE 0
+                        END,
+                        DATEADD(
+                            SECOND,
+                            DATEDIFF(SECOND, '00:00:00', ff.estimatedArrivalTime),
+                            CAST(sd.SearchDate AS DATETIME)
+                        )
                     ) AS ArrivalDateTime
-                ) searchedFlight
+            ) searchedFlight
 
-                WHERE r.codeAirportSalida = @origin
-                AND ac.cantPasajeros >= @quantityOfPassengers
-                AND ff.active = 1
-                AND sd.SearchDate >= ff.startingDate
-                AND sd.SearchDate <= ff.endingDate
-                AND ff.dayOfWeek = CASE DATEDIFF(DAY, '19000101', sd.SearchDate) % 7
+            WHERE r.codeAirportSalida = @origin
+              AND ac.cantPasajeros >= @quantityOfPassengers
+              AND ff.active = 1
+              AND sd.SearchDate >= ff.startingDate
+              AND sd.SearchDate <= ff.endingDate
+              AND ff.dayOfWeek = CASE DATEDIFF(DAY, '19000101', sd.SearchDate) % 7
                     WHEN 0 THEN 'Monday'
                     WHEN 1 THEN 'Tuesday'
                     WHEN 2 THEN 'Wednesday'
@@ -450,9 +460,9 @@ namespace AirDreams.API.Repositories
                     WHEN 5 THEN 'Saturday'
                     WHEN 6 THEN 'Sunday'
                 END
-                AND searchedFlight.DepartureDateTime >= @earliestDeparture
-                AND searchedFlight.DepartureDateTime <= @latestDeparture
-                OPTION (MAXRECURSION 366)
+              AND searchedFlight.DepartureDateTime >= @earliestDeparture
+              AND searchedFlight.DepartureDateTime <= @latestDeparture
+            OPTION (MAXRECURSION 366)
             ";
 
             var searchStartDate = earliestDeparture.Date;

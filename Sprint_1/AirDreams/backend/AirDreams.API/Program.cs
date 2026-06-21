@@ -116,13 +116,17 @@ builder.Services.AddScoped<ILuggageCalculationService, LuggageCalculationService
 builder.Services.AddScoped<IPassengerValidationRepository, PassengerValidationRepository>();
 builder.Services.AddScoped<IPassengerValidationService, PassengerValidationService>();
 
-builder.Services.AddScoped<IPartnerFlightService, PartnerFlightService>();
-builder.Services.AddScoped<IFlightConnectorService, FlightConnectorService>();
+builder.Services.Configure<List<PartnerApiSettings>>(
+    builder.Configuration.GetSection("PartnerApis")
+);
 
 builder.Services.AddHttpClient("AirDreams", client =>
 {
     client.Timeout = TimeSpan.FromSeconds(10);
 });
+
+builder.Services.AddScoped<IPartnerFlightService, PartnerFlightService>();
+builder.Services.AddScoped<IFlightConnectorService, FlightConnectorService>();
 
 var app = builder.Build();
 
