@@ -305,11 +305,16 @@ namespace AirDreams.API.Services
 
         private FlightItineraryDTO MapConnectedFlightToItinerary(ConnectedFlightDto connected)
         {
+            var departureDateTime = DateTime.Parse(connected.ExternalFlight.departureTime);
+            var arrivalDateTime = DateTime.Parse(connected.ExternalFlight.arrivalTime);
+
             var externalSegment = new FlightSegmentDTO
             {
                 FlightNumber = connected.ExternalFlight.flightGUID,
-                DepartureTime = connected.ExternalFlight.departureTime,
-                ArrivalTime = connected.ExternalFlight.arrivalTime,
+                DepartureDate = departureDateTime.Date,
+                DepartureTime = departureDateTime.ToString("HH:mm:ss"),
+                ArrivalDate = arrivalDateTime.Date,
+                ArrivalTime = arrivalDateTime.ToString("HH:mm:ss"),
                 CarryOnPrice = connected.ExternalFlight.carryOnPrice,
                 CheckedPrice = connected.ExternalFlight.checkedPrice,
                 DepartureAirport = new AirportDTO
