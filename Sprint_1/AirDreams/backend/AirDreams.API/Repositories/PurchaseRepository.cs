@@ -14,29 +14,15 @@ namespace AirDreams.API.Repositories
         {
             _connection = connection;
         }
-        public async Task<bool> CheckFlightAvailabilityAsync( string numberFlight, string seatClass, int requestedSeats)
+
+        public async Task<bool> CheckFlightAvailabilityAsync(string numberFlight, string seatClass, int requestedSeats)
         {
             var result = await _connection.ExecuteScalarAsync<int>(
                 "CheckFlightAvailability",
-                new { NumberFlight = numberFlight, SeatClass = seatClass, RequestedSeats = requestedSeats}, commandType: CommandType.StoredProcedure 
-            );
-
-            return result == 1;
-        }
-
-        public async Task ReserveFlightSeatsAsync(string numberFlight, string seatClass, int requestedSeats, IDbTransaction transaction)
-        {
-            await _connection.ExecuteAsync(
-                "ReserveFlightSeats",
-                new
-                {
-                    NumberFlight = numberFlight,
-                    SeatClass = seatClass,
-                    RequestedSeats = requestedSeats
-                },
-                transaction,
+                new { NumberFlight = numberFlight, SeatClass = seatClass, RequestedSeats = requestedSeats },
                 commandType: CommandType.StoredProcedure
             );
+            return result == 1;
         }
 
         public async Task ConfirmPurchaseAsync(ConfirmPurchaseDto dto, string? cardLastFour)
@@ -48,8 +34,13 @@ namespace AirDreams.API.Repositories
 
             try
             {
-                decimal flightCost = dto.PassengerCount * dto.PricePerPassenger;
-                decimal luggageCost = await CalculateLuggageCostAsync(dto, transaction);
+                var luggageCostParams = new DynamicParameters();
+                luggageCostParams.Add("Segments", BuildSegmentTable(dto).AsTableValuedParameter("dbo.FlightSegmentType"));
+                luggageCostParams.Add("Luggage", BuildLuggageTable(dto).AsTableValuedParameter("dbo.LuggagePurchaseType"));
+                luggageCostParams.Add("TotalCost", dbType: DbType.Decimal, direction: ParameterDirection.Output);
+
+                await _connection.ExecuteAsync("dbo.sp_CalculateLuggageCost", luggageCostParams, transaction, commandType: CommandType.StoredProcedure);
+                decimal luggageCost = luggageCostParams.Get<decimal>("TotalCost");
 
                 var passengerTable = BuildPassengerTable(dto);
                 var luggageTable = BuildLuggageTable(dto);
@@ -72,12 +63,9 @@ namespace AirDreams.API.Repositories
                 if (!passengerMappings.Any())
                     throw new InvalidOperationException("No se registraron pasajeros para la compra.");
 
-                var passengerIds = passengerMappings
-                    .OrderBy(p => p.PassengerIndex)
-                    .Select(p => p.IdPassenger)
-                    .ToList();
-
+                decimal flightCost = dto.PassengerCount * dto.PricePerPassenger;
                 decimal amount = flightCost + luggageCost;
+                var firstPassengerId = passengerMappings.First().IdPassenger;
 
                 var sqlItinerary = @"
                     INSERT INTO Itinerary (transactionId, idPassenger, purchaseDate, amount)
@@ -86,61 +74,47 @@ namespace AirDreams.API.Repositories
                 await _connection.ExecuteAsync(sqlItinerary, new
                 {
                     dto.TransactionId,
-                    IdPassenger = passengerIds.First(),
+                    IdPassenger = firstPassengerId,
                     Amount = amount
                 }, transaction);
 
-                foreach (var passenger in passengerMappings)
-                {
-                    var sqlPI = @"
-                        INSERT INTO PassengerItinerary (idPassenger, transactionId)
-                        VALUES (@IdPassenger, @TransactionId)";
+                var passengerItineraryValues = passengerMappings
+                    .Select(pm => $"({pm.IdPassenger}, '{dto.TransactionId}')");
+                var sqlPassengerItinerary = $@"
+                    INSERT INTO PassengerItinerary (idPassenger, transactionId)
+                    VALUES {string.Join(", ", passengerItineraryValues)}";
 
-                    await _connection.ExecuteAsync(sqlPI, new
+                await _connection.ExecuteAsync(sqlPassengerItinerary, transaction: transaction);
+
+                if (luggageMappings.Any())
+                {
+                    var registraValues = luggageMappings.Select(lm =>
                     {
-                        passenger.IdPassenger,
-                        dto.TransactionId
-                    }, transaction);
-                }
+                        var passengerId = passengerMappings
+                            .First(pm => pm.PassengerIndex == lm.PassengerIndex).IdPassenger;
+                        return $"({passengerId}, '{dto.TransactionId}', '{lm.LuggageNumber}')";
+                    });
 
-                foreach (var segment in dto.Segments)
-                {
-                    await EnsureFlightExistsAsync(transaction, segment.FlightNumber, segment.RouteId);
-
-                    var sqlTiene = @"
-                        INSERT INTO Tiene (transactionId, flightNumber)
-                        VALUES (@TransactionId, @FlightNumber)";
-
-                    await _connection.ExecuteAsync(sqlTiene, new
-                    {
-                        dto.TransactionId,
-                        segment.FlightNumber
-                    }, transaction);
-
-                    await ReserveFlightSeatsAsync(
-                        segment.FlightNumber,
-                        dto.SeatClass,
-                        dto.PassengerCount,
-                        transaction);
-                }
-
-                foreach (var luggage in luggageMappings)
-                {
-                    var passengerId = passengerMappings
-                        .First(p => p.PassengerIndex == luggage.PassengerIndex)
-                        .IdPassenger;
-
-                    var sqlRegistra = @"
+                    var sqlRegistra = $@"
                         INSERT INTO Registra (idPassenger, transactionIdItinerary, luggageNumber)
-                        VALUES (@IdPassenger, @TransactionId, @LuggageNumber)";
+                        VALUES {string.Join(", ", registraValues)}";
 
-                    await _connection.ExecuteAsync(sqlRegistra, new
-                    {
-                        IdPassenger = passengerId,
-                        TransactionId = dto.TransactionId,
-                        luggage.LuggageNumber
-                    }, transaction);
+                    await _connection.ExecuteAsync(sqlRegistra, transaction: transaction);
                 }
+
+                var segmentTable = BuildSegmentTable(dto);
+                await _connection.ExecuteAsync(
+                    "dbo.sp_InsertFlightSegments",
+                    new
+                    {
+                        TransactionId = dto.TransactionId,
+                        Segments = segmentTable.AsTableValuedParameter("dbo.FlightSegmentType"),
+                        SeatClass = dto.SeatClass,
+                        PassengerCount = dto.PassengerCount
+                    },
+                    transaction,
+                    commandType: CommandType.StoredProcedure
+                );
 
                 var sqlPayment = @"
                     UPDATE Itinerary
@@ -167,121 +141,70 @@ namespace AirDreams.API.Repositories
             }
         }
 
-        private async Task<decimal> CalculateLuggageCostAsync(ConfirmPurchaseDto dto, IDbTransaction transaction)
-        {
-            decimal luggageCost = 0;
-
-            if (dto.Luggage == null)
-                return luggageCost;
-
-            foreach (var passengerLuggage in dto.Luggage)
-            {
-                foreach (var item in passengerLuggage.LuggageItems)
-                {
-                    if (item.Quantity <= 0)
-                        continue;
-
-                    foreach (var segment in dto.Segments)
-                    {
-                        decimal basePrice = item.Type == "checked"
-                            ? segment.CheckedPrice
-                            : segment.CarryOnPrice;
-
-                        var cost = await _connection.ExecuteScalarAsync<decimal>(
-                            "SELECT dbo.fn_TotalLuggageCost(@basePrice, @multiplier, @quantity)",
-                            new
-                            {
-                                basePrice,
-                                multiplier = segment.Multiplier,
-                                quantity = item.Quantity
-                            },
-                            transaction);
-
-                        luggageCost += cost;
-                    }
-                }
-            }
-
-            return luggageCost;
-        }
-
         private static DataTable BuildPassengerTable(ConfirmPurchaseDto dto)
         {
-            var passengerTable = new DataTable();
-            passengerTable.Columns.Add("PassengerIndex", typeof(int));
-            passengerTable.Columns.Add("NamePassenger", typeof(string));
-            passengerTable.Columns.Add("LastnamesPassenger", typeof(string));
-            passengerTable.Columns.Add("EmailPassenger", typeof(string));
-            passengerTable.Columns.Add("Telephone", typeof(string));
-            passengerTable.Columns.Add("Country", typeof(string));
+            var table = new DataTable();
+            table.Columns.Add("PassengerIndex", typeof(int));
+            table.Columns.Add("NamePassenger", typeof(string));
+            table.Columns.Add("LastnamesPassenger", typeof(string));
+            table.Columns.Add("EmailPassenger", typeof(string));
+            table.Columns.Add("Telephone", typeof(string));
+            table.Columns.Add("Country", typeof(string));
 
             for (int i = 0; i < dto.Passengers.Count; i++)
             {
-                var passenger = dto.Passengers[i];
-
-                passengerTable.Rows.Add(
+                var p = dto.Passengers[i];
+                table.Rows.Add(
                     i + 1,
-                    passenger.NamePassenger,
-                    passenger.LastnamesPassenger,
-                    string.IsNullOrWhiteSpace(passenger.EmailPassenger)
-                        ? DBNull.Value
-                        : passenger.EmailPassenger.Trim().ToLower(),
-                    passenger.Telephone ?? string.Empty,
-                    passenger.Country
+                    p.NamePassenger,
+                    p.LastnamesPassenger,
+                    string.IsNullOrWhiteSpace(p.EmailPassenger) ? DBNull.Value : p.EmailPassenger.Trim().ToLower(),
+                    p.Telephone ?? string.Empty,
+                    p.Country
                 );
             }
-
-            return passengerTable;
+            return table;
         }
 
         private static DataTable BuildLuggageTable(ConfirmPurchaseDto dto)
         {
-            var luggageTable = new DataTable();
-            luggageTable.Columns.Add("PassengerIndex", typeof(int));
-            luggageTable.Columns.Add("Type", typeof(string));
-            luggageTable.Columns.Add("Quantity", typeof(byte));
+            var table = new DataTable();
+            table.Columns.Add("PassengerIndex", typeof(int));
+            table.Columns.Add("Type", typeof(string));
+            table.Columns.Add("Quantity", typeof(byte));
 
-            if (dto.Luggage == null)
-                return luggageTable;
+            if (dto.Luggage == null) return table;
 
-            foreach (var passengerLuggage in dto.Luggage)
+            foreach (var pl in dto.Luggage)
             {
-                foreach (var item in passengerLuggage.LuggageItems)
+                foreach (var item in pl.LuggageItems)
                 {
-                    if (item.Quantity <= 0)
-                        continue;
-
-                    luggageTable.Rows.Add(
-                        passengerLuggage.PassengerIndex,
-                        item.Type,
-                        Convert.ToByte(item.Quantity)
-                    );
+                    if (item.Quantity > 0)
+                    {
+                        table.Rows.Add(pl.PassengerIndex, item.Type, Convert.ToByte(item.Quantity));
+                    }
                 }
             }
-
-            return luggageTable;
+            return table;
         }
 
-        private async Task EnsureFlightExistsAsync(IDbTransaction transaction,
-            string flightNumber, int? routeId)
+        private static DataTable BuildSegmentTable(ConfirmPurchaseDto dto)
         {
-            var exists = await _connection.ExecuteScalarAsync<bool>(
-                "SELECT COUNT(1) FROM Flight WHERE numberFlight = @FlightNumber",
-                new { FlightNumber = flightNumber }, transaction);
+            var table = new DataTable();
+            table.Columns.Add("FlightNumber", typeof(string));
+            table.Columns.Add("RouteId", typeof(int));
+            table.Columns.Add("CheckedPrice", typeof(decimal));
+            table.Columns.Add("CarryOnPrice", typeof(decimal));
+            table.Columns.Add("Multiplier", typeof(decimal));
 
-            if (!exists)
+            foreach (var s in dto.Segments)
             {
-                int resolvedRouteId = routeId ?? 1;
-                var sqlInsertFlight = @"
-                    INSERT INTO Flight (numberFlight, routeId, boardingGate, departureDate, flightState, occupiedFirstclass, occupiedTurist)
-                    VALUES (@FlightNumber, @RouteId, 1, CAST(GETDATE() AS DATE), 'On-time', 0, 0)";
+                var flight = s.FlightNumber ?? "";
+                if (flight.Length > 50) flight = flight.Substring(0, 50);
 
-                await _connection.ExecuteAsync(sqlInsertFlight, new
-                {
-                    FlightNumber = flightNumber,
-                    RouteId = resolvedRouteId
-                }, transaction);
+                table.Rows.Add(flight, s.RouteId ?? 1, s.CheckedPrice, s.CarryOnPrice, s.Multiplier);
             }
+            return table;
         }
     }
 }
