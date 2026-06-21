@@ -371,6 +371,37 @@ namespace AirDreams.API.Services
             
             return true;
         }
+
+        public async Task<bool> DeleteUserAsync(byte employeeId, string currentUserEmail)
+        {
+            var currentUserId =
+                await _userRepository.GetCurrentUserIdFromEmailAsync(currentUserEmail);
+
+            var currentUser =
+                await _userRepository.GetAirlineEmployeeByIdAsync(currentUserId);
+
+            var targetUser =
+                await _userRepository.GetAirlineEmployeeByIdAsync(employeeId);
+
+            if (currentUser == null)
+                throw new UnauthorizedAccessException("Usuario actual no encontrado.");
+
+            if (targetUser == null)
+                throw new KeyNotFoundException("Usuario a eliminar no encontrado.");
+
+            if (!currentUser.IsAdmin)
+                throw new UnauthorizedAccessException("Solo un administrador puede eliminar usuarios.");
+
+            if (currentUserId == employeeId)
+                throw new InvalidOperationException("No puede eliminarse a sí mismo.");
+
+            if (targetUser.EmailInternalUser == "admin3@air.com")
+                throw new InvalidOperationException("No se puede eliminar el administrador principal.");
+
+            await _userRepository.SoftDeleteUserAsync(employeeId);
+
+            return true;
+        }
     }
 }
 

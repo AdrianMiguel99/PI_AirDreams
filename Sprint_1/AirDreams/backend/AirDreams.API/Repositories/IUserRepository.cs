@@ -25,8 +25,9 @@ namespace AirDreams.API.Repositories
         Task UpdateAirlineEmployeeAsync(byte employeeId, string? firstName, string? lastName, bool? isAdmin, bool? isOperator);
         Task UpdateInternalUserActiveStatusAsync(byte employeeId, bool? isActive);
         Task<byte> GetCurrentUserIdFromEmailAsync(string email);
-    }
-    
+
+        Task SoftDeleteUserAsync(byte employeeId);  
+        }  
     public class InvitationData
     {
         public string Email { get; set; } = string.Empty;
