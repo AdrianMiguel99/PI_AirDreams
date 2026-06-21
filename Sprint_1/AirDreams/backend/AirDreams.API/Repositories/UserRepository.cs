@@ -31,19 +31,20 @@ namespace AirDreams.API.Repositories
         public List<UserDTO> GetAll()
         {
             const string sql = @"
-        SELECT 
-            ae.employeeID,
-            ae.nameEmployee + ' ' + ae.lastnames AS fullName,
-            iu.emailUser AS email,
-            CASE
-                WHEN ae.isAdmin = 1 THEN 'Admin'
-                WHEN ae.isOperator = 1 THEN 'Operator'
-                ELSE 'User'
-            END AS role
-        FROM AirlineEmployee ae
-        INNER JOIN InternalUser iu
-            ON iu.emailUser = ae.emailInternalUser;
-    ";
+                SELECT 
+                    ae.employeeID,
+                    ae.nameEmployee + ' ' + ae.lastnames AS fullName,
+                    iu.emailUser AS email,
+                    CASE
+                        WHEN ae.isAdmin = 1 THEN 'Admin'
+                        WHEN ae.isOperator = 1 THEN 'Operator'
+                        ELSE 'User'
+                    END AS role
+                FROM AirlineEmployee ae
+                INNER JOIN InternalUser iu
+                    ON iu.emailUser = ae.emailInternalUser
+                WHERE iu.isActive = 1;
+            ";
 
             var dynamicUsers = _dbConnection.Query(sql).ToList<dynamic>();
 
@@ -60,23 +61,25 @@ namespace AirDreams.API.Repositories
         public List<UserDTO> Search(string searchTerm)
         {
             const string sql = @"
-        SELECT 
-            ae.employeeID,
-            ae.nameEmployee + ' ' + ae.lastnames AS fullName,
-            iu.emailUser AS email,
-            CASE
-                WHEN ae.isAdmin = 1 THEN 'Admin'
-                WHEN ae.isOperator = 1 THEN 'Operator'
-                ELSE 'User'
-            END AS role
-        FROM AirlineEmployee ae
-        INNER JOIN InternalUser iu
-            ON iu.emailUser = ae.emailInternalUser
-        WHERE 
-            ae.nameEmployee LIKE @searchTerm
-            OR ae.lastnames LIKE @searchTerm
-            OR iu.emailUser LIKE @searchTerm;
-    ";
+                SELECT 
+                    ae.employeeID,
+                    ae.nameEmployee + ' ' + ae.lastnames AS fullName,
+                    iu.emailUser AS email,
+                    CASE
+                        WHEN ae.isAdmin = 1 THEN 'Admin'
+                        WHEN ae.isOperator = 1 THEN 'Operator'
+                        ELSE 'User'
+                    END AS role
+                FROM AirlineEmployee ae
+                INNER JOIN InternalUser iu
+                    ON iu.emailUser = ae.emailInternalUser
+                WHERE iu.isActive = 1
+                    AND (
+                        ae.nameEmployee LIKE @searchTerm
+                        OR ae.lastnames LIKE @searchTerm
+                        OR iu.emailUser LIKE @searchTerm
+                    );
+            ";
 
             var dynamicUsers = _dbConnection.Query(sql, new
             {
@@ -251,7 +254,8 @@ namespace AirDreams.API.Repositories
                 FROM InternalUser iu
                 INNER JOIN AirlineEmployee ae
                     ON ae.emailInternalUser = iu.emailUser
-                WHERE iu.emailUser = @Email;
+                WHERE iu.emailUser = @Email
+                    AND iu.isActive = 1;
             ";
 
             return await _dbConnection.QueryFirstOrDefaultAsync<UserModel>(
@@ -273,11 +277,12 @@ namespace AirDreams.API.Repositories
                         ELSE 'User'
                     END AS Role,
                     iu.hashPasswordUser AS PasswordHash,
-                    1 AS IsActive
+                    iu.isActive AS IsActive
                 FROM InternalUser iu
                 INNER JOIN AirlineEmployee ae
                     ON ae.emailInternalUser = iu.emailUser
-                WHERE ae.employeeID = @Id;
+                WHERE ae.employeeID = @Id
+                    AND iu.isActive = 1;
             ";
 
             return await _dbConnection.QueryFirstOrDefaultAsync<UserModel>(
@@ -285,14 +290,27 @@ namespace AirDreams.API.Repositories
                 new { Id = id }
             );
         }
+
         public async Task<AirlineEmployee?> GetAirlineEmployeeByIdAsync(byte employeeId)
         {
             const string sql = @"
-                SELECT employeeID, emailInternalUser, lastnames, nameEmployee, isAdmin, isOperator
-                FROM AirlineEmployee
-                WHERE employeeID = @employeeId";
-            
-            return await _dbConnection.QueryFirstOrDefaultAsync<AirlineEmployee>(sql, new { employeeId });
+                SELECT 
+                    ae.employeeID,
+                    ae.emailInternalUser,
+                    ae.lastnames,
+                    ae.nameEmployee,
+                    ae.isAdmin,
+                    ae.isOperator
+                FROM AirlineEmployee ae
+                INNER JOIN InternalUser iu
+                    ON iu.emailUser = ae.emailInternalUser
+                WHERE ae.employeeID = @employeeId
+                    AND iu.isActive = 1";
+
+            return await _dbConnection.QueryFirstOrDefaultAsync<AirlineEmployee>(
+                sql,
+                new { employeeId }
+            );
         }
 
         public async Task UpdateAirlineEmployeeAsync(byte employeeId, string? firstName, string? lastName, bool? isAdmin, bool? isOperator)
@@ -348,13 +366,30 @@ namespace AirDreams.API.Repositories
             const string sql = @"
                 SELECT ae.employeeID
                 FROM AirlineEmployee ae
-                WHERE ae.emailInternalUser = @email";
-            
-            return await _dbConnection.QueryFirstOrDefaultAsync<byte>(sql, new { email });
+                INNER JOIN InternalUser iu
+                    ON iu.emailUser = ae.emailInternalUser
+                WHERE ae.emailInternalUser = @email
+                    AND iu.isActive = 1";
+
+            return await _dbConnection.QueryFirstOrDefaultAsync<byte>(
+                sql,
+                new { email }
+            );
         }
 
+        public async Task SoftDeleteUserAsync(byte employeeId)
+        {
+            const string sql = @"
+                UPDATE InternalUser
+                SET isActive = 0
+                WHERE emailUser = (
+                    SELECT emailInternalUser
+                    FROM AirlineEmployee
+                    WHERE employeeID = @employeeId
+                );
+            ";
+
+            await _dbConnection.ExecuteAsync(sql, new { employeeId });
+        }
     }
 }
-
-
-

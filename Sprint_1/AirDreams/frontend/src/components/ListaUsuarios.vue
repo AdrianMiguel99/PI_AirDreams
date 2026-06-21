@@ -42,6 +42,7 @@
             <td>{{ user.role }}</td>
             <td>
               <button @click="openEditModal(user)" class="btn-edit">Editar</button>
+              <button @click="deleteUser(user)" class="btn-delete">Eliminar</button>
             </td>
           </tr>
         </tbody>
@@ -240,6 +241,40 @@ export default {
         this.popupTitle = 'Error';
         this.popupMessage = error.response?.data?.message || 'Error al actualizar el usuario';
       });
+    },
+    async deleteUser(user) {
+      const confirmed = confirm(
+        `¿Desea eliminar a ${user.fullName}? Esta acción no se puede deshacer.`
+      );
+
+      if (!confirmed) return;
+
+      try {
+        const token = localStorage.getItem("token");
+
+        await axios.delete(
+          `http://localhost:5276/api/User/${user.id}`,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`
+            }
+          }
+        );
+
+        this.showPopup = true;
+        this.popupType = "success";
+        this.popupTitle = "Éxito";
+        this.popupMessage = "Usuario eliminado correctamente";
+
+        this.fetchUsers();
+      } catch (error) {
+        this.showPopup = true;
+        this.popupType = "error";
+        this.popupTitle = "Error";
+        this.popupMessage =
+          error.response?.data?.message ||
+          "Error al eliminar usuario";
+      }
     }
   },
     created() {
@@ -251,6 +286,7 @@ export default {
       }
     }
 };
+
 </script>
 
 <style scoped>
@@ -451,4 +487,26 @@ th {
   border-radius: 4px;
   cursor: pointer;
 }
+
+.btn-delete {
+  background-color: #dc2626;
+  color: white;
+  border: none;
+  border-radius: 999px;
+  padding: 6px 16px;
+  margin-left: 8px;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-family: 'Inter', sans-serif;
+  font-size: 14px;
+  font-weight: 400;
+  transition: 0.3s;
+  cursor: pointer;
+}
+
+.btn-delete:hover {
+  background-color: #b91c1c;
+}
 </style>
+

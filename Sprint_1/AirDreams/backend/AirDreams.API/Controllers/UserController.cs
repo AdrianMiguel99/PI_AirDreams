@@ -107,5 +107,70 @@ namespace AirDreams.API.Controllers
                 });
             }
         }
+
+        [HttpDelete("{employeeId}")]
+        public async Task<IActionResult> DeleteUser(byte employeeId)
+        {
+            try
+            {
+                var currentUserEmail =
+                    User.FindFirst(ClaimTypes.Email)?.Value;
+
+                if (string.IsNullOrEmpty(currentUserEmail))
+                {
+                    return Unauthorized(new
+                    {
+                        message = "No se pudo identificar al usuario"
+                    });
+                }
+
+                var result = await _userService.DeleteUserAsync(
+                    employeeId,
+                    currentUserEmail
+                );
+
+                if (!result)
+                {
+                    return NotFound(new
+                    {
+                        message = $"Usuario con ID {employeeId} no encontrado"
+                    });
+                }
+
+                return Ok(new
+                {
+                    message = "Usuario eliminado correctamente"
+                });
+            }
+            catch (UnauthorizedAccessException ex)
+            {
+                return StatusCode(403, new
+                {
+                    message = ex.Message
+                });
+            }
+            catch (InvalidOperationException ex)
+            {
+                return BadRequest(new
+                {
+                    message = ex.Message
+                });
+            }
+            catch (KeyNotFoundException ex)
+            {
+                return NotFound(new
+                {
+                    message = ex.Message
+                });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new
+                {
+                    message = "Error interno del servidor",
+                    detail = ex.Message
+                });
+            }
+        }
     }
 }
