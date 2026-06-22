@@ -116,6 +116,9 @@ builder.Services.AddScoped<ILuggageCalculationService, LuggageCalculationService
 builder.Services.AddScoped<IPassengerValidationRepository, PassengerValidationRepository>();
 builder.Services.AddScoped<IPassengerValidationService, PassengerValidationService>();
 
+builder.Services.AddScoped<IReservationRepository, ReservationRepository>();
+builder.Services.AddScoped<IReservationService, ReservationService>();
+
 var app = builder.Build();
 
 if (app.Environment.IsDevelopment())
