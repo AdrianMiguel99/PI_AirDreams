@@ -74,5 +74,22 @@ namespace AirDreams.API.Controllers
                 return BadRequest(new { error = ex.Message });
             }
         }
+
+        [HttpDelete("{code}")]
+        [Authorize(Roles = "Admin")]
+        public async Task<IActionResult> Delete(string code)
+        {
+            try
+            {
+                var (success, message) = await _airportService.DeleteAsync(code.ToUpperInvariant());
+                if (!success)
+                    return NotFound(new { error = message });
+                return Ok(new { message });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { error = ex.Message });
+            }
+        }
     }
 }

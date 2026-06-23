@@ -52,7 +52,8 @@ namespace AirDreams.API.Services
             Name = a.NameAirport,
             City = a.City,
             Country = a.Country,
-            TimeZone = a.TimeZone
+            TimeZone = a.TimeZone,
+            isActive = a.isActive
         };
 
         public async Task UpdateAsync(string code, UpdateAirportDto dto)
@@ -64,6 +65,16 @@ namespace AirDreams.API.Services
             var updated = await _repository.UpdateAsync(code, dto.Name);
             if (!updated)
                 throw new Exception("No se pudo actualizar el aeropuerto.");
+        }
+        public async Task<(bool success, string message)> DeleteAsync(string code)
+        {
+            code = code.ToUpperInvariant();
+            var airport = await _repository.GetByCodeAsync(code);
+            if (airport == null)
+                return (false, "Aeropuerto no encontrado.");
+
+            bool inUse = await _repository.IsAirportInUseAsync(code);
+            return await _repository.DeleteAirportAsync(code, inUse);
         }
     }
 }
