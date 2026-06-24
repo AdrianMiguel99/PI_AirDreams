@@ -3,26 +3,26 @@
     <HeaderLogoNoAdmin />
 
     <main class="reservation-wrapper">
-      <ReservationHero :reservation="reservation" />
+        <ReservationHero :reservation="reservation" />
 
-      <section class="details-card">
-        <div class="details-layout">
-          <section class="tickets-content">
-            <h1>Detalles del vuelo</h1>
+        <section class="details-card">
+          <div class="details-layout">
+            <section class="tickets-content">
+              <h1>Detalles del vuelo</h1>
 
-            <div class="tickets-list">
-              <ReservationTicketCard
-                v-for="ticket in reservation.tickets"
-                :key="ticket.id"
-                :ticket="ticket"
-                :purchase="reservation.purchase"
-              />
-            </div>
-          </section>
+              <div class="tickets-list">
+                <ReservationTicketCard
+                  v-for="ticket in reservation.tickets"
+                  :key="ticket.id"
+                  :ticket="ticket"
+                  :purchase="reservation.purchase"
+                />
+              </div>
+            </section>
 
-          <ReservationOptionsPanel />
-        </div>
-      </section>
+            <ReservationOptionsPanel />
+          </div>
+        </section>
     </main>
   </div>
 </template>
@@ -32,6 +32,8 @@ import HeaderLogoNoAdmin from "../components/HeaderLogoNoAdmin.vue";
 import ReservationHero from "../components/reservations/ReservationHero.vue";
 import ReservationTicketCard from "../components/reservations/ReservationTicketCard.vue";
 import ReservationOptionsPanel from "../components/reservations/ReservationOptionsPanel.vue";
+
+const API_URL = import.meta.env.VITE_API_URL;
 
 export default {
   name: "ReservationDetailsPage",
@@ -43,80 +45,224 @@ export default {
     ReservationOptionsPanel
   },
 
-    data() {
+  data() {
     return {
+      errorMessage: "",
+
       reservation: {
-        reservationCode: this.$route.query.reservationCode || "8473635",
-        destinationCity: "Madrid",
-        destinationCode: "MAD",
-        daysLeft: 93,
-        departureDate: "03/05/2025",
-        passengerCount: 2,
+        reservationCode: "",
+        destinationCity: "",
+        destinationCode: "",
+        daysLeft: 0,
+        departureDate: "",
+        passengerCount: 0,
         status: "Confirmada",
         isCancelled: false,
 
         purchase: {
-          purchaseType: "layover",
+          purchaseType: "direct",
           firstIsAirDreams: true,
           secondIsAirDreams: false,
 
-          flightCode: "AD-956 / AD-824",
-          firstFlightCode: "AD-956",
-          secondFlightCode: "AD-824",
+          flightCode: "",
+          firstFlightCode: "",
+          secondFlightCode: "",
 
-          origin: "SJO",
-          layover: "YYZ",
-          destination: "MAD",
+          origin: "",
+          layover: "",
+          destination: "",
 
-          originName: "San José, CR",
-          layoverName: "Toronto, CA",
-          destinationName: "Madrid, ES",
+          originName: "",
+          layoverName: "",
+          destinationName: "",
 
-          departureDate: "03/05/2025",
-          departureShortDate: "Mar 03",
+          departureDate: "",
+          departureShortDate: "",
 
-          arrivalDate: "04/05/2025",
-          arrivalShortDate: "Mar 04",
+          arrivalDate: "",
+          arrivalShortDate: "",
 
-          firstDepartureDate: "03/05/2025",
-          secondDepartureDate: "03/05/2025",
+          firstDepartureDate: "",
+          secondDepartureDate: "",
 
-          departureTime: "07:10",
-          arrivalTime: "08:50",
+          departureTime: "",
+          arrivalTime: "",
 
-          firstDepartureTime: "07:10",
-          firstArrivalTime: "14:50",
+          firstDepartureTime: "",
+          firstArrivalTime: "",
 
-          secondDepartureTime: "19:30",
-          secondArrivalTime: "08:50",
+          secondDepartureTime: "",
+          secondArrivalTime: "",
 
-          totalDuration: "17h 40m",
-          layoverDuration: "4h 40m",
+          totalDuration: "",
+          layoverDuration: "",
 
-          originTerminal: "M",
-          destinationTerminal: "1",
+          originTerminal: "",
+          destinationTerminal: "",
 
-          firstAircraft: "Boeing 737 MAX 8",
-          secondAircraft: "Airbus A330-300"
+          firstAircraft: "",
+          secondAircraft: ""
         },
 
-        tickets: [
-          {
-            id: 1,
-            passengerName: this.$route.query.passengerName || "Obando Vásquez",
-            seatNumber: "12A",
-            classType: "Turista"
-          },
-          {
-            id: 2,
-            passengerName: "Adrián Arrieta",
-            seatNumber: "12B",
-            classType: "Turista"
-          }
-        ]
+        tickets: []
       }
     };
   },
+
+  async mounted() {
+    await this.loadReservationDetails();
+  },
+
+  methods: {
+    async loadReservationDetails() {
+      try {
+        this.loading = true;
+        this.errorMessage = "";
+
+        const reservationCode = this.$route.query.reservationCode;
+
+        if (!reservationCode) {
+          this.errorMessage = "No se recibió el código de reserva.";
+          return;
+        }
+
+        const response = await fetch(`${API_URL}/Reservation/${encodeURIComponent(reservationCode)}`);
+
+        if (!response.ok) {
+          throw new Error("No se pudo obtener la reserva.");
+        }
+
+        const data = await response.json();
+
+        this.reservation = this.mapReservationDetails(reservationCode, data);
+      } catch (error) {
+        console.error(error);
+        this.errorMessage = "No se pudo cargar la información de la reserva.";
+      } finally {
+        this.loading = false;
+      }
+    },
+
+    mapReservationDetails(reservationCode, data) {
+      const passengers = data.passengers || [];
+      const flights = data.flights || [];
+
+      const firstFlight = flights[0];
+      const lastFlight = flights[flights.length - 1];
+
+      const hasLayover = flights.length > 1;
+
+      return {
+        reservationCode: reservationCode,
+
+        destinationCity: lastFlight?.destinationCity || "",
+        destinationCode: lastFlight?.destinationCode || "",
+
+        daysLeft: this.calculateDaysLeft(firstFlight?.departureDate),
+        departureDate: this.formatDate(firstFlight?.departureDate),
+        passengerCount: passengers.length,
+
+        status: "Confirmada",
+        isCancelled: false,
+
+        purchase: {
+          purchaseType: hasLayover ? "layover" : "direct",
+
+          firstIsAirDreams: true,
+          secondIsAirDreams: hasLayover,
+
+          flightCode: flights.map(flight => flight.flightNumber).join(" / "),
+          firstFlightCode: flights[0]?.flightNumber || "",
+          secondFlightCode: flights[1]?.flightNumber || "",
+
+          origin: firstFlight?.originCode || "",
+          layover: hasLayover ? flights[0]?.destinationCode : "",
+          destination: lastFlight?.destinationCode || "",
+
+          originName: firstFlight
+            ? `${firstFlight.originCity}, ${firstFlight.originCountry}`
+            : "",
+
+          layoverName: hasLayover
+            ? `${flights[0].destinationCity}, ${flights[0].destinationCountry}`
+            : "",
+
+          destinationName: lastFlight
+            ? `${lastFlight.destinationCity}, ${lastFlight.destinationCountry}`
+            : "",
+
+          departureDate: this.formatDate(firstFlight?.departureDate),
+          departureShortDate: this.formatShortDate(firstFlight?.departureDate),
+
+          arrivalDate: "",
+          arrivalShortDate: "",
+
+          firstDepartureDate: this.formatDate(flights[0]?.departureDate),
+          secondDepartureDate: this.formatDate(flights[1]?.departureDate),
+
+          departureTime: "",
+          arrivalTime: "",
+
+          firstDepartureTime: "",
+          firstArrivalTime: "",
+
+          secondDepartureTime: "",
+          secondArrivalTime: "",
+
+          totalDuration: "",
+          layoverDuration: "",
+
+          originTerminal: "",
+          destinationTerminal: "",
+
+          firstAircraft: flights[0]?.aircraftModel || "",
+          secondAircraft: flights[1]?.aircraftModel || ""
+        },
+
+        tickets: passengers.map(passenger => ({
+          id: passenger.idPassenger,
+          passengerName: passenger.passengerName,
+          seatNumber: "",
+          classType: "Turista"
+        }))
+      };
+    },
+
+    formatDate(dateValue) {
+      if (!dateValue) return "";
+
+      const date = new Date(dateValue);
+
+      return date.toLocaleDateString("es-CR", {
+        day: "2-digit",
+        month: "2-digit",
+        year: "numeric"
+      });
+    },
+
+    formatShortDate(dateValue) {
+      if (!dateValue) return "";
+
+      const date = new Date(dateValue);
+
+      return date.toLocaleDateString("es-CR", {
+        month: "short",
+        day: "2-digit"
+      });
+    },
+
+    calculateDaysLeft(departureDate) {
+      if (!departureDate) return 0;
+
+      const today = new Date();
+      const departure = new Date(departureDate);
+
+      const timeDiff = departure.getTime() - today.getTime();
+      const daysLeft = Math.ceil(timeDiff / (1000 * 3600 * 24));
+
+      return daysLeft >= 0 ? daysLeft : 0;
+    }
+  }
 };
 </script>
 
