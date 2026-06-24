@@ -292,7 +292,8 @@ export default {
             lastnamesPassenger: p.lastnamesPassenger,
             emailPassenger: p.emailPassenger || '',
             telephone: p.telephone || '',
-            country: p.country || ''
+            country: p.country || '',
+            birthDate: p.birthDate || ''
           })),
           luggage: luggage ? luggage.map(l => ({
             passengerIndex: l.passenger.index,

@@ -12,5 +12,6 @@
         public string NamePassenger { get; set; }
         public string LastnamesPassenger { get; set; }
         public string Country { get; set; }
+        public string? BirthDate { get; set; }
     }
 }

@@ -3,6 +3,7 @@ using AirDreams.API.Models.Dtos;
 using Dapper;
 using Microsoft.Data.SqlClient;
 using System.Data;
+using System.Globalization;
 
 namespace AirDreams.API.Repositories
 {
@@ -68,14 +69,15 @@ namespace AirDreams.API.Repositories
                 var firstPassengerId = passengerMappings.First().IdPassenger;
 
                 var sqlItinerary = @"
-                    INSERT INTO Itinerary (transactionId, idPassenger, purchaseDate, amount)
-                    VALUES (@TransactionId, @IdPassenger, GETDATE(), @Amount)";
+                    INSERT INTO Itinerary (transactionId, idPassenger, purchaseDate, amount, seatClass)
+                    VALUES (@TransactionId, @IdPassenger, GETDATE(), @Amount, @SeatClass)";
 
                 await _connection.ExecuteAsync(sqlItinerary, new
                 {
                     dto.TransactionId,
                     IdPassenger = firstPassengerId,
-                    Amount = amount
+                    Amount = amount,
+                    SeatClass = dto.SeatClass
                 }, transaction);
 
                 var passengerItineraryValues = passengerMappings
@@ -150,17 +152,25 @@ namespace AirDreams.API.Repositories
             table.Columns.Add("EmailPassenger", typeof(string));
             table.Columns.Add("Telephone", typeof(string));
             table.Columns.Add("Country", typeof(string));
+            table.Columns.Add("BirthDate", typeof(DateTime));
 
             for (int i = 0; i < dto.Passengers.Count; i++)
             {
                 var p = dto.Passengers[i];
+                DateTime? birth = null;
+                if (!string.IsNullOrWhiteSpace(p.BirthDate))
+                {
+                    if (DateTime.TryParseExact(p.BirthDate, "MM-dd-yyyy", CultureInfo.InvariantCulture, DateTimeStyles.None, out var parsed))
+                        birth = parsed;
+                }
                 table.Rows.Add(
                     i + 1,
                     p.NamePassenger,
                     p.LastnamesPassenger,
                     string.IsNullOrWhiteSpace(p.EmailPassenger) ? DBNull.Value : p.EmailPassenger.Trim().ToLower(),
                     p.Telephone ?? string.Empty,
-                    p.Country
+                    p.Country,
+                    birth ?? (object)DBNull.Value
                 );
             }
             return table;
@@ -205,6 +215,19 @@ namespace AirDreams.API.Repositories
                 table.Rows.Add(flight, s.RouteId ?? 1, s.CheckedPrice, s.CarryOnPrice, s.Multiplier);
             }
             return table;
+        }
+
+        public async Task<Dictionary<string, decimal>> GetMultipliersByFlightsAsync(IEnumerable<string> flightNumbers)
+        {
+            var sql = @"SELECT f.numberFlight, r.porcentageMultiplier
+                FROM Flight f
+                JOIN Route r ON f.routeId = r.idRoute
+                WHERE f.numberFlight IN @FlightNumbers";
+            var result = await _connection.QueryAsync(sql, new { FlightNumbers = flightNumbers });
+            return result.ToDictionary(
+                row => (string)row.numberFlight,
+                row => (decimal)row.porcentageMultiplier
+            );
         }
     }
 }

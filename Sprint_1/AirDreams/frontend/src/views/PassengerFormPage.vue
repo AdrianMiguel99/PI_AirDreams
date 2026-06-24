@@ -192,6 +192,12 @@ export default {
       }
     },
 
+    formatBirthDateToMMDDYYYY(isoDate) {
+    if (!isoDate) return '';
+    const [year, month, day] = isoDate.split('-');
+    return `${month}-${day}-${year}`;
+    },
+
     loadPurchaseSelection() {
       const savedPurchase = sessionStorage.getItem('selectedFlightPurchase');
 
@@ -238,22 +244,22 @@ export default {
     },
 
     normalizePassengers() {
-      return this.passengers.map((passenger, index) => ({
+    return this.passengers.map((passenger, index) => ({
         ...passenger,
         isMainPassenger: this.isMainPassenger(index),
         gender: passenger.gender,
         namePassenger: passenger.namePassenger.trim(),
         lastnamesPassenger: passenger.lastnamesPassenger.trim(),
-        birthDate: passenger.birthDate,
+        birthDate: this.formatBirthDateToMMDDYYYY(passenger.birthDate),  // ← convertir aquí
         passportCountry: passenger.country.trim(),
         emailPassenger: this.isMainPassenger(index)
-          ? passenger.emailPassenger.trim().toLowerCase()
-          : null,
+            ? passenger.emailPassenger.trim().toLowerCase()
+            : null,
         telephone: this.isMainPassenger(index)
-          ? passenger.telephone.trim()
-          : null,
+            ? passenger.telephone.trim()
+            : null,
         fullName: `${passenger.namePassenger.trim()} ${passenger.lastnamesPassenger.trim()}`
-      }));
+    }));
     },
 
     isMainPassenger(index) {
@@ -280,7 +286,8 @@ export default {
       const passengersToCheck = this.passengers.map(p => ({
         namePassenger: p.namePassenger.trim(),
         lastnamesPassenger: p.lastnamesPassenger.trim(),
-        country: p.country.trim()
+        country: p.country.trim(),
+        birthDate: this.formatBirthDateToMMDDYYYY(p.birthDate)
       }));
 
       try {
