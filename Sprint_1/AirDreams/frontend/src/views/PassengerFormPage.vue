@@ -250,7 +250,7 @@ export default {
         gender: passenger.gender,
         namePassenger: passenger.namePassenger.trim(),
         lastnamesPassenger: passenger.lastnamesPassenger.trim(),
-        birthDate: this.formatBirthDateToMMDDYYYY(passenger.birthDate),  // ← convertir aquí
+        birthDate: this.formatBirthDateToMMDDYYYY(passenger.birthDate),
         passportCountry: passenger.country.trim(),
         emailPassenger: this.isMainPassenger(index)
             ? passenger.emailPassenger.trim().toLowerCase()
