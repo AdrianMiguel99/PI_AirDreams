@@ -1,7 +1,32 @@
 USE AirDreams;
 GO
 
--- 1. Función de cálculo de equipaje
+IF OBJECT_ID('dbo.sp_CalculateLuggageCost', 'P') IS NOT NULL
+    DROP PROCEDURE dbo.sp_CalculateLuggageCost;
+GO
+IF OBJECT_ID('dbo.sp_InsertFlightSegments', 'P') IS NOT NULL
+    DROP PROCEDURE dbo.sp_InsertFlightSegments;
+GO
+IF OBJECT_ID('dbo.sp_InsertPassengersAndLuggage', 'P') IS NOT NULL
+    DROP PROCEDURE dbo.sp_InsertPassengersAndLuggage;
+GO
+IF TYPE_ID('dbo.FlightSegmentType') IS NOT NULL
+    DROP TYPE dbo.FlightSegmentType;
+GO
+IF TYPE_ID('dbo.FlightSegmentTypeV2') IS NOT NULL
+    DROP TYPE dbo.FlightSegmentTypeV2;
+GO
+IF TYPE_ID('dbo.PassengerPurchaseType') IS NOT NULL
+    DROP TYPE dbo.PassengerPurchaseType;
+GO
+IF TYPE_ID('dbo.LuggagePurchaseType') IS NOT NULL
+    DROP TYPE dbo.LuggagePurchaseType;
+GO
+IF OBJECT_ID('dbo.fn_TotalLuggageCost', 'FN') IS NOT NULL
+    DROP FUNCTION dbo.fn_TotalLuggageCost;
+GO
+
+
 CREATE FUNCTION dbo.fn_TotalLuggageCost
 (
     @basePrice DECIMAL(10,2),
@@ -21,15 +46,14 @@ BEGIN
 END;
 GO
 
--- 2. Tipos de tabla personalizados 
-
 CREATE TYPE dbo.PassengerPurchaseType AS TABLE (
     PassengerIndex INT NOT NULL,
     NamePassenger VARCHAR(100) NOT NULL,
     LastnamesPassenger VARCHAR(100) NOT NULL,
     EmailPassenger VARCHAR(50) NULL,
     Telephone VARCHAR(50) NULL,
-    Country VARCHAR(100) NOT NULL
+    Country VARCHAR(100) NOT NULL,
+    BirthDate DATE NULL
 );
 GO
 
@@ -43,15 +67,13 @@ GO
 CREATE TYPE dbo.FlightSegmentType AS TABLE (
     FlightNumber VARCHAR(50) NOT NULL,
     RouteId INT NOT NULL,
+    DepartureDate DATE NOT NULL,
     CheckedPrice DECIMAL(10,2) NOT NULL,
     CarryOnPrice DECIMAL(10,2) NOT NULL,
     Multiplier DECIMAL(5,2) NOT NULL
 );
 GO
 
--- 3. Procedimientos almacenados
-
--- Insertar pasajeros y equipaje
 CREATE PROCEDURE dbo.sp_InsertPassengersAndLuggage
     @TransactionId VARCHAR(20),
     @Passengers dbo.PassengerPurchaseType READONLY,
@@ -72,36 +94,46 @@ BEGIN
 
         ;WITH OrderedPassengers AS (
             SELECT PassengerIndex,
-                   ROW_NUMBER() OVER (ORDER BY PassengerIndex) AS RowNumber
+                ROW_NUMBER() OVER (ORDER BY PassengerIndex) AS RowNumber
             FROM @Passengers
         )
-        INSERT INTO @PassengerMapping (PassengerIndex, IdPassenger)
+        INSERT INTO @PassengerMapping (
+            PassengerIndex,
+            IdPassenger
+        )
         SELECT PassengerIndex, @CurrentMaxPassengerId + RowNumber
         FROM OrderedPassengers;
 
-        INSERT INTO Passenger (idPassenger, namePassenger, lastnamesPassenger,
-                               emailPassenger, telephone, country)
+        INSERT INTO Passenger (
+            idPassenger,
+            namePassenger,
+            lastnamesPassenger,
+            emailPassenger,
+            telephone,
+            country
+        )
         SELECT pm.IdPassenger, p.NamePassenger, p.LastnamesPassenger,
-               p.EmailPassenger,
-               TRY_CONVERT(BIGINT, NULLIF(p.Telephone, '')),
-               p.Country
+            p.EmailPassenger,
+            TRY_CONVERT(BIGINT, NULLIF(p.Telephone, '')),
+            p.Country
         FROM @Passengers p
         INNER JOIN @PassengerMapping pm ON pm.PassengerIndex = p.PassengerIndex;
 
-        -- Equipaje
-        INSERT INTO Luggage (luggageNumber, type, quantity)
+        INSERT INTO Luggage (luggageNumber,
+        type,
+        quantity
+        )
         SELECT CONCAT('LUG-', @TransactionId, '-', PassengerIndex, '-', Type),
-               Type, Quantity
+            Type, Quantity
         FROM @Luggage
         WHERE Quantity > 0;
 
         COMMIT TRANSACTION;
 
-        -- Devolver los mapeos para que C# pueda insertar PassengerItinerary y Registra en lote
         SELECT PassengerIndex, IdPassenger FROM @PassengerMapping ORDER BY PassengerIndex;
         SELECT PassengerIndex,
-               CONCAT('LUG-', @TransactionId, '-', PassengerIndex, '-', Type) AS LuggageNumber,
-               Type, Quantity
+            CONCAT('LUG-', @TransactionId, '-', PassengerIndex, '-', Type) AS LuggageNumber,
+            Type, Quantity
         FROM @Luggage WHERE Quantity > 0
         ORDER BY PassengerIndex, Type;
     END TRY
@@ -112,7 +144,6 @@ BEGIN
 END
 GO
 
--- Insertar segmentos de vuelo  y reservar asientos
 CREATE PROCEDURE dbo.sp_InsertFlightSegments
     @TransactionId VARCHAR(20),
     @Segments dbo.FlightSegmentType READONLY,
@@ -122,15 +153,22 @@ AS
 BEGIN
     SET NOCOUNT ON;
 
-    -- Crear vuelos que no existan
-    INSERT INTO Flight (numberFlight, routeId, boardingGate, departureDate,
-                        flightState, occupiedFirstclass, occupiedTurist)
-    SELECT s.FlightNumber, s.RouteId, 1, CAST(GETDATE() AS DATE),
-           'On-time', 0, 0
+
+    INSERT INTO Flight (
+        numberFlight,
+        routeId,
+        boardingGate,
+        departureDate,
+        flightState,
+        occupiedFirstclass,
+        occupiedTurist
+    )
+    SELECT s.FlightNumber, s.RouteId, 1, s.DepartureDate,
+        'On-time', 0, 0
     FROM @Segments s
     WHERE NOT EXISTS (SELECT 1 FROM Flight f WHERE f.numberFlight = s.FlightNumber);
 
-    -- Relacionar con itinerario
+
     INSERT INTO Tiene (transactionId, flightNumber)
     SELECT @TransactionId, s.FlightNumber
     FROM @Segments s;
@@ -151,7 +189,6 @@ BEGIN
 END
 GO
 
--- Calcular costo total del equipaje en lote
 CREATE OR ALTER PROCEDURE dbo.sp_CalculateLuggageCost
     @Segments dbo.FlightSegmentType READONLY,
     @Luggage dbo.LuggagePurchaseType READONLY,
@@ -166,10 +203,15 @@ BEGIN
             s.Multiplier,
             l.Quantity
         )
-    ), 0)   
+    ), 0)  
     FROM @Luggage l
     CROSS JOIN @Segments s;
 END
 GO
 
+DBCC FREEPROCCACHE;
 
+GO
+
+
+Select * from Flight

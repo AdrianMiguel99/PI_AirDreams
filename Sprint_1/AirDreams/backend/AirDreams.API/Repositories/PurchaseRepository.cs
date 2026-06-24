@@ -203,6 +203,7 @@ namespace AirDreams.API.Repositories
             var table = new DataTable();
             table.Columns.Add("FlightNumber", typeof(string));
             table.Columns.Add("RouteId", typeof(int));
+            table.Columns.Add("DepartureDate", typeof(DateTime));
             table.Columns.Add("CheckedPrice", typeof(decimal));
             table.Columns.Add("CarryOnPrice", typeof(decimal));
             table.Columns.Add("Multiplier", typeof(decimal));
@@ -212,7 +213,16 @@ namespace AirDreams.API.Repositories
                 var flight = s.FlightNumber ?? "";
                 if (flight.Length > 50) flight = flight.Substring(0, 50);
 
-                table.Rows.Add(flight, s.RouteId ?? 1, s.CheckedPrice, s.CarryOnPrice, s.Multiplier);
+                if (!s.DepartureDate.HasValue)
+                    throw new InvalidOperationException($"El vuelo {flight} no tiene fecha de salida.");
+
+                table.Rows.Add(
+                    flight,
+                    s.RouteId ?? 1,
+                    s.DepartureDate.Value.Date,
+                    s.CheckedPrice,
+                    s.CarryOnPrice,
+                    s.Multiplier);
             }
             return table;
         }

@@ -1,11 +1,30 @@
+USE AirDreams
+GO
+
 ALTER TABLE Itinerary
 ADD seatClass VARCHAR(20) NULL;
 
 ALTER TABLE Passenger ADD birthDate DATE NULL;
 GO
 
-IF OBJECT_ID('dbo.sp_InsertPassengersAndLuggage', 'P') IS NOT NULL
-    DROP PROCEDURE dbo.sp_InsertPassengersAndLuggage;
+
+
+DROP PROCEDURE IF EXISTS dbo.sp_InsertPassengersAndLuggage;
+GO
+
+DROP TYPE IF EXISTS dbo.PassengerPurchaseType;
+GO
+
+CREATE TYPE dbo.PassengerPurchaseType AS TABLE
+(
+    PassengerIndex INT NOT NULL,
+    NamePassenger VARCHAR(100) NOT NULL,
+    LastnamesPassenger VARCHAR(150) NOT NULL,
+    EmailPassenger VARCHAR(150) NULL,
+    Telephone VARCHAR(30) NULL,
+    Country VARCHAR(100) NULL,
+    BirthDate DATE NULL
+);
 GO
 
 CREATE PROCEDURE dbo.sp_InsertPassengersAndLuggage
@@ -36,7 +55,7 @@ BEGIN
         FROM OrderedPassengers;
 
         INSERT INTO Passenger (idPassenger, namePassenger, lastnamesPassenger,
-                               emailPassenger, telephone, country, birthDate)
+                               emailPassenger, telephone, country, BirthDate)
         SELECT pm.IdPassenger, p.NamePassenger, p.LastnamesPassenger,
                p.EmailPassenger,
                TRY_CONVERT(BIGINT, NULLIF(p.Telephone, '')),
