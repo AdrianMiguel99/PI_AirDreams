@@ -70,6 +70,7 @@ namespace AirDreams.API.Repositories
                 ) searchedFlight
 
                 WHERE r.codeAirportLlegada = @destination
+                AND r.isDeleted = 0
                 AND ac.cantPasajeros >= @quantityOfPassengers
                 AND ff.active = 1
                 AND sd.SearchDate >= ff.startingDate
@@ -242,6 +243,8 @@ namespace AirDreams.API.Repositories
                 WHERE
                     ac1.cantPasajeros >= @quantityOfPassengers
                     AND ac2.cantPasajeros >= @quantityOfPassengers
+                    AND r1.isDeleted = 0
+                    AND r2.isDeleted = 0
 
                     AND ff1.active = 1
                     AND ff2.active = 1
