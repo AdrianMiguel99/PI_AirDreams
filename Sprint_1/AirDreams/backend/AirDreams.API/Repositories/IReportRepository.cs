@@ -1,0 +1,15 @@
+using AirDreams.API.DTOs;
+
+namespace AirDreams.API.Repositories
+{
+    public interface IReportRepository
+    {
+        Task<IEnumerable<IncomeReportDTO>> GetIncomeReportAsync(
+            DateTime startDate,
+            DateTime endDate,
+            string? origin,
+            string? destination);
+
+        Task<IncomeReportFiltersDTO> GetIncomeReportFiltersAsync();
+    }
+}
