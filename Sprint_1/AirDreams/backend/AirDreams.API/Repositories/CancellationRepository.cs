@@ -63,10 +63,6 @@ namespace AirDreams.API.Repositories
                     dbTransaction
                 );
 
-                // Cancelar BoardingPass
-                // Liberar asientos
-                // Liberar equipaje
-
                 dbTransaction.Commit();
             }
             catch
