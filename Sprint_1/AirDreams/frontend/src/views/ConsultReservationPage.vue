@@ -9,7 +9,7 @@
           <p>Ingrese los datos de su reservación para ver los detalles del vuelo.</p>
         </div>
 
-        <div class="form-card">
+        <form class="form-card" @submit.prevent="goToReservationDetails">
           <h2>Datos de la reserva</h2>
 
           <div class="form-group">
@@ -18,6 +18,7 @@
               v-model="reservationCode"
               type="text"
               placeholder="Ej: TXN-d30ae4ba"
+              autocomplete="off"
             >
           </div>
 
@@ -27,30 +28,33 @@
               v-model="passengerName"
               type="text"
               placeholder="Ej: Obando Vásquez"
+              autocomplete="off"
             >
           </div>
-          
-          <!-- TODO: Mostrar mensaje de error si los campos no son válidos -->
+
           <p v-if="errorMessage" class="error-message">
             {{ errorMessage }}
           </p>
 
-          <button class="search-button" @click="goToReservationDetails">
+          <button class="search-button" type="submit">
             Buscar reserva
           </button>
-        </div>
+        </form>
       </section>
     </main>
   </div>
 </template>
 
 <script>
-import HeaderLogoNoAdmin from '../components/HeaderLogoNoAdmin.vue';
+import HeaderLogoNoAdmin from "../components/HeaderLogoNoAdmin.vue";
+
 export default {
   name: "ConsultReservationPage",
+
   components: {
     HeaderLogoNoAdmin
   },
+
   data() {
     return {
       reservationCode: "",
@@ -63,7 +67,10 @@ export default {
     goToReservationDetails() {
       this.errorMessage = "";
 
-      if (!this.reservationCode.trim() || !this.passengerName.trim()) {
+      const cleanReservationCode = this.reservationCode.trim();
+      const cleanPassengerName = this.passengerName.trim();
+
+      if (!cleanReservationCode || !cleanPassengerName) {
         this.errorMessage = "Debe ingresar el número de reserva y el nombre del pasajero.";
         return;
       }
@@ -71,8 +78,8 @@ export default {
       this.$router.push({
         name: "ReservationDetails",
         query: {
-          reservationCode: this.reservationCode,
-          passengerName: this.passengerName
+          reservationCode: cleanReservationCode,
+          passengerName: cleanPassengerName
         }
       });
     }
@@ -81,6 +88,10 @@ export default {
 </script>
 
 <style scoped>
+.consult-reservation-page {
+  min-height: 100vh;
+}
+
 .consult-container {
   min-height: calc(100vh - 70px);
   display: flex;
@@ -108,7 +119,7 @@ export default {
 
 .consult-title h1 {
   font-size: 34px;
-  font-weight: SEMI;
+  font-weight: 700;
   margin-bottom: 8px;
 }
 
@@ -154,6 +165,13 @@ export default {
 
 .form-group input:focus {
   border-color: #032056;
+}
+
+.error-message {
+  margin: 4px 0 18px;
+  color: #b00020;
+  font-size: 14px;
+  font-weight: 600;
 }
 
 .search-button {

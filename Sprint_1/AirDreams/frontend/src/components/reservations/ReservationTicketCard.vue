@@ -101,13 +101,21 @@
 
     <div class="passenger-info">
       <div>
-        <span>Pasajero</span>
-        <strong>{{ ticket.passengerName }}</strong>
+        <span>Pasajeros</span>
+
+        <ul class="passenger-list">
+          <li
+            v-for="passenger in ticket.passengers"
+            :key="passenger.id"
+          >
+            {{ passenger.name }}
+          </li>
+        </ul>
       </div>
 
       <div>
         <span>Asiento</span>
-        <strong>{{ ticket.seatNumber }}</strong>
+        <strong>{{ ticket.seatNumber || "No asignado" }}</strong>
       </div>
     </div>
   </article>
@@ -405,6 +413,22 @@ export default {
 .passenger-info strong {
   color: #032056;
   font-size: 15px;
+}
+
+.passenger-list {
+  margin: 0;
+  padding-left: 18px;
+  color: #032056;
+  font-size: 15px;
+  font-weight: 700;
+}
+
+.passenger-list li {
+  margin-bottom: 4px;
+}
+
+.passenger-list li:last-child {
+  margin-bottom: 0;
 }
 
 @media (max-width: 700px) {

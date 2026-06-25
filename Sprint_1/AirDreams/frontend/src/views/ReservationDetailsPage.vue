@@ -3,26 +3,26 @@
     <HeaderLogoNoAdmin />
 
     <main class="reservation-wrapper">
-        <ReservationHero :reservation="reservation" />
+      <ReservationHero :reservation="reservation" />
 
-        <section class="details-card">
-          <div class="details-layout">
-            <section class="tickets-content">
-              <h1>Detalles del vuelo</h1>
+      <section class="details-card">
+        <div class="details-layout">
+          <section class="tickets-content">
+            <h1>Detalles del vuelo</h1>
 
-              <div class="tickets-list">
-                <ReservationTicketCard
-                  v-for="ticket in reservation.tickets"
-                  :key="ticket.id"
-                  :ticket="ticket"
-                  :purchase="reservation.purchase"
-                />
-              </div>
-            </section>
+            <div class="tickets-list">
+              <ReservationTicketCard
+                v-for="ticket in reservation.tickets"
+                :key="ticket.id"
+                :ticket="ticket"
+                :purchase="reservation.purchase"
+              />
+            </div>
+          </section>
 
-            <ReservationOptionsPanel />
-          </div>
-        </section>
+          <ReservationOptionsPanel />
+        </div>
+      </section>
     </main>
   </div>
 </template>
@@ -47,6 +47,7 @@ export default {
 
   data() {
     return {
+      loading: false,
       errorMessage: "",
 
       reservation: {
@@ -126,7 +127,9 @@ export default {
           return;
         }
 
-        const response = await fetch(`${API_URL}/Reservation/${encodeURIComponent(reservationCode)}`);
+        const response = await fetch(
+          `${API_URL}/Reservation/${encodeURIComponent(reservationCode)}`
+        );
 
         if (!response.ok) {
           throw new Error("No se pudo obtener la reserva.");
@@ -219,12 +222,17 @@ export default {
           secondAircraft: flights[1]?.aircraftModel || ""
         },
 
-        tickets: passengers.map(passenger => ({
-          id: passenger.idPassenger,
-          passengerName: passenger.passengerName,
-          seatNumber: "",
-          classType: "Turista"
-        }))
+        tickets: [
+          {
+            id: reservationCode,
+            passengers: passengers.map(passenger => ({
+              id: passenger.idPassenger,
+              name: passenger.passengerName
+            })),
+            seatNumber: "",
+            classType: "Turista"
+          }
+        ]
       };
     },
 
