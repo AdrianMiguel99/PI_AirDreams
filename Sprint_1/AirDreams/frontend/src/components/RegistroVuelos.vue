@@ -429,7 +429,7 @@
                 headers: { 'Authorization': `Bearer ${token}` }
             });
             
-            this.airports = res.data.map((a, i) => ({ id: i+1, code: a.code || a.Code || a.CodeAirport, name: a.name || a.Name || a.NameAirport }));
+            this.airports = res.data.filter(a => a.isActive !== false) .map((a, i) => ({ id: i+1, code: a.code || a.Code || a.CodeAirport, name: a.name || a.Name || a.NameAirport }));
             } catch (e) {
             console.error('No se pudieron cargar aeropuertos', e);
             }

@@ -14,10 +14,12 @@ namespace AirDreams.API.Controllers
     public class RouteController : ControllerBase
     {
         private readonly IRouteService _routeService;
+        private readonly IAirportRepository _airportRepository;
 
-        public RouteController(IRouteService routeService)
+        public RouteController(IRouteService routeService, IAirportRepository airportRepository)
         {
             _routeService = routeService;
+            _airportRepository = airportRepository;
         }
 
         [HttpPost]
@@ -25,6 +27,11 @@ namespace AirDreams.API.Controllers
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
+
+            bool originActive = await _airportRepository.IsActiveAsync(model.CodeAirportSalida);
+            bool destinationActive = await _airportRepository.IsActiveAsync(model.CodeAirportLlegada);
+            if (!originActive || !destinationActive)
+                return BadRequest(new { message = "Uno o ambos aeropuertos están inactivos y no pueden usarse para nuevas rutas." });
 
             var adminIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
 

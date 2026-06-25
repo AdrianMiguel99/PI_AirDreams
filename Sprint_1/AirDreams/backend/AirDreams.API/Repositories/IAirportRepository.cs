@@ -13,5 +13,6 @@ namespace AirDreams.API.Repositories
         Task<bool> SoftDeleteAsync(string code);
         Task<bool> HardDeleteAsync(string code);
         Task<(bool success, string message)> DeleteAirportAsync(string code, bool inUse);
+        Task<bool> IsActiveAsync(string code);
     }
 }

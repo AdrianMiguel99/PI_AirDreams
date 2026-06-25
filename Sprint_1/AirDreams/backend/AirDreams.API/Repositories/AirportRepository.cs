@@ -50,8 +50,10 @@ namespace AirDreams.API.Repositories
 
         public async Task<bool> IsAirportInUseAsync(string code)
         {
-            var sql = @"SELECT COUNT(1) FROM Route
-                WHERE codeAirportSalida = @Code OR codeAirportLlegada = @Code";
+            var sql = @"SELECT COUNT(1)
+                FROM Route r
+                JOIN Flight f ON f.routeId = r.idRoute
+                WHERE r.codeAirportSalida = @Code OR r.codeAirportLlegada = @Code";
             var count = await _connection.ExecuteScalarAsync<int>(sql, new { Code = code });
             return count > 0;
         }
@@ -70,6 +72,12 @@ namespace AirDreams.API.Repositories
             return affected > 0;
         }
 
+        public async Task<bool> IsActiveAsync(string code)
+        {
+            var sql = "SELECT isActive FROM Airport WHERE codeAirport = @Code";
+            var isActive = await _connection.ExecuteScalarAsync<bool?>(sql, new { Code = code });
+            return isActive == true;
+        }
         public async Task<(bool success, string message)> DeleteAirportAsync(string code, bool inUse)
         {
             if (!inUse)
