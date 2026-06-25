@@ -20,6 +20,8 @@ namespace AirDreams.API.Services
 
         Task<bool> UpdateUserAsync(byte employeeId, UpdateUserDto updateDto, string currentUserEmail);
 
+        Task<bool> DeleteUserAsync(byte employeeId, string currentUserEmail);
+
     }
     
     public class InvitationValidationResult
