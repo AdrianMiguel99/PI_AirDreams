@@ -27,5 +27,11 @@ namespace AirDreams.API.Repositories
             int quantityOfPassengers
         );
 
+        Task<IEnumerable<dynamic>> SearchFlightsByOriginAsync(
+            string origin,
+            DateTime earliestDeparture,
+            DateTime latestDeparture,
+            int quantityOfPassengers
+        );
     }
 }
