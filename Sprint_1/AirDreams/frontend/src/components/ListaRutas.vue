@@ -37,11 +37,19 @@
             <td>{{ route.flightDuration }} min</td>
             <td>${{ Number(route.basePrice).toFixed(2) }}</td>
             <td>
+
+            
               <button
                 class="delete-button"
+                
                 :disabled="deletingRouteId === route.routeID"
                 @click="deleteRoute(route)"
               >
+              <img 
+                src="https://i.ibb.co/FkMhvPdS/Chat-GPT-Image-5-may-2026-05-11-58-1.png"
+                alt="eliminar"
+                style="width: 20px; height: 22px;"
+                >
                 {{ deletingRouteId === route.routeID ? 'Eliminando...' : 'Eliminar' }}
               </button>
             </td>
@@ -270,7 +278,7 @@ th {
 .delete-button {
   border: none;
   border-radius: 999px;
-  background: #dc2626;
+  background: #ff0000;
   color: #fff;
   padding: 7px 16px;
   font-family: 'Inter', sans-serif;

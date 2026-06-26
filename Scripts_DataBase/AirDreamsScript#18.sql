@@ -44,8 +44,12 @@ BEGIN
         BEGIN
             UPDATE dbo.Route
             SET
-                isDeleted = 1,
-                deletedAt = SYSDATETIME()
+                isDeleted = 1
+            WHERE idRoute = @RouteId;
+
+            UPDATE dbo.FlightFrequency
+            SET
+                active = 0
             WHERE idRoute = @RouteId;
 
             COMMIT TRANSACTION;
