@@ -53,8 +53,13 @@
             No, mantener reserva
           </button>
 
-          <button class="confirm-cancel-button" type="button" @click="confirmCancellation">
-            Sí, cancelar reserva
+          <button
+            class="confirm-cancel-button"
+            type="button"
+            :disabled="isLoading"
+            @click="confirmCancellation"
+          >
+            {{ isLoading ? "Cancelando..." : "Sí, cancelar reserva" }}
           </button>
         </div>
       </div>
@@ -104,14 +109,13 @@ export default {
     async confirmCancellation() {
       this.errorMessage = "";
       this.successMessage = "";
-      this.showConfirmModal = false;
 
       const cleanReservationCode = this.reservationCode.trim();
 
       try {
         this.isLoading = true;
 
-        const response = await fetch("https://localhost:7000/api/cancellation/cancel", {
+        const response = await fetch("https://localhost:7136/api/cancellation/cancel", {
           method: "POST",
           headers: {
             "Content-Type": "application/json"
@@ -121,17 +125,22 @@ export default {
           })
         });
 
-        const data = await response.json();
+        const text = await response.text();
+        const data = text ? JSON.parse(text) : {};
 
         if (!response.ok) {
           this.errorMessage = data.message || "No se pudo cancelar la reserva.";
+          this.showConfirmModal = false;
           return;
         }
 
         this.successMessage = data.message || "Reserva cancelada correctamente.";
         this.reservationCode = "";
+        this.showConfirmModal = false;
       } catch (error) {
+        console.error("Error al cancelar reserva:", error);
         this.errorMessage = "Ocurrió un error al conectar con el servidor.";
+        this.showConfirmModal = false;
       } finally {
         this.isLoading = false;
       }
@@ -327,5 +336,10 @@ export default {
 
 .confirm-cancel-button:hover {
   background: #d11f3f;
+}
+
+.confirm-cancel-button:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
 }
 </style>
