@@ -22,6 +22,7 @@ import LuggagePage from '../views/LuggagePage.vue'
 import PassengerFormPage from '../views/PassengerFormPage.vue'
 import PaymentPage from '../views/PaymentPage.vue'
 import RoutesManagement from '../views/RoutesManagement.vue'
+import CancelReservation from '../views/CancelReservation.vue'
 
 const routes = [
   
@@ -29,6 +30,11 @@ const routes = [
     path: '/completar-registro',
     name: 'CompleteRegistration',
     component: CompleteRegistration
+  },
+  {
+    path: '/cancel-reservation',
+    name: 'cancelReservation',
+    component: CancelReservation
   },
   { path: '/', name: 'home', component: LandingPage },
 
