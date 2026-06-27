@@ -24,6 +24,7 @@ import PaymentPage from '../views/PaymentPage.vue'
 import RoutesManagement from '../views/RoutesManagement.vue'
 import ConsultReservationPage from '../views/ConsultReservationPage.vue'
 import ReservationDetailsPage from '../views/ReservationDetailsPage.vue'
+import CancelReservationPage from '../views/CancelReservationPage.vue'
 
 const routes = [
   
@@ -57,6 +58,7 @@ const routes = [
   { path: '/payment', name: 'payment', component: PaymentPage },
   { path: '/consultar-reserva', name: 'ConsultReservation', component: ConsultReservationPage},
   { path: '/detalle-reserva', name: 'ReservationDetails', component: ReservationDetailsPage },
+  { path: '/cancelar-reserva', name: 'CancelReservation', component: CancelReservationPage },
 ]
 
 const router = createRouter({
