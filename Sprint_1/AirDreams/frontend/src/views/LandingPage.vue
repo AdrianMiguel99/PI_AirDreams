@@ -99,7 +99,7 @@ export default {
       const seatClass = 
         selection.seatClass === "FirstClass" || selection.seatClass === "firstClass" 
           ? "FirstClass" 
-          : "Turist";
+          : "Turista";
 
       for (const segment of selection.flight.segments) {
         

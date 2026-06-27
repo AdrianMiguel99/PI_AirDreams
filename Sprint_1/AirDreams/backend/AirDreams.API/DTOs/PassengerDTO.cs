@@ -8,5 +8,8 @@ namespace AirDreams.API.DTOs
         public string EmailPassenger { get; set; } = string.Empty;
         public long? Telephone { get; set; }
         public string Country { get; set; } = string.Empty;
+
+        public String BirthDate { get; set; } = string.Empty;
+
     }
 }
