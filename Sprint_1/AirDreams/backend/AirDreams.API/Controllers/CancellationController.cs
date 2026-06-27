@@ -4,7 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace AirDreams.API.Controllers
 {
-    [Route("api/cancellation")]
+    [Route("api/cancellations")]
     [ApiController]
     public class CancellationController : ControllerBase
     {
@@ -13,9 +13,9 @@ namespace AirDreams.API.Controllers
         public CancellationController(ICancellationService service)
         {
             _service = service;
-        }
+        }s
 
-        [HttpPost("cancel")]
+        [HttpPost]
         public async Task<IActionResult> CancelReservation(
             [FromBody] CancelReservationDto dto)
         {
