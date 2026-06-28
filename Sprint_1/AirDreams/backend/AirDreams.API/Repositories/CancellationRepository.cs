@@ -192,5 +192,83 @@ namespace AirDreams.API.Repositories
                 throw;
             }
         }
+        public async Task<string?> GetBuyerEmailByTransactionIdAsync(string transactionId)
+        {
+            const string sql = @"
+                SELECT TOP 1 p.emailPassenger
+                FROM Passenger p
+                INNER JOIN PassengerItinerary pi
+                    ON pi.idPassenger = p.idPassenger
+                WHERE pi.transactionId = @TransactionId
+                AND p.emailPassenger IS NOT NULL;
+            ";
+
+            return await _connection.QueryFirstOrDefaultAsync<string?>(
+                sql,
+                new { TransactionId = transactionId }
+            );
+        }
+
+        public async Task SaveCancellationTokenAsync(
+            string transactionId,
+            string token,
+            DateTime expirationDate)
+        {
+            const string sql = @"
+                INSERT INTO ReservationCancellationToken (
+                    transactionId,
+                    token,
+                    expirationDate
+                )
+                VALUES (
+                    @TransactionId,
+                    @Token,
+                    @ExpirationDate
+                );
+            ";
+
+            await _connection.ExecuteAsync(
+                sql,
+                new
+                {
+                    TransactionId = transactionId,
+                    Token = token,
+                    ExpirationDate = expirationDate
+                }
+            );
+        }
+
+        public async Task<(string transactionId, bool isUsed, DateTime expirationDate)?>
+            GetCancellationTokenAsync(string token)
+        {
+            const string sql = @"
+                SELECT
+                    transactionId,
+                    isUsed,
+                    expirationDate
+                FROM ReservationCancellationToken
+                WHERE token = @Token;
+            ";
+
+            return await _connection.QueryFirstOrDefaultAsync
+                <(string transactionId, bool isUsed, DateTime expirationDate)?>(
+                    sql,
+                    new { Token = token }
+                );
+        }
+
+        public async Task MarkCancellationTokenAsUsedAsync(string token)
+        {
+            const string sql = @"
+                UPDATE ReservationCancellationToken
+                SET isUsed = 1
+                WHERE token = @Token;
+            ";
+
+            await _connection.ExecuteAsync(
+                sql,
+                new { Token = token }
+            );
+        }
     }
 }

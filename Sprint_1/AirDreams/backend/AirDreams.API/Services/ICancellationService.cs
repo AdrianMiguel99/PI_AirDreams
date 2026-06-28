@@ -3,5 +3,7 @@ namespace AirDreams.API.Services.Interfaces
     public interface ICancellationService
     {
         Task<bool> CancelReservationAsync(string transactionId);
+        Task RequestCancellationAsync(string transactionId);
+        Task ConfirmCancellationAsync(string token);
     }
 }
