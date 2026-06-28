@@ -29,6 +29,7 @@ namespace AirDreams.API.Repositories
                     WHERE p.namePassenger = @Name
                       AND p.lastnamesPassenger = @Lastnames
                       AND p.country = @Country
+                      AND p.birthDate = @BirthDate  
                       AND f.numberFlight IN @FlightNumbers";
 
                 var count = await _connection.ExecuteScalarAsync<int>(sql, new
@@ -36,6 +37,7 @@ namespace AirDreams.API.Repositories
                     Name = p.NamePassenger,
                     Lastnames = p.LastnamesPassenger,
                     Country = p.Country,
+                    BirthDate = p.BirthDate,
                     FlightNumbers = flightNumbers
                 });
 
