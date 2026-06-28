@@ -80,7 +80,11 @@ const navigateTo = (path) => {
         <section>
             <h2>Reportes</h2>
             <div class="cards">
-            <div class="card" @click="navigateTo('/admin/reports')">
+            <div
+                class="card"
+                data-testid="reports-card"
+                @click="navigateTo('/admin/reports')"
+            >
                 <img :src="reportsIcon" alt="Reports" class="icon blue">
                 <div>
                 <h3>Reportes</h3>

@@ -80,14 +80,15 @@ namespace AirDreams.API.Repositories
                 decimal amount = flightCost + luggageCost;
 
                 var sqlItinerary = @"
-                    INSERT INTO Itinerary (transactionId, idPassenger, purchaseDate, amount)
-                    VALUES (@TransactionId, @IdPassenger, GETDATE(), @Amount)";
+                    INSERT INTO Itinerary (transactionId, idPassenger, purchaseDate, amount, seatClass)
+                    VALUES (@TransactionId, @IdPassenger, GETDATE(), @Amount, @SeatClass)";
 
                 await _connection.ExecuteAsync(sqlItinerary, new
                 {
                     dto.TransactionId,
                     IdPassenger = passengerIds.First(),
-                    Amount = amount
+                    Amount = amount,
+                    dto.SeatClass
                 }, transaction);
 
                 foreach (var passenger in passengerMappings)
@@ -214,6 +215,7 @@ namespace AirDreams.API.Repositories
             passengerTable.Columns.Add("EmailPassenger", typeof(string));
             passengerTable.Columns.Add("Telephone", typeof(string));
             passengerTable.Columns.Add("Country", typeof(string));
+            passengerTable.Columns.Add("BirthDate", typeof(DateTime));
 
             for (int i = 0; i < dto.Passengers.Count; i++)
             {
@@ -227,7 +229,8 @@ namespace AirDreams.API.Repositories
                         ? DBNull.Value
                         : passenger.EmailPassenger.Trim().ToLower(),
                     passenger.Telephone ?? string.Empty,
-                    passenger.Country
+                    passenger.Country,
+                    passenger.BirthDate.Date
                 );
             }
 
