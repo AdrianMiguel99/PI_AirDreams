@@ -179,10 +179,9 @@ async deleteRoute(route) {
             headers: { Authorization: `Bearer ${token}` }
         })
 
-        const deleteType = res.data?.deleteType || 'Borrado realizado'
         const message = res.data?.message || 'La ruta fue eliminada correctamente.'
 
-        this.showRoutePopup('success', deleteType, message)
+        this.showRoutePopup('success', 'Ruta eliminada', message)
         await this.fetchRoutes()
     } catch (error) {
         console.error('Error al eliminar ruta:', error)

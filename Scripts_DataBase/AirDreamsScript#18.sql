@@ -55,7 +55,7 @@ BEGIN
             COMMIT TRANSACTION;
 
             SELECT
-                'Soft delete' AS DeleteType,
+                'delete' AS DeleteType,
                 'La ruta posee vuelos asociados y fue desactivada.' AS Message;
 
             RETURN;
@@ -70,7 +70,7 @@ BEGIN
         COMMIT TRANSACTION;
 
         SELECT
-            'Hard delete' AS DeleteType,
+            'delete' AS DeleteType,
             'La ruta fue eliminada permanentemente.' AS Message;
 
     END TRY
