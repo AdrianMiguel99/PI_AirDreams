@@ -12,5 +12,14 @@ namespace AirDreams.API.Services
             string? destination);
 
         Task<IncomeReportFiltersDTO> GetIncomeReportFiltersAsync();
+
+        Task<IEnumerable<FlightsReportRowDto>> GetFlightsReportAsync(
+            string? origin,
+            string? destination,
+            string? seatClass,
+            DateTime? fromDate,
+            DateTime? toDate);
+
+        Task<FlightsReportFiltersDto> GetFlightsReportFiltersAsync();
     }
 }
