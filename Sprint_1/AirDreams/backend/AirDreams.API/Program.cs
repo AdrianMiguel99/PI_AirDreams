@@ -128,6 +128,11 @@ builder.Services.AddHttpClient("AirDreams", client =>
 builder.Services.AddScoped<IPartnerFlightService, PartnerFlightService>();
 builder.Services.AddScoped<IFlightConnectorService, FlightConnectorService>();
 
+builder.Services.AddScoped<IExternalFlightRepository, ExternalFlightRepository>();
+builder.Services.AddScoped<IExternalFlightService, ExternalFlightService>();
+
+builder.Services.AddMemoryCache();
+
 var app = builder.Build();
 
 if (app.Environment.IsDevelopment())

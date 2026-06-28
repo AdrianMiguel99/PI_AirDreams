@@ -3,12 +3,14 @@ using AirDreams.API.Models;
 using AirDreams.API.Services.Interfaces;
 using AirDreams.ExternalAPI.DTOs;
 using Microsoft.Extensions.Options;
+using Microsoft.Extensions.Caching.Memory;
 
 namespace AirDreams.API.Services
 {
     public class PartnerFlightService : IPartnerFlightService
     {
         private readonly IHttpClientFactory _httpClientFactory;
+        private readonly IMemoryCache _cache;
         private readonly List<PartnerApiSettings> _partners;
 
         private static readonly JsonSerializerOptions JsonOptions = new()
@@ -18,10 +20,12 @@ namespace AirDreams.API.Services
 
         public PartnerFlightService(
             IHttpClientFactory httpClientFactory,
-            IOptions<List<PartnerApiSettings>> partnerOptions)
+            IOptions<List<PartnerApiSettings>> partnerOptions,
+            IMemoryCache cache)
         {
             _httpClientFactory = httpClientFactory;
             _partners = partnerOptions.Value;
+            _cache = cache;
         }
 
         public async Task<List<ExternalResponseFlightDTO>> SearchPartnerFlightsAsync(
@@ -70,12 +74,31 @@ namespace AirDreams.API.Services
                 var content = await response.Content.ReadAsStringAsync();
                 var parsed = JsonSerializer.Deserialize<ExternalFlightResponse>(content, JsonOptions);
 
-                return parsed?.Flights ?? new List<ExternalResponseFlightDTO>();
+                var flights = parsed?.Flights ?? new List<ExternalResponseFlightDTO>();
+
+                foreach (var flight in flights)
+                {
+                    _cache.Set(
+                        $"ExternalFlight:{flight.flightGUID}",
+                        flight,
+                        TimeSpan.FromHours(2));
+                }
+
+                return flights;
             }
             catch (Exception ex)
             {
                 return new List<ExternalResponseFlightDTO>();
             }
+        }
+
+        public Task<ExternalResponseFlightDTO?> GetCachedFlightAsync(string flightGuid)
+        {
+            _cache.TryGetValue(
+                $"ExternalFlight:{flightGuid}",
+                out ExternalResponseFlightDTO? flight);
+
+            return Task.FromResult(flight);
         }
     }
 }

@@ -10,5 +10,6 @@ namespace AirDreams.API.Services.Interfaces
             DateTime latestDeparture,
             int quantityOfPassengers
         );
+        Task<ExternalResponseFlightDTO?> GetCachedFlightAsync(string flightGuid);
     }
 }
