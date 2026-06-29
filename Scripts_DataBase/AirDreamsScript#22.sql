@@ -137,10 +137,3 @@ BEGIN
 END;
 GO
 
-
-SELECT * FROM Flight
-
-SELECT * FROM Route
-
-SELECT * FROM Aircraft
-
