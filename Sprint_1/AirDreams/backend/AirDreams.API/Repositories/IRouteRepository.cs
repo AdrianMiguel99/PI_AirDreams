@@ -4,5 +4,6 @@ using AirDreams.API.DTOs;
 public  interface IRouteRepository
 {
     Task<int> CreateRouteWithFrequenciesAsync(CreateRouteModel model);
-    Task<IEnumerable<RouteDTO>> GetAllAsync(); 
+    Task<IEnumerable<RouteDTO>> GetAllAsync();
+    Task<RouteDeleteResultDTO> DeleteAsync(int routeId);
 }

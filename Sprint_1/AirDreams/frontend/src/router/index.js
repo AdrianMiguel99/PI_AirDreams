@@ -25,6 +25,8 @@ import RoutesManagement from '../views/RoutesManagement.vue'
 import ConsultReservationPage from '../views/ConsultReservationPage.vue'
 import ReservationDetailsPage from '../views/ReservationDetailsPage.vue'
 import CancelReservationPage from '../views/CancelReservationPage.vue'
+import ReportsPage from '../views/ReportsPage.vue'
+import CancelReservation from '../views/CancelReservation.vue'
 
 const routes = [
   
@@ -32,6 +34,11 @@ const routes = [
     path: '/completar-registro',
     name: 'CompleteRegistration',
     component: CompleteRegistration
+  },
+  {
+    path: '/cancel-reservation',
+    name: 'cancelReservation',
+    component: CancelReservation
   },
   { path: '/', name: 'home', component: LandingPage },
 
@@ -42,6 +49,7 @@ const routes = [
   { path: '/adminHome', name: 'adminHome', component: LandingPageAdmin, meta: { requiresAdmin: true }},
 
   { path: '/admin/routes', name: 'routesManagement', component: RoutesManagement },
+  { path: '/admin/reports', name: 'reports', component: ReportsPage },
 
   { path: '/admin/usuarios', name: 'adminUsuarios', component: ListaUsuarios, meta: { requiresAdmin: true }},
   { path: '/managementPlanes', name: 'managementPlanes', component: AirplaneManagement },

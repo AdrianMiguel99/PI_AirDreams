@@ -296,6 +296,7 @@ export default {
           passengers: passengers.map(p => ({
             namePassenger: p.namePassenger,
             lastnamesPassenger: p.lastnamesPassenger,
+            birthDate: p.birthDate || null,
             emailPassenger: p.emailPassenger || '',
             telephone: p.telephone || '',
             country: p.country || '',

@@ -4,7 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace AirDreams.API.Controllers
 {
-    [Route("api/cancellation")]
+    [Route("api/cancellations")]
     [ApiController]
     public class CancellationController : ControllerBase
     {
@@ -15,7 +15,61 @@ namespace AirDreams.API.Controllers
             _service = service;
         }
 
-        [HttpPost("cancel")]
+        [HttpPost("request")]
+        public async Task<IActionResult> RequestCancellation(
+            [FromBody] CancelReservationDto dto)
+        {
+            try
+            {
+                await _service.RequestCancellationAsync(dto.TransactionId);
+
+                return Ok(new
+                {
+                    message = "Se ha enviado un correo de confirmación."
+                });
+            }
+            catch (KeyNotFoundException ex)
+            {
+                return NotFound(new { message = ex.Message });
+            }
+            catch (InvalidOperationException ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
+            catch (ArgumentException ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
+        }
+
+        [HttpPost("confirm")]
+        public async Task<IActionResult> ConfirmCancellation(
+            [FromBody] ConfirmCancellationDto dto)
+        {
+            try
+            {
+                await _service.ConfirmCancellationAsync(dto.Token);
+
+                return Ok(new
+                {
+                    message = "La reserva ha sido cancelada correctamente."
+                });
+            }
+            catch (KeyNotFoundException ex)
+            {
+                return NotFound(new { message = ex.Message });
+            }
+            catch (InvalidOperationException ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
+            catch (ArgumentException ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
+        }
+
+        [HttpPost]
         public async Task<IActionResult> CancelReservation(
             [FromBody] CancelReservationDto dto)
         {

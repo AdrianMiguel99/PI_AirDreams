@@ -106,11 +106,11 @@ export default {
 
     deleteAirplane(modelo) {
       axios.delete(`http://localhost:5276/api/Airplane/${modelo}`)
-        .then(() => {
+        .then(response => {
           this.showPopup = true;
           this.popupType = 'success';
           this.popupTitle = 'Aeronave Eliminada';
-          this.popupMessage = 'Aeronave eliminada con éxito';
+          this.popupMessage = response.data?.message || 'Aeronave eliminada con éxito';
           this.getAirplanes();
         })
         .catch(error => {
