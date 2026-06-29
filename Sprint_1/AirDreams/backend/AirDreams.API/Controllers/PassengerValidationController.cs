@@ -23,7 +23,8 @@ namespace AirDreams.API.Controllers
                 {
                     NamePassenger = p.NamePassenger,
                     LastnamesPassenger = p.LastnamesPassenger,
-                    Country = p.Country
+                    Country = p.Country,
+                    BirthDate = p.BirthDate
                 }),
                 request.FlightNumbers);
 
@@ -42,5 +43,6 @@ namespace AirDreams.API.Controllers
         public string NamePassenger { get; set; }
         public string LastnamesPassenger { get; set; }
         public string Country { get; set; }
+        public string? BirthDate { get; set; }
     }
 }

@@ -106,7 +106,7 @@ export default {
       this.segmentsPricing = segments.map(seg => ({
         checkedPrice: Number(seg.checkedPrice) || 0,
         carryOnPrice: Number(seg.carryOnPrice) || 0,
-        multiplier: Number(seg.porcentageMultiplier) || 0.2
+        multiplier: Number(seg.porcentageMultiplier) || 0.5
       }));
     },
     loadPassengers() {
