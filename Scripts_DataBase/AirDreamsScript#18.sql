@@ -9,9 +9,6 @@ BEGIN
 END;
 GO
 
-Update Route
-Set isDeleted = 0;
-
 CREATE OR ALTER PROCEDURE dbo.sp_DeleteRoute
     @RouteId INT
 AS
@@ -78,3 +75,6 @@ BEGIN
     END CATCH
 END;
 GO
+
+Update Route
+Set isDeleted = 0;
