@@ -92,6 +92,9 @@ builder.Services.AddScoped<IPdfService, PdfService>();
 builder.Services.AddScoped<IPurchaseService, PurchaseService>();
 builder.Services.AddScoped<IPurchaseRepository, PurchaseRepository>();
 
+builder.Services.AddScoped<IReportRepository, ReportRepository>();
+builder.Services.AddScoped<IReportService, ReportService>();
+
 builder.Services.AddScoped<IAircraftRepository,AircraftRepository>();
 builder.Services.AddScoped<IAircraftService, AircraftService>();
 
@@ -130,6 +133,11 @@ builder.Services.AddHttpClient("AirDreams", client =>
 
 builder.Services.AddScoped<IPartnerFlightService, PartnerFlightService>();
 builder.Services.AddScoped<IFlightConnectorService, FlightConnectorService>();
+
+builder.Services.AddScoped<IExternalFlightRepository, ExternalFlightRepository>();
+builder.Services.AddScoped<IExternalFlightService, ExternalFlightService>();
+
+builder.Services.AddMemoryCache();
 
 var app = builder.Build();
 

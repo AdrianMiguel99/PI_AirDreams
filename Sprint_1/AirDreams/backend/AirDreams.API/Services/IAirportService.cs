@@ -8,5 +8,6 @@ namespace AirDreams.API.Services
         Task<AirportDto?> GetByCodeAsync(string code);
         Task<AirportDto> CreateAsync(CreateAirportDto dto, byte adminId);
         Task UpdateAsync(string code, UpdateAirportDto dto);
+        Task<(bool success, string message)> DeleteAsync(string code);
     }
 }

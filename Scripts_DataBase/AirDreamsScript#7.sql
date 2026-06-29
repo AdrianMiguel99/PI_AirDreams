@@ -1,3 +1,11 @@
+IF OBJECT_ID(N'dbo.sp_InsertPassengersAndLuggage', 'P') IS NOT NULL
+    DROP PROCEDURE dbo.sp_InsertPassengersAndLuggage;
+GO
+
+IF TYPE_ID(N'dbo.PassengerPurchaseType') IS NOT NULL
+    DROP TYPE dbo.PassengerPurchaseType;
+GO
+
 IF TYPE_ID(N'dbo.PassengerPurchaseType') IS NULL
 BEGIN
     EXEC('
@@ -7,10 +15,18 @@ BEGIN
             LastnamesPassenger VARCHAR(100) NOT NULL,
             EmailPassenger VARCHAR(50) NULL,
             Telephone VARCHAR(50) NULL,
-            Country VARCHAR(100) NOT NULL
+            Country VARCHAR(100) NOT NULL,
+            BirthDate DATE NOT NULL
         );
     ');
 END
+GO
+
+IF COL_LENGTH('Passenger', 'birthDate') IS NULL
+BEGIN
+    ALTER TABLE Passenger
+    ADD birthDate DATE NULL;
+END;
 GO
 
 IF TYPE_ID(N'dbo.LuggagePurchaseType') IS NULL
@@ -60,6 +76,7 @@ BEGIN
             idPassenger,
             namePassenger,
             lastnamesPassenger,
+            birthDate,
             emailPassenger,
             telephone,
             country
@@ -68,6 +85,7 @@ BEGIN
             pm.IdPassenger,
             p.NamePassenger,
             p.LastnamesPassenger,
+            p.BirthDate,
             p.EmailPassenger,
             TRY_CONVERT(BIGINT, NULLIF(p.Telephone, '')),
             p.Country

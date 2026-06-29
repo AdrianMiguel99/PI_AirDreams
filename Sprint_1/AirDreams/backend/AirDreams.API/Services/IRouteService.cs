@@ -7,5 +7,6 @@ namespace AirDreams.API.Services
     {
         Task<int> CreateRouteWithFrequenciesAsync(CreateRouteModel model, byte adminID);
         Task<IEnumerable<RouteDTO>> GetAllAsync();
+        Task<RouteDeleteResultDTO> DeleteAsync(int routeId);
     }
 }
