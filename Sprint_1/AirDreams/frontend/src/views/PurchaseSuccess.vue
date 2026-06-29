@@ -289,19 +289,11 @@ export default {
         return {
           id: index + 1,
           passengerName: `${passenger.namePassenger || ""} ${passenger.lastnamesPassenger || ""}`.trim(),
-          seatNumber: this.generateRandomSeat(index),
+          seatNumber: passenger.seatNumber || "N/A",
           classType: successData.seatClassLabel || "Turista",
           price: Number(successData.pricePerPassenger || 0)
         };
       });
-    },
-
-    generateRandomSeat(index) {
-      const letters = ["A", "B", "C", "D", "E", "F"];
-      const row = (index % 30) + 1;
-      const letter = letters[index % letters.length];
-
-      return `${row}${letter}`;
     },
 
     goHome() {

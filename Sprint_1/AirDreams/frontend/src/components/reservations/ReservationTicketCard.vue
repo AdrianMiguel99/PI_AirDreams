@@ -10,7 +10,6 @@
 
       <div class="class-info">
         <strong>{{ ticket.classType }}</strong>
-        <span>Basic</span>
       </div>
     </div>
 
@@ -34,7 +33,7 @@
       <div class="time-block left">
         <strong>{{ purchase.departureTime }}</strong>
         <span>{{ purchase.origin }}</span>
-        <small>Terminal {{ purchase.originTerminal || "M" }}</small>
+        <small>Terminal {{ purchase.originTerminal || " " }}</small>
       </div>
 
       <div class="timeline-line">
@@ -65,14 +64,18 @@
         <span
           v-if="isLayover"
           class="segment-marker segment-two"
-          :class="{ 'default-marker': !purchase.secondIsAirDreams }"
+          :class="{ 'external-marker': !purchase.secondIsAirDreams }"
         >
           <img
+            v-if="purchase.secondIsAirDreams"
             :src="secondSegmentIcon"
-            alt="Aerolínea tramo 2"
+            alt="AirDreams"
           >
-        </span>
 
+          <span v-else class="external-airline-name">
+            {{ purchase.secondAirlineName || "Aerolínea externa" }}
+          </span>
+        </span>
         <span class="point end"></span>
       </div>
 
@@ -83,7 +86,7 @@
 
         <strong>{{ purchase.arrivalTime }}</strong>
         <span>{{ purchase.destination }}</span>
-        <small>Terminal {{ purchase.destinationTerminal || "1" }}</small>
+        <small>Terminal {{ purchase.destinationTerminal || " " }}</small>
       </div>
     </div>
 
@@ -115,7 +118,7 @@
 
       <div>
         <span>Asiento</span>
-        <strong>{{ ticket.seatNumber || "No asignado" }}</strong>
+        <strong> {{ ticket.passengers.map(passenger => passenger.seatNumber).join(", ") || "No asignado" }}</strong>
       </div>
     </div>
   </article>
@@ -347,6 +350,22 @@ export default {
   left: 75%;
 }
 
+.segment-marker.external-marker {
+  width: auto;
+  min-width: 92px;
+  height: 28px;
+  padding: 0 10px;
+  border-radius: 999px;
+  background: white;
+  border: 2px solid #032056;
+}
+
+.external-airline-name {
+  color: #032056;
+  font-size: 11px;
+  font-weight: 800;
+  white-space: nowrap;
+}
 .layover-center {
   position: absolute;
   left: 50%;
