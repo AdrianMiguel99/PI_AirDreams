@@ -1,4 +1,5 @@
-﻿using AirDreams.API.Models;
+﻿using AirDreams.API.DTOs;
+using AirDreams.API.Models;
 
 namespace AirDreams.API.Repositories
 {
@@ -6,7 +7,7 @@ namespace AirDreams.API.Repositories
     {
         List<AircraftViewModel> GetAircrafts();
         bool AddAircraft(AircraftModel aircraft);
-        bool DeleteAircraft(string modelo);
+        AircraftDeleteResultDTO DeleteAircraft(string modelo);
         AircraftViewModel? GetAircraftByModel(string modelo);
         bool UpdateAircraft(AircraftModel aircraft);
         bool ExistsByModel(string modelo);

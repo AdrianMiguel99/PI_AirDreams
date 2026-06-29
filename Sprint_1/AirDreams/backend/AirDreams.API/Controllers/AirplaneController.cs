@@ -2,6 +2,7 @@
 using AirDreams.API.Services.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Data.SqlClient;
 using System.Security.Claims;
 
 namespace AirDreams.API.Controllers
@@ -67,20 +68,25 @@ namespace AirDreams.API.Controllers
         [HttpDelete("{modelo}")]
         public IActionResult Delete(string modelo)
         {
-            var result = aircraftService.DeleteAircraft(modelo);
-
-            if (string.IsNullOrEmpty(result))
+            try
             {
-                return Ok(new
+                var result = aircraftService.DeleteAircraft(modelo);
+                return Ok(result);
+            }
+            catch (ArgumentException ex)
+            {
+                return BadRequest(new
                 {
-                    message = "Aeronave eliminada correctamente."
+                    message = ex.Message
                 });
             }
-
-            return BadRequest(new
+            catch (SqlException ex) when (ex.Number == 50001)
             {
-                message = result
-            });
+                return NotFound(new
+                {
+                    message = ex.Message
+                });
+            }
         }
 
         [HttpGet("{modelo}")]

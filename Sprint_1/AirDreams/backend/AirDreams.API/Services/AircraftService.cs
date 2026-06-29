@@ -1,4 +1,5 @@
-﻿using AirDreams.API.Models;
+﻿using AirDreams.API.DTOs;
+using AirDreams.API.Models;
 using AirDreams.API.Repositories;
 using AirDreams.API.Services.Interfaces;
 
@@ -49,33 +50,14 @@ namespace AirDreams.API.Services
             return string.Empty;
         }
 
-        public string DeleteAircraft(string modelo)
+        public AircraftDeleteResultDTO DeleteAircraft(string modelo)
         {
             if (string.IsNullOrWhiteSpace(modelo))
             {
-                return "El modelo es obligatorio.";
+                throw new ArgumentException("El modelo es obligatorio.");
             }
 
-            if (aircraftRepository.IsAircraftInUse(modelo))
-            {
-                return "No se puede eliminar la aeronave porque está asociada a una ruta.";
-            }
-
-            try
-            {
-                var isDeleted = aircraftRepository.DeleteAircraft(modelo);
-
-                if (!isDeleted)
-                {
-                    return "No existe una aeronave con ese modelo.";
-                }
-            }
-            catch (Exception ex)
-            {
-                return ex.Message;
-            }
-
-            return string.Empty;
+            return aircraftRepository.DeleteAircraft(modelo.Trim());
         }
 
         public AircraftViewModel? GetAircraftByModel(string modelo)
