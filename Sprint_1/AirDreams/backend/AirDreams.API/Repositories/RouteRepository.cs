@@ -43,7 +43,8 @@ public class RouteRepository : IRouteRepository
             a2.timeZone AS TimeZone
         FROM Route r
         LEFT JOIN Airport a1 ON r.codeAirportSalida = a1.codeAirport
-        LEFT JOIN Airport a2 ON r.codeAirportLlegada = a2.codeAirport;
+        LEFT JOIN Airport a2 ON r.codeAirportLlegada = a2.codeAirport
+        WHERE r.isDeleted = 0;
     ";
 
     
@@ -154,5 +155,18 @@ public class RouteRepository : IRouteRepository
             tran.Rollback();
             throw;
         }
+    }
+
+    public async Task<RouteDeleteResultDTO> DeleteAsync(int routeId)
+    {
+        if (_connection.State == ConnectionState.Closed) _connection.Open();
+
+        var result = await _connection.QuerySingleAsync<RouteDeleteResultDTO>(
+            "dbo.sp_DeleteRoute",
+            new { RouteId = routeId },
+            commandType: CommandType.StoredProcedure
+        );
+
+        return result;
     }
 }

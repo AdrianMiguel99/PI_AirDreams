@@ -25,6 +25,7 @@
             <th>Aeropuerto llegada</th>
             <th>Duración</th>
             <th>Precio base</th>
+            <th>Acciones</th>
           </tr>
         </thead>
 
@@ -35,10 +36,36 @@
             <td>{{ route.codeAirportLlegada }}</td>
             <td>{{ route.flightDuration }} min</td>
             <td>${{ Number(route.basePrice).toFixed(2) }}</td>
+            <td>
+
+            
+              <button
+                class="delete-button"
+                
+                :disabled="deletingRouteId === route.routeID"
+                @click="deleteRoute(route)"
+              >
+              <img 
+                src="https://i.ibb.co/FkMhvPdS/Chat-GPT-Image-5-may-2026-05-11-58-1.png"
+                alt="eliminar"
+                style="width: 20px; height: 22px;"
+                >
+                {{ deletingRouteId === route.routeID ? 'Eliminando...' : 'Eliminar' }}
+              </button>
+            </td>
           </tr>
         </tbody>
       </table>
     </div>
+
+    <PopupMessage
+      :show="showPopup"
+      :type="popupType"
+      :title="popupTitle"
+      :message="popupMessage"
+      :actionText="popupActionText"
+      @close="showPopup = false"
+    />
   </div>
 </template>
 
@@ -46,17 +73,25 @@
 <script>
 import axios from 'axios'
 import AdminHeader from './AdminHeader.vue'
+import PopupMessage from './PopupMessage.vue'
 
 export default {
     name: 'ListaRutas',
     components: {
-    AdminHeader
+    AdminHeader,
+    PopupMessage
     },
 data() {
     return {
     routes: [],
     loading: false,
-    errorMessage: ''
+    errorMessage: '',
+    deletingRouteId: null,
+    showPopup: false,
+    popupType: 'success',
+    popupTitle: '',
+    popupMessage: '',
+    popupActionText: ''
     }
 },
     methods: {
@@ -120,6 +155,48 @@ async fetchRoutes() {
         } finally {
         this.loading = false
     }
+}
+,
+async deleteRoute(route) {
+    if (!route?.routeID) {
+        this.showRoutePopup('error', 'Ruta inválida', 'No se pudo identificar la ruta seleccionada.')
+        return
+    }
+
+    const confirmed = window.confirm(`¿Deseas eliminar la ruta ${route.routeID}?`)
+    if (!confirmed) return
+
+    const token = localStorage.getItem("token")
+    if (!token) {
+        this.showRoutePopup('error', 'Sesión requerida', 'Debes iniciar sesión.')
+        return
+    }
+
+    this.deletingRouteId = route.routeID
+
+    try {
+        const res = await axios.delete(`http://localhost:5276/api/routes/${route.routeID}`, {
+            headers: { Authorization: `Bearer ${token}` }
+        })
+
+        const message = res.data?.message || 'La ruta fue eliminada correctamente.'
+
+        this.showRoutePopup('success', 'Ruta eliminada', message)
+        await this.fetchRoutes()
+    } catch (error) {
+        console.error('Error al eliminar ruta:', error)
+        const message = error.response?.data?.message || 'No se pudo eliminar la ruta.'
+        this.showRoutePopup('error', 'Error al eliminar ruta', message)
+    } finally {
+        this.deletingRouteId = null
+    }
+},
+showRoutePopup(type, title, message) {
+    this.popupType = type
+    this.popupTitle = title
+    this.popupMessage = message
+    this.popupActionText = ''
+    this.showPopup = true
 }
     },
     created() {
@@ -195,5 +272,26 @@ th {
   background: #f8fafc;
   color: #384467;
   font-weight: bold;
+}
+
+.delete-button {
+  border: none;
+  border-radius: 999px;
+  background: #ff0000;
+  color: #fff;
+  padding: 7px 16px;
+  font-family: 'Inter', sans-serif;
+  font-size: 14px;
+  cursor: pointer;
+  transition: background 0.2s ease, opacity 0.2s ease;
+}
+
+.delete-button:hover:not(:disabled) {
+  background: #b91c1c;
+}
+
+.delete-button:disabled {
+  cursor: not-allowed;
+  opacity: 0.65;
 }
 </style>
