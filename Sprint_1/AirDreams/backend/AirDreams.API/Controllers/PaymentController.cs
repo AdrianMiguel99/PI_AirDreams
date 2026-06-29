@@ -47,5 +47,11 @@ namespace AirDreams.API.Controllers
             });
         }
 
+        [HttpPost("external-purchase")]
+        public async Task<IActionResult> ExternalPurchase([FromBody] ExternalOrderRequestDto dto)
+        {
+            var result = await _purchaseService.ConfirmExternalPurchaseAsync(dto);
+            return Ok(result);
+        }
     }
 }
