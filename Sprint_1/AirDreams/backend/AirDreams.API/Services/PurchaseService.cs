@@ -1,21 +1,29 @@
 ﻿using AirDreams.API.Models.Dtos;
 using AirDreams.API.Repositories;
 using AirDreams.API.Services;
+using AirDreams.API.Services.Interfaces;
+using AirDreams.ExternalAPI.DTOs;
 
 public class PurchaseService : IPurchaseService
 {
     private readonly IPurchaseRepository _repository;
     private readonly IEmailService _emailService;
     private readonly IPdfService _pdfService;
+    private readonly IPartnerFlightService _partnerFlightService;
+    private readonly IExternalFlightService _externalFlightService;
 
     public PurchaseService(
         IPurchaseRepository repository,
         IEmailService emailService,
-        IPdfService pdfService)
+        IPdfService pdfService,
+        IPartnerFlightService partnerFlightService,
+        IExternalFlightService externalFlightService)
         {
             _repository = repository;
             _emailService = emailService;
             _pdfService = pdfService;
+            _partnerFlightService = partnerFlightService;
+            _externalFlightService = externalFlightService;
         }
     public async Task<bool> CheckFlightAvailabilityAsync( string numberFlight, string seatClass, int requestedSeats)
     {
@@ -36,7 +44,32 @@ public class PurchaseService : IPurchaseService
             lastFour = digits.Length >= 4 ? digits[^4..] : null;
         }
 
+        var externalSegments = dto.Segments
+            .Where(s => !s.FlightNumber.StartsWith("AD"))
+            .ToList();
+
+        var externalFlights = new List<ExternalResponseFlightDTO>();
+
+        foreach (var segment in externalSegments)
+        {
+            var externalFlight =
+                await _partnerFlightService.GetCachedFlightAsync(segment.FlightNumber);
+
+            if (externalFlight != null)
+            {
+                externalFlights.Add(externalFlight);
+            }
+        }
+
+        dto.Segments.RemoveAll(s => !s.FlightNumber.StartsWith("AD"));
         await _repository.ConfirmPurchaseAsync(dto, lastFour);
+
+        foreach (var externalFlight in externalFlights)
+        {
+            await _externalFlightService.RegisterExternalFlightAsync(
+                dto.TransactionId,
+                externalFlight);
+        }
 
         var flightNumbers = dto.Segments.Select(s => s.FlightNumber).Distinct();
         var multipliers = await _repository.GetMultipliersByFlightsAsync(flightNumbers);
