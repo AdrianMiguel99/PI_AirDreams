@@ -15,7 +15,7 @@
       >
         Volver al inicio
       </button> 
-</div>
+  </div>
 
     <div class="success-hero">
       <div class="success-logo">

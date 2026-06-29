@@ -22,6 +22,8 @@ import LuggagePage from '../views/LuggagePage.vue'
 import PassengerFormPage from '../views/PassengerFormPage.vue'
 import PaymentPage from '../views/PaymentPage.vue'
 import RoutesManagement from '../views/RoutesManagement.vue'
+import ConsultReservationPage from '../views/ConsultReservationPage.vue'
+import ReservationDetailsPage from '../views/ReservationDetailsPage.vue'
 import ReportsPage from '../views/ReportsPage.vue'
 import CancelReservation from '../views/CancelReservation.vue'
 
@@ -60,7 +62,9 @@ const routes = [
   { path: '/purchased/:idCompra', name: 'PurchaseSuccess', component: PurchaseSuccess},
   { path: '/passengers', name: 'passengers', component: PassengerFormPage },
   { path: '/luggage', name: 'luggage', component: LuggagePage },
-  { path: '/payment', name: 'payment', component: PaymentPage }
+  { path: '/payment', name: 'payment', component: PaymentPage },
+  { path: '/consultar-reserva', name: 'ConsultReservation', component: ConsultReservationPage},
+  { path: '/detalle-reserva', name: 'ReservationDetails', component: ReservationDetailsPage },
 ]
 
 const router = createRouter({

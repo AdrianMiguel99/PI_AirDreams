@@ -131,7 +131,13 @@ export default {
         seatClass: seatClass,
         price: selection.price,
         passengerCount: this.passengersCount,
-        itinerary: selection.flight,
+        itinerary: {
+          ...selection.flight,
+          segments: selection.flight.segments.map(segment => ({
+            ...segment,
+            departureDate: this.departureDate
+          }))
+        },
         selectedAt: new Date().toISOString()
       };
 
