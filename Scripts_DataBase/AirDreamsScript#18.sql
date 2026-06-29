@@ -9,12 +9,8 @@ BEGIN
 END;
 GO
 
-IF COL_LENGTH('Route', 'deletedAt') IS NULL
-BEGIN
-    ALTER TABLE Route
-    ADD deletedAt DATETIME2 NULL;
-END;
-GO
+Update Route
+Set isDeleted = 0;
 
 CREATE OR ALTER PROCEDURE dbo.sp_DeleteRoute
     @RouteId INT
