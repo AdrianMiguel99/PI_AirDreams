@@ -9,7 +9,8 @@ namespace AirDreams.API.Services
             DateTime? startDate,
             DateTime? endDate,
             string? origin,
-            string? destination);
+            string? destination,
+            string? airline);
 
         Task<IncomeReportFiltersDTO> GetIncomeReportFiltersAsync();
 

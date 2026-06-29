@@ -17,7 +17,8 @@ namespace AirDreams.API.Services
             DateTime? startDate,
             DateTime? endDate,
             string? origin,
-            string? destination)
+            string? destination,
+            string? airline)
         {
             var resolvedStartDate = year.HasValue
                 ? new DateTime(year.Value, 1, 1)
@@ -34,7 +35,8 @@ namespace AirDreams.API.Services
                 resolvedStartDate,
                 resolvedEndDate,
                 origin,
-                destination);
+                destination,
+                airline);
         }
 
         public async Task<IncomeReportFiltersDTO> GetIncomeReportFiltersAsync()

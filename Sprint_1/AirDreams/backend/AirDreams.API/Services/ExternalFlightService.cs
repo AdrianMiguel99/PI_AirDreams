@@ -33,7 +33,7 @@ namespace AirDreams.API.Services
 
             var partnerName = PartnerNames.TryGetValue(prefix, out var partner)
                 ? partner
-                : "Unknown";
+                : "Snoopy Airlines";
 
             await _repository.RegisterExternalFlightAsync(
                 transactionId,

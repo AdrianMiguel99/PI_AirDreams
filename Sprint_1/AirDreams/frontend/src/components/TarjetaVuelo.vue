@@ -70,7 +70,7 @@
             <button
               type="button"
               class="buy-button tourist-button"
-              @click="buyFlight('Tourist', flight.touristPrice)"
+              @click="buyFlight('Turista', flight.touristPrice)"
             >
               Comprar turista
             </button>

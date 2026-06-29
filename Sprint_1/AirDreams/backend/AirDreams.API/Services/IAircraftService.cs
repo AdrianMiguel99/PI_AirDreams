@@ -1,3 +1,4 @@
+using AirDreams.API.DTOs;
 using AirDreams.API.Models;
 
 namespace AirDreams.API.Services.Interfaces
@@ -6,9 +7,8 @@ namespace AirDreams.API.Services.Interfaces
     {
         List<AircraftViewModel> GetAircrafts();
         string AddAircraft(AircraftModel aircraft);
-        string DeleteAircraft(string modelo);
+        AircraftDeleteResultDTO DeleteAircraft(string modelo);
         AircraftViewModel? GetAircraftByModel(string modelo);
         string UpdateAircraft(AircraftModel aircraft);
     }
 }
-

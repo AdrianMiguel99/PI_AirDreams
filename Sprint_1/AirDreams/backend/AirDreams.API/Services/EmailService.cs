@@ -128,6 +128,55 @@ namespace AirDreams.API.Services
                 itineraryPdf
             );
         }
+        public async Task SendCancellationEmailAsync(
+            string toEmail,
+            string token)
+        {
+            var frontendUrl = "http://localhost:5173";
+
+            var cancellationLink =
+                $"{frontendUrl}/cancel-reservation?token={token}";
+
+            var subject =
+                "Confirmación de cancelación de reserva - AirDreams";
+
+            var body = $@"
+                <h1>Solicitud de cancelación de reserva</h1>
+
+                <p>
+                    Se ha solicitado la cancelación de su reserva en AirDreams.
+                </p>
+
+                <p>
+                    Para confirmar la cancelación, haga clic en el siguiente enlace:
+                </p>
+
+                <p>
+                    <a href='{cancellationLink}'>
+                        Confirmar cancelación
+                    </a>
+                </p>
+
+                <p>
+                    <strong>Importante:</strong>
+                    esta acción es irreversible.
+                </p>
+
+                <p>
+                    No se realizará devolución de dinero.
+                </p>
+
+                <p>
+                    Si usted no realizó esta solicitud, ignore este correo.
+                </p>
+            ";
+
+            await SendEmailAsync(
+                toEmail,
+                subject,
+                body
+            );
+        }
 
         private async Task SendEmailAsync(
             string toEmail,

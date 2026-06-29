@@ -20,7 +20,8 @@ namespace AirDreams.API.Controllers
             [FromQuery] DateTime? startDate,
             [FromQuery] DateTime? endDate,
             [FromQuery] string? origin,
-            [FromQuery] string? destination)
+            [FromQuery] string? destination,
+            [FromQuery] string? airline)
         {
             try
             {
@@ -29,7 +30,8 @@ namespace AirDreams.API.Controllers
                     startDate,
                     endDate,
                     origin,
-                    destination);
+                    destination,
+                    airline);
 
                 return Ok(report);
             }

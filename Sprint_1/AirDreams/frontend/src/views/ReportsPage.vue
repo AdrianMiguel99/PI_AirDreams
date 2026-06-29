@@ -93,6 +93,20 @@
               </select>
             </label>
 
+            <label>
+              Aerolínea
+              <select v-model="incomeFilters.airline">
+                <option value="">Todas</option>
+                <option
+                  v-for="airline in incomeFilterOptions.airlines"
+                  :key="airline"
+                  :value="airline"
+                >
+                  {{ airline }}
+                </option>
+              </select>
+            </label>
+
             <button class="filter-btn" type="submit">
               Filtrar
             </button>
@@ -293,8 +307,18 @@ export default {
     return {
       currentView: 'sales',
       incomeReport: [],
-      incomeFilterOptions: { origins: [], destinations: [], years: [] },
-      incomeFilters: { origin: '', destination: '', year: '' },
+      incomeFilterOptions: {
+        origins: [],
+        destinations: [],
+        years: [],
+        airlines: []
+      },
+      incomeFilters: {
+        origin: '',
+        destination: '',
+        year: '',
+        airline: ''
+      },
       loadingIncomeReport: false,
       incomeReportError: '',
       preparingExcel: false,
@@ -354,7 +378,11 @@ export default {
         if (this.incomeFilters.origin) params.origin = this.incomeFilters.origin
         if (this.incomeFilters.destination) params.destination = this.incomeFilters.destination
         if (this.incomeFilters.year) params.year = this.incomeFilters.year
-        const response = await axios.get('http://localhost:5276/api/reports/income', { params })
+        if (this.incomeFilters.airline) params.airline = this.incomeFilters.airline
+
+        const response = await axios.get('http://localhost:5276/api/reports/income', {
+          params
+        })
         this.incomeReport = response.data
       } catch (error) {
         this.incomeReportError = error.response?.data?.error || 'No se pudo cargar el reporte de ingresos.'
@@ -369,7 +397,8 @@ export default {
         this.incomeFilterOptions = {
           origins: response.data.origins || [],
           destinations: response.data.destinations || [],
-          years: response.data.years || []
+          years: response.data.years || [],
+          airlines: response.data.airlines || []
         }
       } catch (error) {
         console.error('No se pudieron cargar los filtros del reporte:', error)
@@ -396,7 +425,9 @@ export default {
       const origin = this.incomeFilters.origin || 'todos-origenes'
       const destination = this.incomeFilters.destination || 'todos-destinos'
       const year = this.incomeFilters.year || 'todos-años'
-      return `reporte-ingresos-${origin}-${destination}-${year}.${extension}`
+      const airline = this.incomeFilters.airline || 'todas-aerolineas'
+
+      return `reporte-ingresos-${origin}-${destination}-${year}-${airline}.${extension}`
         .toLowerCase()
         .replace(/\s+/g, '-')
     },
@@ -405,7 +436,8 @@ export default {
       return [
         `Origen: ${this.incomeFilters.origin || 'Todos'}`,
         `Destino: ${this.incomeFilters.destination || 'Todos'}`,
-        `Año: ${this.incomeFilters.year || 'Todos'}`
+        `Año: ${this.incomeFilters.year || 'Todos'}`,
+        `Aerolínea: ${this.incomeFilters.airline || 'Todas'}`
       ].join(' | ')
     },
 

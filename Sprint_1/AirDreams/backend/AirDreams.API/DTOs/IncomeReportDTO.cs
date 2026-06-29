@@ -22,5 +22,6 @@ namespace AirDreams.API.DTOs
         public IEnumerable<string> Origins { get; set; } = Enumerable.Empty<string>();
         public IEnumerable<string> Destinations { get; set; } = Enumerable.Empty<string>();
         public IEnumerable<int> Years { get; set; } = Enumerable.Empty<int>();
+        public IEnumerable<string> Airlines { get; set; } = Enumerable.Empty<string>();
     }
 }

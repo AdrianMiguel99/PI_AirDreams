@@ -17,7 +17,8 @@ namespace AirDreams.API.Repositories
             DateTime startDate,
             DateTime endDate,
             string? origin,
-            string? destination)
+            string? destination,
+            string? airline)
         {
             return await _connection.QueryAsync<IncomeReportDTO>(
                 "dbo.sp_GetIncomeReport",
@@ -26,7 +27,8 @@ namespace AirDreams.API.Repositories
                     FechaInicio = startDate.Date,
                     FechaFinExclusiva = endDate.Date,
                     Origen = string.IsNullOrWhiteSpace(origin) ? null : origin.Trim().ToUpper(),
-                    Destino = string.IsNullOrWhiteSpace(destination) ? null : destination.Trim().ToUpper()
+                    Destino = string.IsNullOrWhiteSpace(destination) ? null : destination.Trim().ToUpper(),
+                    Aerolinea = string.IsNullOrWhiteSpace(airline) ? null : airline.Trim()
                 },
                 commandType: CommandType.StoredProcedure);
         }
@@ -40,12 +42,14 @@ namespace AirDreams.API.Repositories
             var origins = await results.ReadAsync<string>();
             var destinations = await results.ReadAsync<string>();
             var years = await results.ReadAsync<int>();
+            var airlines = await results.ReadAsync<string>();
 
             return new IncomeReportFiltersDTO
             {
                 Origins = origins,
                 Destinations = destinations,
-                Years = years
+                Years = years,
+                Airlines = airlines
             };
         }
         public async Task<IEnumerable<FlightsReportRowDto>> GetFlightsReportAsync(
