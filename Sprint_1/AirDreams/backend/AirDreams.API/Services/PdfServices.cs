@@ -307,7 +307,7 @@ public class PdfService : IPdfService
 
                     BodyCell(table.Cell(), FormatLuggageType(item.Type));
                     BodyCell(table.Cell(), item.Quantity.ToString());
-                    BodyCell(table.Cell(), FormatMoney(subtotal));
+                    BodyCell(table.Cell(), FormatMoney(item.Subtotal));
                 }
             }
         });
@@ -372,7 +372,7 @@ public class PdfService : IPdfService
 
         return dto.Luggage
             .SelectMany(luggage => luggage.LuggageItems)
-            .Sum(item => GetLuggageSubtotal(dto, item));
+            .Sum(item => item.Subtotal);
     }
 
     private decimal GetLuggageSubtotal(ConfirmPurchaseDto dto, LuggageItemDto item)

@@ -7,5 +7,6 @@
         public string City { get; set; } = string.Empty;
         public string Country { get; set; } = string.Empty;
         public String? TimeZone { get; set; }
+        public bool isActive { get; set; } = true;
     }
 }

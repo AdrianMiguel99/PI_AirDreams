@@ -177,6 +177,10 @@ export default {
     formatCurrency(value) {
       return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(Number(value || 0))
     },
+
+    normalizeSeatClass(value) {
+      return value === 'FirstClass' || value === 'firstClass' ? 'FirstClass' : 'Turista'
+    },
     
     formatDate(value) {
       const date = new Date(value)
@@ -188,6 +192,7 @@ export default {
       const purchase = JSON.parse(sessionStorage.getItem('selectedFlightPurchase') || '{}')
       const passengers = JSON.parse(sessionStorage.getItem('purchasePassengers') || '[]')
       const luggage = JSON.parse(sessionStorage.getItem('purchaseLuggage') || '[]')
+      const seatClass = this.normalizeSeatClass(purchase.seatClass)
 
       return {
         transactionId: this.payment.transactionId,
@@ -195,7 +200,7 @@ export default {
         paymentMethod: this.payment.paymentMethod,
         flightDescription: this.flightDescription,
         seatClassLabel: this.seatClassLabel,
-        seatClass: purchase.seatClass,
+        seatClass,
         passengerCount: this.passengerCount,
         pricePerPassenger: this.pricePerPassenger,
         flightSubtotal: this.flightSubtotal,
@@ -250,6 +255,7 @@ export default {
         const purchase = JSON.parse(sessionStorage.getItem('selectedFlightPurchase'))
         const passengers = JSON.parse(sessionStorage.getItem('purchasePassengers'))
         const luggage = JSON.parse(sessionStorage.getItem('purchaseLuggage'))
+        const seatClass = this.normalizeSeatClass(purchase.seatClass)
 
         const payload = {
           transactionId: this.payment.transactionId,
@@ -284,7 +290,7 @@ export default {
             carryOnPrice: s.carryOnPrice || 0,
             multiplier: s.porcentageMultiplier || 0.2
           })),
-          seatClass: purchase.seatClass,
+          seatClass,
           pricePerPassenger: purchase.price,
           passengerCount: purchase.passengerCount,
           passengers: passengers.map(p => ({
@@ -293,7 +299,8 @@ export default {
             birthDate: p.birthDate || null,
             emailPassenger: p.emailPassenger || '',
             telephone: p.telephone || '',
-            country: p.country || ''
+            country: p.country || '',
+            birthDate: p.birthDate || ''
           })),
           luggage: luggage ? luggage.map(l => ({
             passengerIndex: l.passenger.index,
