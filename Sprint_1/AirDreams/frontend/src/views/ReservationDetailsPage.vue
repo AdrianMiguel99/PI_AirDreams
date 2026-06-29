@@ -6,6 +6,14 @@
       <ReservationHero :reservation="reservation" />
 
       <section class="details-card">
+        <p v-if="errorMessage" class="error-message">
+          {{ errorMessage }}
+        </p>
+
+        <p v-if="cancellationMessage" class="success-message">
+          {{ cancellationMessage }}
+        </p>
+
         <div class="details-layout">
           <section class="tickets-content">
             <h1>Detalles del vuelo</h1>
@@ -20,7 +28,11 @@
             </div>
           </section>
 
-          <ReservationOptionsPanel />
+          <ReservationOptionsPanel
+            :loading="cancellationLoading"
+            :disabled="reservation.isCancelled"
+            @cancel-reservation="requestCancellation"
+          />
         </div>
       </section>
     </main>
@@ -49,6 +61,8 @@ export default {
     return {
       loading: false,
       errorMessage: "",
+      cancellationLoading: false,
+      cancellationMessage: "",
 
       reservation: {
         reservationCode: "",
@@ -143,6 +157,48 @@ export default {
         this.errorMessage = "No se pudo cargar la información de la reserva.";
       } finally {
         this.loading = false;
+      }
+    },
+
+    async requestCancellation() {
+      this.errorMessage = "";
+      this.cancellationMessage = "";
+
+      const transactionId =
+        this.reservation.reservationCode || this.$route.query.reservationCode;
+
+      if (!transactionId) {
+        this.errorMessage = "No se encontró el número de reserva para cancelar.";
+        return;
+      }
+
+      this.cancellationLoading = true;
+
+      try {
+        const response = await fetch(`${API_URL}/cancellations/request`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({
+            transactionId: transactionId
+          })
+        });
+
+        const responseText = await response.text();
+
+        if (!response.ok) {
+          throw new Error(responseText || "No se pudo solicitar la cancelación.");
+        }
+
+        this.cancellationMessage =
+          "Solicitud de cancelación enviada correctamente. Revise su correo para confirmar la cancelación.";
+      } catch (error) {
+        console.error(error);
+        this.errorMessage =
+          error.message || "Ocurrió un error al solicitar la cancelación.";
+      } finally {
+        this.cancellationLoading = false;
       }
     },
 
@@ -341,6 +397,24 @@ export default {
   display: flex;
   flex-direction: column;
   gap: 18px;
+}
+
+.error-message {
+  margin: 0 0 18px;
+  padding: 12px 16px;
+  border-radius: 10px;
+  background: #fde8e8;
+  color: #b00020;
+  font-weight: 700;
+}
+
+.success-message {
+  margin: 0 0 18px;
+  padding: 12px 16px;
+  border-radius: 10px;
+  background: #e8f7ee;
+  color: #1f7a3f;
+  font-weight: 700;
 }
 
 @media (max-width: 900px) {

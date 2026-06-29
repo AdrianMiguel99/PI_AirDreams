@@ -3,7 +3,7 @@
     <section>
       <h2>Opciones de viaje</h2>
 
-      <button class="option-button" @click="showComingSoon">
+      <button class="option-button" type="button" @click="showComingSoon">
         <span class="option-left">
           <img
             class="option-icon"
@@ -20,14 +20,19 @@
     <section class="management-section">
       <h2>Manejo del viaje</h2>
 
-      <button class="option-button" @click="showComingSoon">
+      <button
+        class="option-button"
+        type="button"
+        :disabled="loading || disabled"
+        @click="$emit('cancel-reservation')"
+      >
         <span class="option-left">
           <img
             class="option-icon"
             src="../../assets/icons/vuelo_cancelado.png"
             alt="Icono de cancelar itinerario"
           >
-          Cancelar itinerario
+          {{ loading ? "Enviando..." : "Cancelar itinerario" }}
         </span>
 
         <span>›</span>
@@ -39,6 +44,19 @@
 <script>
 export default {
   name: "ReservationOptionsPanel",
+
+  props: {
+    loading: {
+      type: Boolean,
+      default: false
+    },
+    disabled: {
+      type: Boolean,
+      default: false
+    }
+  },
+
+  emits: ["cancel-reservation"],
 
   methods: {
     showComingSoon() {
@@ -82,6 +100,11 @@ export default {
   background: #fbd6d6;
 }
 
+.option-button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
 .option-left {
   display: flex;
   align-items: center;
@@ -97,6 +120,13 @@ export default {
   margin-top: 235px;
 }
 
+.option-icon {
+  width: 22px;
+  height: 22px;
+  object-fit: contain;
+  display: block;
+}
+
 @media (max-width: 900px) {
   .options-panel {
     min-height: auto;
@@ -105,18 +135,5 @@ export default {
   .management-section {
     margin-top: 40px;
   }
-}
-
-.option-left {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-}
-
-.option-icon {
-  width: 22px;
-  height: 22px;
-  object-fit: contain;
-  display: block;
 }
 </style>
