@@ -52,8 +52,8 @@ namespace AirDreams.API.Repositories
                 FROM SearchDates sd
                 INNER JOIN Route r ON r.codeAirportSalida = @origin
                 INNER JOIN FlightFrequency ff ON r.idRoute = ff.idRoute
-                INNER JOIN Airport a1 ON r.codeAirportSalida = a1.codeAirport
-                INNER JOIN Airport a2 ON r.codeAirportLlegada = a2.codeAirport
+                INNER JOIN Airport a1 ON r.codeAirportSalida = a1.codeAirport AND a1.isActive = 1
+                INNER JOIN Airport a2 ON r.codeAirportLlegada = a2.codeAirport AND a2.isActive = 1
                 INNER JOIN AircraftView ac ON r.modelo = ac.modelo
                 CROSS APPLY (
                     SELECT DATEADD(
@@ -191,9 +191,9 @@ namespace AirDreams.API.Repositories
                     INNER JOIN FlightFrequency ff1 ON r1.idRoute = ff1.idRoute
                     INNER JOIN FlightFrequency ff2 ON r2.idRoute = ff2.idRoute
 
-                    INNER JOIN Airport a1 ON r1.codeAirportSalida = a1.codeAirport
-                    INNER JOIN Airport a2 ON r1.codeAirportLlegada = a2.codeAirport
-                    INNER JOIN Airport a3 ON r2.codeAirportLlegada = a3.codeAirport
+                    INNER JOIN Airport a1 ON r1.codeAirportSalida = a1.codeAirport AND a1.isActive = 1
+                    INNER JOIN Airport a2 ON r1.codeAirportLlegada = a2.codeAirport AND a2.isActive = 1
+                    INNER JOIN Airport a3 ON r2.codeAirportLlegada = a3.codeAirport AND a3.isActive = 1
 
                     INNER JOIN AircraftView ac1 ON r1.modelo = ac1.modelo
                     INNER JOIN AircraftView ac2 ON r2.modelo = ac2.modelo
@@ -334,8 +334,8 @@ namespace AirDreams.API.Repositories
                 FROM SearchDates sd
                 INNER JOIN Route r ON 1=1
                 INNER JOIN FlightFrequency ff ON r.idRoute = ff.idRoute
-                INNER JOIN Airport a1 ON r.codeAirportSalida = a1.codeAirport
-                INNER JOIN Airport a2 ON r.codeAirportLlegada = a2.codeAirport
+                INNER JOIN Airport a1 ON r.codeAirportSalida = a1.codeAirport AND a1.isActive = 1
+                INNER JOIN Airport a2 ON r.codeAirportLlegada = a2.codeAirport AND a2.isActive = 1
                 INNER JOIN AircraftView ac ON r.modelo = ac.modelo
                 CROSS APPLY (
                     SELECT DATEADD(
