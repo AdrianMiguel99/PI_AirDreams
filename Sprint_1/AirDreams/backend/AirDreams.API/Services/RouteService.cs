@@ -31,6 +31,14 @@ namespace AirDreams.API.Services
             return await _routeRepository.GetAllAsync();
         }
 
+        public async Task<RouteDeleteResultDTO> DeleteAsync(int routeId)
+        {
+            if (routeId <= 0)
+                throw new ArgumentException("El ID de la ruta no es válido.");
+
+            return await _routeRepository.DeleteAsync(routeId);
+        }
+
         private void ValidateRoute(CreateRouteModel model)
         {
             if (model == null)
