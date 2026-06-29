@@ -134,6 +134,9 @@ builder.Services.AddHttpClient("AirDreams", client =>
 builder.Services.AddScoped<IPartnerFlightService, PartnerFlightService>();
 builder.Services.AddScoped<IFlightConnectorService, FlightConnectorService>();
 
+builder.Services.AddScoped<IReservationRepository, ReservationRepository>();
+builder.Services.AddScoped<IReservationService, ReservationService>();
+
 builder.Services.AddScoped<IExternalFlightRepository, ExternalFlightRepository>();
 builder.Services.AddScoped<IExternalFlightService, ExternalFlightService>();
 
