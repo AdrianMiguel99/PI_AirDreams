@@ -129,30 +129,37 @@ export default {
     async handleLuggageChange({ passengerIndex, checkedCount, carryOnCount }) {
       if (checkedCount === 0 && carryOnCount === 0) {
         this.luggageSelections[passengerIndex] = {
-          checkedCount: 0,
-          carryOnCount: 0,
-          passengerTotal: 0
+          checkedCount: 0, carryOnCount: 0, passengerTotal: 0
         };
         return;
       }
+
+      const representativeSegment = this.segmentsPricing.find(seg =>
+        (checkedCount > 0 && seg.checkedPrice > 0) ||
+        (carryOnCount > 0 && seg.carryOnPrice > 0)
+      ) || this.segmentsPricing[0]; 
+
+      if (!representativeSegment) {
+        this.luggageSelections[passengerIndex] = {
+          checkedCount, carryOnCount, passengerTotal: 0
+        };
+        return;
+      }
+
       try {
         const res = await axios.post(`${API_BASE}/api/luggage/calculate/total`, {
           checkedQuantity: checkedCount,
           carryOnQuantity: carryOnCount,
-          segments: this.segmentsPricing
+          segments: [representativeSegment] 
         });
         const total = (res.data.checkedTotal || 0) + (res.data.carryOnTotal || 0);
         this.luggageSelections[passengerIndex] = {
-          checkedCount,
-          carryOnCount,
-          passengerTotal: total
+          checkedCount, carryOnCount, passengerTotal: total
         };
       } catch (e) {
         console.error('Error al calcular equipaje:', e);
         this.luggageSelections[passengerIndex] = {
-          checkedCount,
-          carryOnCount,
-          passengerTotal: 0
+          checkedCount, carryOnCount, passengerTotal: 0
         };
       }
     },
