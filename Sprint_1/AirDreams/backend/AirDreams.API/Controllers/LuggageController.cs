@@ -84,9 +84,9 @@ namespace AirDreams.API.Controllers
                 return BadRequest(new { message = "ID de reserva inválido." });
             }
 
-            var luggage = await _luggageService.GetReservationLuggageAsync(transactionId);
+            var luggageData = await _luggageService.GetReservationLuggageAsync(transactionId);
 
-            return Ok(luggage);
+            return Ok(luggageData);
         }
     }
 }

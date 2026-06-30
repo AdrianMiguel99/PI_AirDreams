@@ -124,7 +124,7 @@ namespace AirDreams.API.Services
             }
         }
 
-        public async Task<IEnumerable<ReservationLuggageDto>> GetReservationLuggageAsync(string transactionId)
+        public async Task<ReservationLuggageResponseDto> GetReservationLuggageAsync(string transactionId)
         {
             return await _luggageRepository.GetReservationLuggageAsync(transactionId);
         }

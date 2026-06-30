@@ -8,6 +8,6 @@ namespace AirDreams.API.Services.Interfaces
         Task<(bool success, string message)> RegisterLuggageAsync(LuggageRegistrationModel model);
         Task<(bool success, string message)> CheckAvailabilityAsync(string flightId, int routeId, decimal luggageWeight, decimal carryOnWeight);
         Task<(bool success, string message)> UpdateFlightWeightAsync(string transactionId, decimal luggageWeight, decimal carryOnWeight);
-        Task<IEnumerable<ReservationLuggageDto>> GetReservationLuggageAsync(string transactionId);
+        Task<ReservationLuggageResponseDto> GetReservationLuggageAsync(string transactionId);
     }
 }

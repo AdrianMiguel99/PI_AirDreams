@@ -131,36 +131,49 @@ namespace AirDreams.API.Repositories
             }
         }
 
-        public async Task<IEnumerable<ReservationLuggageDto>> GetReservationLuggageAsync(string transactionId)
+        public async Task<ReservationLuggageResponseDto> GetReservationLuggageAsync(string transactionId)
         {
-            string query = @"
+            string luggageQuery = @"
                 SELECT
                     r.idPassenger AS IdPassenger,
                     r.transactionIdItinerary AS TransactionIdItinerary,
                     l.luggageNumber AS LuggageNumber,
                     l.type AS Type,
-                    l.quantity AS Quantity,
+                    l.quantity AS Quantity
+                FROM Registra r
+                INNER JOIN Luggage l
+                    ON l.luggageNumber = r.luggageNumber
+                WHERE r.transactionIdItinerary = @transactionId";
 
+            string segmentsQuery = @"
+                SELECT
                     f.numberFlight AS FlightNumber,
                     f.routeId AS RouteId,
                     rt.luggagePrice AS CheckedPrice,
                     rt.carryOnPrice AS CarryOnPrice,
                     rt.porcentageMultiplier AS Multiplier
-                FROM Registra r
-                INNER JOIN Luggage l
-                    ON l.luggageNumber = r.luggageNumber
-                INNER JOIN Tiene t
-                    ON t.transactionId = r.transactionIdItinerary
+                FROM Tiene t
                 INNER JOIN Flight f
                     ON f.numberFlight = t.flightNumber
                 INNER JOIN Route rt
                     ON rt.idRoute = f.routeId
-                WHERE r.transactionIdItinerary = @transactionId";
+                WHERE t.transactionId = @transactionId";
 
-            return await _connection.QueryAsync<ReservationLuggageDto>(
-                query,
+            var luggage = await _connection.QueryAsync<ReservationLuggageDto>(
+                luggageQuery,
                 new { transactionId }
             );
+
+            var segments = await _connection.QueryAsync<ReservationLuggageSegmentDto>(
+                segmentsQuery,
+                new { transactionId }
+            );
+
+            return new ReservationLuggageResponseDto
+            {
+                Luggage = luggage,
+                Segments = segments
+            };
         }
     }
 }
