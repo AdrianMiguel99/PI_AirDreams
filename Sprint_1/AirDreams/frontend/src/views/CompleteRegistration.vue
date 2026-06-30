@@ -52,6 +52,7 @@
 </template>
 
 <script>
+const API_BASE = import.meta.env.VITE_API_URL;
 export default {
   name: 'CompleteRegistration',
   data() {
@@ -88,7 +89,7 @@ export default {
     async validarToken() {
       try {
         const response = await fetch(
-          `http://localhost:5276/api/auth/validate-invitation?token=${this.token}`
+          `${API_BASE}/api/auth/validate-invitation?token=${this.token}`
         );
 
         const data = await response.json();
@@ -130,7 +131,7 @@ export default {
       this.cargando = true;
 
       try {
-        const response = await fetch("http://localhost:5276/api/auth/complete-registration", {
+        const response = await fetch(`${API_BASE}/api/auth/complete-registration`, {
           method: "POST",
           headers: {
             "Content-Type": "application/json"

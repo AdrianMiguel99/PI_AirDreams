@@ -32,6 +32,7 @@ import axios from 'axios'
 
 import AirplaneForm from '../components/Airplane/AirplaneForm.vue'
 import PopupMessage from '../components/PopupMessage.vue'
+const API_BASE = import.meta.env.VITE_API_URL;
 
 export default {
   name: 'AddAirplaneView',
@@ -101,7 +102,7 @@ export default {
       const token = localStorage.getItem('token')
 
       axios.post(
-        'http://localhost:5276/api/Airplane',
+        `${API_BASE}/api/Airplane`,
         aeronave,
         {
           headers: {

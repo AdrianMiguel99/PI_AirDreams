@@ -74,6 +74,7 @@
 <script>
 import axios from 'axios';
 import PopupMessage from '../components/PopupMessage.vue';
+const API_BASE = import.meta.env.VITE_API_URL;
 
 export default {
   name: 'ListAirplane',
@@ -95,7 +96,7 @@ export default {
 
   methods: {
     getAirplanes() {
-      axios.get('http://localhost:5276/api/Airplane')
+      axios.get(`${API_BASE}/api/Airplane`)
         .then(response => {
           this.airplanes = response.data;
         })
@@ -105,7 +106,7 @@ export default {
     },
 
     deleteAirplane(modelo) {
-      axios.delete(`http://localhost:5276/api/Airplane/${modelo}`)
+      axios.delete(`${API_BASE}/api/Airplane/${modelo}`)
         .then(response => {
           this.showPopup = true;
           this.popupType = 'success';

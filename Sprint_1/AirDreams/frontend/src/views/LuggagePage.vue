@@ -35,6 +35,7 @@ import axios from 'axios';
 import StepperLayout from '../components/StepperLayout.vue';
 import LuggagePassenger from '../components/LuggagePassenger.vue';
 import PopupMessage from '../components/PopupMessage.vue';
+const API_BASE = import.meta.env.VITE_API_URL;
 
 export default {
   name: 'LuggagePage',
@@ -135,7 +136,7 @@ export default {
         return;
       }
       try {
-        const res = await axios.post('http://localhost:5276/api/luggage/calculate/total', {
+        const res = await axios.post(`${API_BASE}/api/luggage/calculate/total`, {
           checkedQuantity: checkedCount,
           carryOnQuantity: carryOnCount,
           segments: this.segmentsPricing
@@ -281,7 +282,7 @@ export default {
 
     async validateWeights(flightId, routeId, checkedWeight, carryOnWeight) {
       try {
-        const response = await fetch('http://localhost:5276/api/luggage/availability', {
+        const response = await fetch(`${API_BASE}/api/luggage/availability`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json'

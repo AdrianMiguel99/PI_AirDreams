@@ -90,6 +90,8 @@ import HeaderLogo from '../components/HeaderLogo.vue'
 import PopupMessage from './PopupMessage.vue'
 import ButtomNavigationAirports from './ButtomNavigationAirports.vue'
 
+const API_BASE = import.meta.env.VITE_API_URL
+
 export default {
   name: 'AirportRegister',
   components: { HeaderLogo, PopupMessage, ButtomNavigationAirports },
@@ -118,7 +120,7 @@ export default {
     },
     async cargarPaises() {
       try {
-        const res = await axios.get('http://localhost:5276/api/locations/countries')
+        const res = await axios.get(`${API_BASE}/api/locations/countries`)
         this.paises = res.data
       } catch (e) {
         console.error('Error al cargar países:', e)
@@ -130,7 +132,7 @@ export default {
         return
       }
       try {
-        const res = await axios.get('http://localhost:5276/api/locations/cities', {
+        const res = await axios.get(`${API_BASE}/api/locations/cities`, {
           params: { country: this.form.country }
         })
         this.ciudades = res.data
@@ -169,7 +171,7 @@ export default {
           this.showErrorPopup('Debes iniciar sesión.')
           return
         }
-        const res = await axios.post('http://localhost:5276/api/airports', this.form, {
+        const res = await axios.post(`${API_BASE}/api/airports`, this.form, {
           headers: {
             'Content-Type': 'application/json',
             'Authorization': `Bearer ${token}`
