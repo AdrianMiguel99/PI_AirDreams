@@ -16,20 +16,22 @@ namespace AirDreams.API.Repositories
         {
             try
             {
-                string query = @"
-                    INSERT INTO Luggage (type, quantity)
-                    OUTPUT INSERTED.luggageNumber
-                    VALUES (@type, @quantity)";
+                var luggageNumber = "LUG-" + Guid.NewGuid().ToString("N").Substring(0, 8);
 
-                var luggageNumber = await _connection.ExecuteScalarAsync<string>(query, new 
-                { 
-                    type, 
-                    quantity 
+                string query = @"
+            INSERT INTO Luggage (luggageNumber, type, quantity)
+            VALUES (@luggageNumber, @type, @quantity)";
+
+                var affectedRows = await _connection.ExecuteAsync(query, new
+                {
+                    luggageNumber,
+                    type,
+                    quantity
                 });
 
-                return luggageNumber;
+                return affectedRows > 0 ? luggageNumber : null;
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 return null;
             }
