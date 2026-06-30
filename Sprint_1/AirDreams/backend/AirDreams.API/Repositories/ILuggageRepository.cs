@@ -1,3 +1,5 @@
+using AirDreams.API.DTOs;
+
 namespace AirDreams.API.Repositories
 {
     public interface ILuggageRepository
@@ -7,5 +9,6 @@ namespace AirDreams.API.Repositories
         Task<bool> CheckLuggageWeightAsync(string flightId, int routeId, decimal luggageWeight);
         Task<bool> CheckCarryOnWeightAsync(string flightId, int routeId, decimal carryOnWeight);
         Task<bool> UpdateFlightWeightAsync(string transactionId, decimal luggageWeight, decimal carryOnWeight);
+        Task<IEnumerable<ReservationLuggageDto>> GetReservationLuggageAsync(string transactionId);
     }
 }

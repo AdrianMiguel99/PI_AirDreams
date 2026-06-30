@@ -1,5 +1,6 @@
-using System.Data;
+using AirDreams.API.DTOs;
 using Dapper;
+using System.Data;
 
 namespace AirDreams.API.Repositories
 {
@@ -128,6 +129,38 @@ namespace AirDreams.API.Repositories
             {
                 return false;
             }
+        }
+
+        public async Task<IEnumerable<ReservationLuggageDto>> GetReservationLuggageAsync(string transactionId)
+        {
+            string query = @"
+                SELECT
+                    r.idPassenger AS IdPassenger,
+                    r.transactionIdItinerary AS TransactionIdItinerary,
+                    l.luggageNumber AS LuggageNumber,
+                    l.type AS Type,
+                    l.quantity AS Quantity,
+
+                    f.numberFlight AS FlightNumber,
+                    f.routeId AS RouteId,
+                    rt.luggagePrice AS CheckedPrice,
+                    rt.carryOnPrice AS CarryOnPrice,
+                    rt.porcentageMultiplier AS Multiplier
+                FROM Registra r
+                INNER JOIN Luggage l
+                    ON l.luggageNumber = r.luggageNumber
+                INNER JOIN Tiene t
+                    ON t.transactionId = r.transactionIdItinerary
+                INNER JOIN Flight f
+                    ON f.numberFlight = t.flightNumber
+                INNER JOIN Route rt
+                    ON rt.idRoute = f.routeId
+                WHERE r.transactionIdItinerary = @transactionId";
+
+            return await _connection.QueryAsync<ReservationLuggageDto>(
+                query,
+                new { transactionId }
+            );
         }
     }
 }
