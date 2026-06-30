@@ -1,4 +1,5 @@
 using System.Text.Json;
+using AirDreams.ExternalAPI.Dtos;
 
 namespace AirDreams.ExternalAPI.Services
 {

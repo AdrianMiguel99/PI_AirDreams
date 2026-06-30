@@ -481,5 +481,96 @@ namespace AirDreams.API.Repositories
                 latestDeparture
             });
         }
+
+        public async Task<dynamic> GetFlightByGuidAsync(string flightGuid)
+        {
+            const string sql = @"
+                SELECT TOP (1)
+                    f.numberFlight AS FlightGUID,
+                    r.idRoute AS RouteId,
+                    f.departureDate AS DepartureDate,
+                    CAST(searchedFlight.ArrivalDateTime AS DATE) AS ArrivalDate,
+                    CONVERT(VARCHAR(8), ff.departureTime, 108) AS DepartureTime,
+                    CONVERT(VARCHAR(8), ff.estimatedArrivalTime, 108) AS ArrivalTime,
+                    r.stimatedTime AS Duration,
+                    r.turistClassPrice AS TouristPrice,
+                    r.firstClassPrice AS FirstClassPrice,
+                    r.carryOnPrice AS CarryOnPrice,
+                    r.luggagePrice AS CheckedPrice,
+                    r.porcentageMultiplier AS Multiplier,
+                    a1.codeAirport AS DepartureAirportCode,
+                    a1.nameAirport AS DepartureAirportName,
+                    a1.city AS DepartureCity,
+                    a2.codeAirport AS ArrivalAirportCode,
+                    a2.nameAirport AS ArrivalAirportName,
+                    a2.city AS ArrivalCity
+
+                FROM Flight f
+
+                INNER JOIN Route r
+                    ON f.routeId = r.idRoute
+
+                INNER JOIN FlightFrequency ff
+                    ON ff.idRoute = r.idRoute
+
+                INNER JOIN Airport a1
+                    ON r.codeAirportSalida = a1.codeAirport
+
+                INNER JOIN Airport a2
+                    ON r.codeAirportLlegada = a2.codeAirport
+
+                CROSS APPLY
+                (
+                    SELECT
+                        DATEADD(
+                            SECOND,
+                            DATEDIFF(SECOND,'00:00:00',ff.departureTime),
+                            CAST(f.departureDate AS DATETIME)
+                        ) AS DepartureDateTime,
+
+                        DATEADD(
+                            DAY,
+                            CASE
+                                WHEN ff.estimatedArrivalTime < ff.departureTime
+                                    THEN 1
+                                ELSE 0
+                            END,
+
+                            DATEADD(
+                                SECOND,
+                                DATEDIFF(SECOND,'00:00:00',ff.estimatedArrivalTime),
+                                CAST(f.departureDate AS DATETIME)
+                            )
+                        ) AS ArrivalDateTime
+                ) searchedFlight
+
+                WHERE
+                    f.numberFlight = @flightGuid
+
+                    AND ff.active = 1
+
+                    AND f.departureDate BETWEEN ff.startingDate AND ff.endingDate
+
+                    AND ff.dayOfWeek =
+                        CASE DATEDIFF(DAY,'19000101',f.departureDate) % 7
+                            WHEN 0 THEN 'Monday'
+                            WHEN 1 THEN 'Tuesday'
+                            WHEN 2 THEN 'Wednesday'
+                            WHEN 3 THEN 'Thursday'
+                            WHEN 4 THEN 'Friday'
+                            WHEN 5 THEN 'Saturday'
+                            WHEN 6 THEN 'Sunday'
+                        END
+
+                    AND CONCAT(
+                            'AD',
+                            r.idRoute,
+                            ff.idFrequency,
+                            CONVERT(CHAR(8),f.departureDate,112)
+                        ) = f.numberFlight;
+            ";
+
+            return await _connection.QueryFirstOrDefaultAsync(sql, new { flightGuid });
+        }
     }
 }

@@ -1,4 +1,5 @@
 ﻿using AirDreams.API.Models.Dtos;
+using AirDreams.API.DTOs;
 
 namespace AirDreams.API.Services
 {
@@ -6,6 +7,6 @@ namespace AirDreams.API.Services
     {
         Task<PaymentResponseDto> ConfirmPurchaseAsync(ConfirmPurchaseDto dto);
         Task<bool> CheckFlightAvailabilityAsync( string numberFlight, string seatClass, int requestedSeats);
-        Task<PaymentResponseDto> ConfirmExternalPurchaseAsync(ExternalOrderRequestDto dto);
+        Task<ExternalPaymentResponseDto> ConfirmExternalPurchaseAsync(ExternalOrderRequestDto dto);
     }
 }

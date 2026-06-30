@@ -33,5 +33,7 @@ namespace AirDreams.API.Repositories
             DateTime latestDeparture,
             int quantityOfPassengers
         );
+
+        Task<dynamic> GetFlightByGuidAsync(string flightGuid);
     }
 }

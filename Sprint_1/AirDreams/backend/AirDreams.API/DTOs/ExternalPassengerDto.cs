@@ -1,4 +1,4 @@
-namespace AirDreams.ExternalAPI.Dtos
+namespace AirDreams.API.DTOs
 {
     public class ExternalPassengerDto
     {

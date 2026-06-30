@@ -1,3 +1,6 @@
+using AirDreams.ExternalAPI.Dtos;
+using System.Text.Json;
+
 namespace AirDreams.ExternalAPI.Services
 {
     public interface IPurchaseService

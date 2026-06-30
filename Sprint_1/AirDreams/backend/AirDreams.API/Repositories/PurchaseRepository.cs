@@ -75,7 +75,7 @@ namespace AirDreams.API.Repositories
                 await _connection.ExecuteAsync(sqlItinerary, new
                 {
                     dto.TransactionId,
-                    IdPassenger = passengerIds.First(),
+                    IdPassenger = firstPassengerId,
                     Amount = amount,
                     dto.SeatClass
                 }, transaction);
