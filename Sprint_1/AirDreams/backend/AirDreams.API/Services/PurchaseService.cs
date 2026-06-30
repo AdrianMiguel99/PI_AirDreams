@@ -131,14 +131,6 @@ public class PurchaseService : IPurchaseService
     public async Task<ExternalPaymentResponseDto> ConfirmExternalPurchaseAsync(ExternalOrderRequestDto dto)
     {        
         var purchase = await MapToConfirmPurchaseDto(dto);
-        bool available = await CheckFlightAvailabilityAsync(
-            purchase.Segments.First().FlightNumber,
-            purchase.SeatClass,
-            purchase.PassengerCount);
-
-        if (!available)
-            throw new InvalidOperationException("Not enough seats");
-
         await ConfirmPurchaseAsync(purchase);
         return await MapToExternalPaymentResponse(purchase, dto);
     }
@@ -219,7 +211,7 @@ public class PurchaseService : IPurchaseService
             Luggage = dto.passengers
                 .Select((p, index) => new LuggagePerPassengerDto
                 {
-                    PassengerIndex = index,
+                    PassengerIndex = index + 1,
 
                     LuggageItems = new()
                     {
