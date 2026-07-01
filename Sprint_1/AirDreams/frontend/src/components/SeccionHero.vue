@@ -1,7 +1,7 @@
 <template>
   <div class="hero">
     <div class="overlay">
-      <h1>Air Dreams</h1>
+      <h1>Air Dreamssss</h1>
     </div>
   </div>
 </template>

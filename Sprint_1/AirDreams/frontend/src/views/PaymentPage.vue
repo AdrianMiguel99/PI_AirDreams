@@ -306,7 +306,7 @@ export default {
             lastnamesPassenger: p.lastnamesPassenger,
             birthDate: p.birthDate || null,
             emailPassenger: p.emailPassenger || '',
-            telephone: p.telephone || '',
+            telephone: p.telephone || 0,
             country: p.country || '',
             seatNumber: this.generateRandomSeat(index)
           })),
