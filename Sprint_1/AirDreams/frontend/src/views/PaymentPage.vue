@@ -187,6 +187,14 @@ export default {
       return date.toLocaleDateString('es-ES', { day: '2-digit', month: 'long', year: 'numeric' })
     },
 
+    generateRandomSeat(index) {
+      const letters = ["A", "B", "C", "D", "E", "F"];
+      const row = (index % 30) + 1;
+      const letter = letters[index % letters.length];
+
+      return `${row}${letter}`;
+    },
+
 
     createStructForPage() {
       const purchase = JSON.parse(sessionStorage.getItem('selectedFlightPurchase') || '{}')
@@ -293,14 +301,14 @@ export default {
           seatClass,
           pricePerPassenger: purchase.price,
           passengerCount: purchase.passengerCount,
-          passengers: passengers.map(p => ({
+          passengers: passengers.map((p, index) => ({
             namePassenger: p.namePassenger,
             lastnamesPassenger: p.lastnamesPassenger,
             birthDate: p.birthDate || null,
             emailPassenger: p.emailPassenger || '',
             telephone: p.telephone || '',
             country: p.country || '',
-            birthDate: p.birthDate || ''
+            seatNumber: this.generateRandomSeat(index)
           })),
           luggage: luggage ? luggage.map(l => ({
             passengerIndex: l.passenger.index,
@@ -333,6 +341,7 @@ export default {
         await axios.post(`${API_BASE}/api/payment`, payload)
         await this.updateFlightWeight(this.payment.transactionId)
         const purchasewindowData = this.createStructForPage()
+        purchasewindowData.passengers = payload.passengers
         sessionStorage.removeItem('transactionId')
         sessionStorage.removeItem('luggageWeights')
 
@@ -375,7 +384,7 @@ export default {
       } catch (error) {
         console.error('Ha ocurrido un error al actualizar el peso del equipaje:', error)
       }
-    }
+    },
   }
 }
 </script>

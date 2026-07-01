@@ -39,6 +39,8 @@ namespace AirDreams.API.Models.Dtos
         public string? Telephone { get; set; }
         public string Country { get; set; }
         public string? BirthDate { get; set; }
+
+        public string seatNumber { get; set; } = string.Empty;
     }
 
     public class FlightSegmentDto
