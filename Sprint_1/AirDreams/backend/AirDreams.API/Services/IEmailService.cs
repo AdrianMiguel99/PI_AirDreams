@@ -1,4 +1,4 @@
-using AirDreams.API.Models.Dtos;
+using AirDreams.API.DTOs;
 
 namespace AirDreams.API.Services
 {
@@ -17,7 +17,7 @@ namespace AirDreams.API.Services
 
         Task SendPurchaseConfirmationEmail(
             string toEmail,
-            ConfirmPurchaseDto purchase,
+            ConfirmPurchaseDTO purchase,
             byte[] invoicePdf,
             byte[] itineraryPdf
         );

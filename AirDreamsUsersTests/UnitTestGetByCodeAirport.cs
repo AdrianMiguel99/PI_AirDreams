@@ -1,6 +1,6 @@
 ﻿using Moq;
 using NUnit.Framework;
-using AirDreams.API.Models.Dtos;
+using AirDreams.API.DTOs;
 using AirDreams.API.Models.Entities;
 using AirDreams.API.Repositories;
 using AirDreams.API.Services;

@@ -53,7 +53,7 @@ namespace AirDreams.API.Controllers
         }
 
         [HttpPost("update")]
-        public async Task<IActionResult> UpdateFlightWeight([FromBody] UpdateFlightWeightDto dto)
+        public async Task<IActionResult> UpdateFlightWeight([FromBody] UpdateFlightWeightDTO dto)
         {
             var result = await _luggageService.UpdateFlightWeightAsync(
                 dto.TransactionId,
@@ -87,6 +87,38 @@ namespace AirDreams.API.Controllers
             var luggageData = await _luggageService.GetReservationLuggageAsync(transactionId);
 
             return Ok(luggageData);
+        }
+
+        [HttpPost("register-extra")]
+        public async Task<IActionResult> RegisterExtraLuggage([FromBody] RegisterExtraLuggageDto request)
+        {
+            try
+            {
+                var success = await _luggageService.RegisterExtraLuggageAsync(request);
+
+                if (!success)
+                {
+                    return BadRequest(new
+                    {
+                        success = false,
+                        message = "No se pudo registrar el equipaje adicional."
+                    });
+                }
+
+                return Ok(new
+                {
+                    success = true,
+                    message = "Equipaje adicional registrado correctamente."
+                });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new
+                {
+                    success = false,
+                    message = ex.Message
+                });
+            }
         }
     }
 }

@@ -39,7 +39,7 @@
             </a>
 
             <button 
-              @click="deleteAirplane(airplane.modelo)"
+              @click="confirmarEliminacion(airplane.modelo)"
               class="btn-editar"
               style="background-color: #ff0000;"
             >
@@ -61,12 +61,21 @@
     </p>
 
     <PopupMessage
-      :show="showPopup"
+      :show="showConfirmPopup"
+      type="warning"
+      title="¿Eliminar aeronave?"
+      :message="`¿Estás seguro de que deseas eliminar la aeronave ${airplaneToDelete}? Esta acción no se puede deshacer.`"
+      actionText="Eliminar"
+      @close="showConfirmPopup = false"
+      @action="eliminarAeronave"
+    />
+
+    <PopupMessage
+      :show="showResultPopup"
       :type="popupType"
       :title="popupTitle"
       :message="popupMessage"
-      :actionText="popupActionText"
-      @close="showPopup = false"    
+      @close="showResultPopup = false"    
     />                
   </div>
 </template>
@@ -86,11 +95,12 @@ export default {
     return {
       airplanes: [],
 
-      showPopup: false,
+      showConfirmPopup: false,
+      airplaneToDelete: '',
+      showResultPopup: false,
       popupType: 'success',
       popupTitle: '',
-      popupMessage: '',
-      popupActionText: ''
+      popupMessage: ''
     };
   },
 
@@ -105,21 +115,45 @@ export default {
         });
     },
 
-    deleteAirplane(modelo) {
-      axios.delete(`${API_BASE}/api/Airplane/${modelo}`)
+    confirmarEliminacion(modelo) {
+      this.airplaneToDelete = modelo;
+      this.showConfirmPopup = true;
+    },
+
+    eliminarAeronave() {
+      this.showConfirmPopup = false;
+
+      if (!this.airplaneToDelete) {
+        this.showAirplanePopup('error', 'Aeronave inválida', 'No se pudo identificar la aeronave seleccionada.');
+        return;
+      }
+
+      axios.delete(`${API_BASE}/api/Airplane/${this.airplaneToDelete}`)
         .then(response => {
-          this.showPopup = true;
-          this.popupType = 'success';
-          this.popupTitle = 'Aeronave Eliminada';
-          this.popupMessage = response.data?.message || 'Aeronave eliminada con éxito';
+          this.showAirplanePopup(
+            'success',
+            'Aeronave eliminada',
+            response.data?.message || 'Aeronave eliminada con éxito'
+          );
           this.getAirplanes();
         })
         .catch(error => {
-          this.showPopup = true;
-          this.popupType = 'error';
-          this.popupTitle = 'Error al eliminar aeronave';
-          this.popupMessage = error.response?.data?.message || error.response?.data || 'Ocurrió un error al eliminar la aeronave.';
+          this.showAirplanePopup(
+            'error',
+            'Error al eliminar aeronave',
+            error.response?.data?.message || error.response?.data || 'Ocurrió un error al eliminar la aeronave.'
+          );
+        })
+        .finally(() => {
+          this.airplaneToDelete = '';
         });
+    },
+
+    showAirplanePopup(type, title, message) {
+      this.popupType = type;
+      this.popupTitle = title;
+      this.popupMessage = message;
+      this.showResultPopup = true;
     }
   },
 

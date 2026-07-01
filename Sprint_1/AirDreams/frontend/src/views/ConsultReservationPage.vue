@@ -36,9 +36,15 @@
             {{ errorMessage }}
           </p>
 
-          <button class="search-button" type="submit">
-            Buscar reserva
-          </button>
+          <div class="form-actions">
+            <button class="home-button" type="button" @click="goHome">
+              Inicio
+            </button>
+
+            <button class="search-button" type="submit">
+              Buscar reserva
+            </button>
+          </div>
         </form>
       </section>
     </main>
@@ -64,6 +70,10 @@ export default {
   },
 
   methods: {
+    goHome() {
+      this.$router.push("/");
+    },
+
     goToReservationDetails() {
       this.errorMessage = "";
 
@@ -88,6 +98,29 @@ export default {
 </script>
 
 <style scoped>
+
+.form-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+}
+
+.home-button,
+.search-button {
+  border: none;
+  border-radius: 50px;
+  padding: 12px 30px;
+  background: #384467;
+  color: white;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.home-button:hover,
+.search-button:hover {
+  background: #4c5d8f;
+}
+
 .consult-reservation-page {
   min-height: 100vh;
 }

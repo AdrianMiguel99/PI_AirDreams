@@ -1,4 +1,4 @@
-﻿using AirDreams.API.Models.Dtos;
+﻿using AirDreams.API.DTOs;
 using AirDreams.API.Models.Entities;
 using AirDreams.API.Repositories;
 
@@ -13,19 +13,19 @@ namespace AirDreams.API.Services
             _repository = repository;
         }
 
-        public async Task<List<AirportDto>> GetAllAsync()
+        public async Task<List<AirportDTO>> GetAllAsync()
         {
             var airports = await _repository.GetAllAsync();
             return airports.Select(a => MapToDto(a)).ToList();
         }
 
-        public async Task<AirportDto?> GetByCodeAsync(string code)
+        public async Task<AirportDTO?> GetByCodeAsync(string code)
         {
             var airport = await _repository.GetByCodeAsync(code);
             return airport is null ? null : MapToDto(airport);
         }
 
-        public async Task<AirportDto> CreateAsync(CreateAirportDto dto, byte adminId)
+        public async Task<AirportDTO> CreateAsync(CreateAirportDTO dto, byte adminId)
         {
             string code = dto.Code.ToUpperInvariant(); 
 
@@ -46,7 +46,7 @@ namespace AirDreams.API.Services
             return MapToDto(created);
         }
 
-        private static AirportDto MapToDto(Airport a) => new()
+        private static AirportDTO MapToDto(Airport a) => new()
         {
             Code = a.CodeAirport,
             Name = a.NameAirport,
@@ -56,7 +56,7 @@ namespace AirDreams.API.Services
             isActive = a.isActive
         };
 
-        public async Task UpdateAsync(string code, UpdateAirportDto dto)
+        public async Task UpdateAsync(string code, UpdateAirportDTO dto)
         {
             var airport = await _repository.GetByCodeAsync(code);
             if (airport == null)

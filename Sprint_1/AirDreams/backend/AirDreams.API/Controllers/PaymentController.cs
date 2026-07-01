@@ -1,5 +1,4 @@
 ﻿using AirDreams.API.DTOs;
-using AirDreams.API.Models.Dtos;
 using AirDreams.API.Services;
 using Microsoft.AspNetCore.Mvc;
 
@@ -17,7 +16,7 @@ namespace AirDreams.API.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> ProcessPayment([FromBody] ConfirmPurchaseDto dto)
+        public async Task<IActionResult> ProcessPayment([FromBody] ConfirmPurchaseDTO dto)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);

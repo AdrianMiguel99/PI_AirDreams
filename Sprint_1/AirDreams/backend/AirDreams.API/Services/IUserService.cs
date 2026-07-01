@@ -18,7 +18,7 @@ namespace AirDreams.API.Services
 
         Task<List<UserDTO>> Search(string searchTerm, string currentUserEmail);
 
-        Task<bool> UpdateUserAsync(byte employeeId, UpdateUserDto updateDto, string currentUserEmail);
+        Task<bool> UpdateUserAsync(byte employeeId, UpdateUserDTO updateDto, string currentUserEmail);
 
         Task<bool> DeleteUserAsync(byte employeeId, string currentUserEmail);
 

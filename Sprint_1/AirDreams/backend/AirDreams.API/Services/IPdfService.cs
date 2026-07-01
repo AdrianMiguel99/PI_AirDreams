@@ -1,12 +1,12 @@
-using AirDreams.API.Models.Dtos;
+using AirDreams.API.DTOs;
 
 public interface IPdfService
 {
     byte[] GenerateInvoice(
-        ConfirmPurchaseDto dto
+        ConfirmPurchaseDTO dto
     );
 
     byte[] GenerateItinerary(
-        ConfirmPurchaseDto dto
+        ConfirmPurchaseDTO dto
     );
 }

@@ -1,6 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
 using AirDreams.API.DTOs;
-using AirDreams.API.Models.Dto;
 using AirDreams.API.Services.Interfaces;
 
 namespace AirDreams.API.Controllers
@@ -71,7 +70,7 @@ namespace AirDreams.API.Controllers
         }
 
         [HttpGet("search-destination")]
-        public async Task<IActionResult> SearchFlightsByDestination([FromQuery] DestinationSearchDto request)
+        public async Task<IActionResult> SearchFlightsByDestination([FromQuery] DestinationSearchDTO request)
         {
             try
             {

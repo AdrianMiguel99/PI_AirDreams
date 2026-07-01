@@ -1,6 +1,6 @@
 namespace AirDreams.API.DTOs
 {
-    public class UpdateFlightWeightDto
+    public class UpdateFlightWeightDTO
     {
         public string TransactionId { get; set; } = string.Empty;
 

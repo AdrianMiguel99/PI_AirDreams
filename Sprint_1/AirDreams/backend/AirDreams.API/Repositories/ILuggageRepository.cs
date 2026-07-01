@@ -10,5 +10,7 @@ namespace AirDreams.API.Repositories
         Task<bool> CheckCarryOnWeightAsync(string flightId, int routeId, decimal carryOnWeight);
         Task<bool> UpdateFlightWeightAsync(string transactionId, decimal luggageWeight, decimal carryOnWeight);
         Task<ReservationLuggageResponseDto> GetReservationLuggageAsync(string transactionId);
+
+        Task<bool> RegisterExtraLuggageAsync(int idPassenger, string transactionIdItinerary, string type, int quantity);
     }
 }

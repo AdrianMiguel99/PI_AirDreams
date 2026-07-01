@@ -57,7 +57,7 @@ namespace AirDreams.API.Controllers
         [HttpPut("{employeeId}")]
         public async Task<IActionResult> UpdateUser(
             byte employeeId,
-            [FromBody] UpdateUserDto updateDto)
+            [FromBody] UpdateUserDTO updateDto)
         {
             try
             {

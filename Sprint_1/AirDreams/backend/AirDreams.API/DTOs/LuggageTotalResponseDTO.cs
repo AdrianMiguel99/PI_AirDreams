@@ -1,4 +1,4 @@
-﻿namespace AirDreams.API.Models.Dtos
+﻿namespace AirDreams.API.DTOs
 {
     public class LuggageTotalResponse
     {
