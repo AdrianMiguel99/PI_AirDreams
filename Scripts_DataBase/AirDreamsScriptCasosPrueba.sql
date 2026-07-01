@@ -1,12 +1,16 @@
 USE AirDreams;
 GO
 
+
+
 DELETE FROM PassengerItinerary;
 DELETE FROM Registra;
 DELETE FROM Realiza;
 DELETE FROM Tiene;
+DELETE FROM TieneExternal;
 DELETE FROM BoardingPass;
 DELETE FROM CheckIn;
+DELETE FROM ExternalFlight;
 DELETE FROM Flight;
 DELETE FROM FlightFrequency;
 DELETE FROM Route;
@@ -20,6 +24,7 @@ DELETE FROM Country;
 DELETE FROM AirlineEmployee;
 DELETE FROM InternalUser;
 DELETE FROM ExternalUser;
+
 DELETE FROM SystemUser;
 
 DBCC CHECKIDENT ('SystemUser', RESEED, 0);
@@ -80,17 +85,17 @@ VALUES
 ('FRA', 1, 'Frankfurt Airport', 'Frankfurt', 'Germany', 'UTC+1'),
 ('AMS', 1, 'Amsterdam Airport Schiphol', 'Amsterdam', 'Netherlands', 'UTC+1');
 
-INSERT INTO Route (adminID, codeAirportSalida, codeAirportLlegada, modelo, firstClassPrice, turistClassPrice, stimatedTime, distance, luggagePrice, carryOnPrice, carryOnMaxWeight, luggageMaxWeight, porcentageMultiplier)
+INSERT INTO Route (adminID, codeAirportSalida, codeAirportLlegada, modelo, firstClassPrice, turistClassPrice, stimatedTime, distance, luggagePrice, carryOnPrice, carryOnMaxWeight, luggageMaxWeight, porcentageMultiplier, isDeleted)
 VALUES 
-(1, 'SJO', 'CDG', 'PI-Sprint2', 2000, 800,'09:00', 9000, 100, 0, 2300, 1000, 0.50),
-(1, 'SJO', 'JFK', 'PI-Sprint2', 1000, 400,'05:00', 3500, 75, 0, 2300, 1000, 0.50),
-(1, 'JFK', 'CDG', 'PI-Sprint2', 1050, 450,'07:00', 5800, 75, 0, 2300, 1000, 0.50),
-(1, 'JFK', 'CDG', 'PI-Sprint2', 800, 350,'07:00', 5800, 75, 0, 2300, 1000, 0.50),
-(1, 'CDG', 'MEL', 'PI-Sprint2', 1000, 300,'03:00', 2000, 50, 0, 2300, 1000, 0.50),
-(1, 'MSQ', 'SJO', 'AIRBUS-2026', 2200, 950,'10:00', 10000, 100, 0, 2300, 1000,  0.50),
-(1, 'SJO', 'MAD', 'PI-Sprint2', 1999, 799,'09:00', 8500, 100, 0, 2300, 1000, 0.50),
-(1, 'SJO', 'FRA', 'PI-Sprint2', 1950, 790,'09:00', 9200, 100, 0, 2300, 1000, 0.50),
-(1, 'SJO', 'AMS', 'PI-Sprint2', 2050, 810,'09:00', 8800, 100, 0, 2300, 1000, 0.50);
+(1, 'SJO', 'CDG', 'PI-Sprint2', 2000, 800,'09:00', 9000, 100, 0, 2300, 1000, 0.50, 0),
+(1, 'SJO', 'JFK', 'PI-Sprint2', 1000, 400,'05:00', 3500, 75, 0, 2300, 1000, 0.50, 0),
+(1, 'JFK', 'CDG', 'PI-Sprint2', 1050, 450,'07:00', 5800, 75, 0, 2300, 1000, 0.50, 0),
+(1, 'JFK', 'CDG', 'PI-Sprint2', 800, 350,'07:00', 5800, 75, 0, 2300, 1000, 0.50, 0),
+(1, 'CDG', 'MEL', 'PI-Sprint2', 1000, 300,'03:00', 2000, 50, 0, 2300, 1000, 0.50, 0),
+(1, 'MSQ', 'SJO', 'AIRBUS-2026', 2200, 950,'10:00', 10000, 100, 0, 2300, 1000,  0.50, 0),
+(1, 'SJO', 'MAD', 'PI-Sprint2', 1999, 799,'09:00', 8500, 100, 0, 2300, 1000, 0.50, 0),
+(1, 'SJO', 'FRA', 'PI-Sprint2', 1950, 790,'09:00', 9200, 100, 0, 2300, 1000, 0.50, 0),
+(1, 'SJO', 'AMS', 'PI-Sprint2', 2050, 810,'09:00', 8800, 100, 0, 2300, 1000, 0.50, 0);
 Select * from Route
 INSERT INTO FlightFrequency (idRoute, dayOfWeek, departureTime, estimatedArrivalTime, startingDate, endingDate, active)
 VALUES 
@@ -126,8 +131,7 @@ GO
 
 
 Select * from Aircraft;
-Select * from Luggage;
-Select * from Passenger;
+
 Select * from FlightFrequency;
 Select * from Flight;
 Select * from Route;
@@ -136,5 +140,8 @@ Select * from Luggage;
 Select * from PassengerItinerary;
 Select * from Registra;
 
+
+Select * from Luggage;
+Select * from Passenger;
 Select * from Tiene;
 

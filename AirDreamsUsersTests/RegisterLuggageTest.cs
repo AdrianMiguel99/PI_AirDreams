@@ -22,7 +22,7 @@ public class RegisterLuggageTests
     public async Task RegisterLuggage_shouldReturnSuccess_whenLuggageRegistered()
     {
         // arrange
-        var passenger = new PassengerDto
+        var passenger = new PassengerDTO
         {
             IdPassenger = 1
         };
@@ -67,7 +67,7 @@ public class RegisterLuggageTests
                 }
             ]
         };
-        _passengerService.Setup(x => x.GetPassengerByNameAsync(model.FullName)).ReturnsAsync((PassengerDto)null!);
+        _passengerService.Setup(x => x.GetPassengerByNameAsync(model.FullName)).ReturnsAsync((PassengerDTO)null!);
 
         // act
         var result = await _service.RegisterLuggageAsync(model);
@@ -80,7 +80,7 @@ public class RegisterLuggageTests
     public async Task RegisterLuggage_shouldReturnFailure_whenNoLuggageRegistered()
     {
         // arrange
-        var passenger = new PassengerDto
+        var passenger = new PassengerDTO
         {
             IdPassenger = 1
         };

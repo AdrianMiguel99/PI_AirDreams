@@ -12,7 +12,7 @@ public class ReservationRepository : IReservationRepository
         _connection = connection;
     }
 
-    public async Task<ReservationDetailsDto?> GetReservationDetailsAsync(string reservationCode)
+    public async Task<ReservationDetailsDTO?> GetReservationDetailsAsync(string reservationCode)
     {
         if (_connection.State == ConnectionState.Closed)
             _connection.Open();
@@ -28,15 +28,15 @@ public class ReservationRepository : IReservationRepository
             commandType: CommandType.StoredProcedure
         );
 
-        var passengers = (await result.ReadAsync<ReservationPassengerDto>()).ToList();
-        var flights = (await result.ReadAsync<ReservationFlightDto>()).ToList();
+        var passengers = (await result.ReadAsync<ReservationPassengerDTO>()).ToList();
+        var flights = (await result.ReadAsync<ReservationFlightDTO>()).ToList();
 
         if (!passengers.Any() && !flights.Any())
         {
             return null;
         }
 
-        return new ReservationDetailsDto
+        return new ReservationDetailsDTO
         {
             Passengers = passengers,
             Flights = flights

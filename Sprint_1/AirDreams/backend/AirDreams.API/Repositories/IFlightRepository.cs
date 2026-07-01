@@ -1,5 +1,3 @@
-using AirDreams.API.Models.Entities;
-
 namespace AirDreams.API.Repositories
 {
     public interface IFlightRepository
@@ -33,5 +31,8 @@ namespace AirDreams.API.Repositories
             DateTime latestDeparture,
             int quantityOfPassengers
         );
+
+        Task<dynamic> GetFlightByGuidAsync(string flightGuid);
+        Task<int> GetRouteIdByFlightGuidAsync(string flightGuid);
     }
 }

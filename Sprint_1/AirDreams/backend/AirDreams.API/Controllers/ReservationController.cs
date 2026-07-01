@@ -17,7 +17,7 @@ namespace AirDreams.API.Controllers
         }
 
         [HttpGet("{reservationCode}")]
-        public async Task<ActionResult<ReservationDetailsDto>> GetReservationDetails(string reservationCode)
+        public async Task<ActionResult<ReservationDetailsDTO>> GetReservationDetails(string reservationCode)
         {
             if (string.IsNullOrWhiteSpace(reservationCode))
             {

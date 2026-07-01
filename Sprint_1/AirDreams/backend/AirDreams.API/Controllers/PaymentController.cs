@@ -1,5 +1,4 @@
 ﻿using AirDreams.API.DTOs;
-using AirDreams.API.Models.Dtos;
 using AirDreams.API.Services;
 using Microsoft.AspNetCore.Mvc;
 
@@ -17,7 +16,7 @@ namespace AirDreams.API.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> ProcessPayment([FromBody] ConfirmPurchaseDto dto)
+        public async Task<IActionResult> ProcessPayment([FromBody] ConfirmPurchaseDTO dto)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
@@ -47,5 +46,21 @@ namespace AirDreams.API.Controllers
             });
         }
 
+        [HttpPost("external-purchase")]
+        public async Task<IActionResult> ExternalPurchase([FromBody] ExternalOrderRequestDto dto)
+        {
+            try{
+                var result = await _purchaseService.ConfirmExternalPurchaseAsync(dto);
+                return Ok(result);
+            }
+            catch (InvalidOperationException ex)
+            {
+                return BadRequest(new
+                {
+                    code = "FLIGHT_NOT_AVAILABLE",
+                    description = ex.Message
+                });
+            }
+        }
     }
 }

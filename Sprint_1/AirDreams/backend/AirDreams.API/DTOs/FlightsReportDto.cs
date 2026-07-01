@@ -1,6 +1,6 @@
 ﻿namespace AirDreams.API.DTOs
 {
-    public class FlightsReportRowDto
+    public class FlightsReportRowDTO
     {
         public DateTime FlightDate { get; set; }
         public string Origin { get; set; } = string.Empty;
@@ -14,7 +14,7 @@
         public decimal? TotalRevenue { get; set; }
     }
 
-    public class FlightsReportFiltersDto
+    public class FlightsReportFiltersDTO
     {
         public IEnumerable<string> Origins { get; set; } = Enumerable.Empty<string>();
         public IEnumerable<string> Destinations { get; set; } = Enumerable.Empty<string>();

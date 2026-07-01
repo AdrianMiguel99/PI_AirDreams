@@ -1,8 +1,9 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace AirDreams.API.Models.Dtos
+namespace AirDreams.API.DTOs
+
 {
-    public class CreateAirportDto
+    public class CreateAirportDTO
     {
         [Required(ErrorMessage = "El código es obligatorio.")]
         [RegularExpression(@"^[A-Z]{3}$", ErrorMessage = "Deben ser 3 letras mayúsculas, sin números.")]

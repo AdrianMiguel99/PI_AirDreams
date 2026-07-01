@@ -3,7 +3,7 @@ using MailKit.Security;
 using Microsoft.Extensions.Options;
 using MimeKit;
 using AirDreams.API.Models;
-using AirDreams.API.Models.Dtos;
+using AirDreams.API.DTOs;
 
 namespace AirDreams.API.Services
 {
@@ -25,7 +25,7 @@ namespace AirDreams.API.Services
             string token,
             string role)
         {
-            var frontendUrl = "http://localhost:5173";
+            var frontendUrl = "https://www.airdreams.lat";
 
             var registerLink =
                 $"{frontendUrl}/completar-registro?token={token}";
@@ -78,7 +78,7 @@ namespace AirDreams.API.Services
 
         public async Task SendPurchaseConfirmationEmail(
             string toEmail,
-            ConfirmPurchaseDto purchase,
+            ConfirmPurchaseDTO purchase,
             byte[] invoicePdf,
             byte[] itineraryPdf
         )
@@ -132,7 +132,7 @@ namespace AirDreams.API.Services
             string toEmail,
             string token)
         {
-            var frontendUrl = "http://localhost:5173";
+            var frontendUrl = "https://www.airdreams.lat";
 
             var cancellationLink =
                 $"{frontendUrl}/cancel-reservation?token={token}";

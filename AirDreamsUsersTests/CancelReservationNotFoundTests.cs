@@ -18,7 +18,6 @@ public class CancelReservationNotFoundTests
             repositoryMock.Object,
             emailServiceMock.Object
         );
-
         var transactionId = "TXN-NOT-FOUND";
 
         repositoryMock

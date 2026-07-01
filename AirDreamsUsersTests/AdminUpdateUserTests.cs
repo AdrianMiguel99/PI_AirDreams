@@ -46,7 +46,7 @@ public class AdminUpdateUserTests
             IsOperator = true
         };
 
-        var updateDto = new UpdateUserDto
+        var updateDto = new UpdateUserDTO
         {
             FirstName = "Nuevo",
             LastName = "Nombre",

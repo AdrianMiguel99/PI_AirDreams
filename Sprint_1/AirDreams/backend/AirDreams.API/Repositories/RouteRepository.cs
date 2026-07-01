@@ -85,7 +85,9 @@ public class RouteRepository : IRouteRepository
                 carryOnPrice,
                 carryOnMaxWeight,
                 porcentageMultiplier,
-                distance)
+                distance,
+                isDeleted
+                )
 
                 VALUES (
                 @AdminID,
@@ -100,7 +102,8 @@ public class RouteRepository : IRouteRepository
                 @carryOnPrice,
                 @carryOnMaxWeight,
                 @porcentageMultiplier,             
-                @Distance);
+                @Distance,
+                0);
 
                 SELECT CAST(SCOPE_IDENTITY() AS int);
             ";

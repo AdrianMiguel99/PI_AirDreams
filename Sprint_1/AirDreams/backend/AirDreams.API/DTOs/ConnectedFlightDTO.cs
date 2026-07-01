@@ -1,10 +1,11 @@
 using AirDreams.ExternalAPI.DTOs;
 using AirDreams.API.DTOs;
-using AirDreams.API.Models.Dtos;
 
-namespace AirDreams.API.Models.Dtos
+
+namespace AirDreams.API.DTOs
+
 {
-    public class ConnectedFlightDto
+    public class ConnectedFlightDTO
     {
         public FlightSegmentDTO InternalFlight { get; set; } = new();
         public ExternalResponseFlightDTO ExternalFlight { get; set; } = new();

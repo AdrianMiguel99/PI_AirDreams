@@ -1,6 +1,5 @@
 using AirDreams.API.DTOs;
 using AirDreams.ExternalAPI.DTOs;
-using AirDreams.API.Models.Dtos;
 using AirDreams.API.Repositories;
 using AirDreams.API.Services.Interfaces;
 
@@ -45,14 +44,15 @@ namespace AirDreams.API.Services
 
             IEnumerable<dynamic> oneStopFlightsList = Enumerable.Empty<dynamic>();
 
-            if (includeStops){
-                    oneStopFlightsList = await _flightRepository.SearchOneStopFlightsAsync(
-                    origin,
-                    destination,
-                    earliestDeparture,
-                    latestDeparture,
-                    quantityOfPassengers
-                );
+            if (includeStops)
+            {
+                oneStopFlightsList = await _flightRepository.SearchOneStopFlightsAsync(
+                origin,
+                destination,
+                earliestDeparture,
+                latestDeparture,
+                quantityOfPassengers
+            );
 
                 var internalOriginFlights = await _flightRepository.SearchFlightsByOriginAsync(
                     origin,
@@ -79,7 +79,7 @@ namespace AirDreams.API.Services
                         quantityOfPassengers
                     );
 
-                    if(externalFlights.Any())
+                    if (externalFlights.Any())
                     {
                         var internalSegments = internalOriginFlights
                         .Select(f => (FlightSegmentDTO)MapToFlightSegment(f))
@@ -306,7 +306,7 @@ namespace AirDreams.API.Services
             };
         }
 
-        private FlightItineraryDTO MapConnectedFlightToItinerary(ConnectedFlightDto connected)
+        private FlightItineraryDTO MapConnectedFlightToItinerary(ConnectedFlightDTO connected)
         {
             var departureDateTime = DateTime.Parse(connected.ExternalFlight.departureTime);
             var arrivalDateTime = DateTime.Parse(connected.ExternalFlight.arrivalTime);
@@ -343,6 +343,17 @@ namespace AirDreams.API.Services
                 FirstClassPrice = connected.FirstClassPrice,
                 Segments = new List<FlightSegmentDTO> { connected.InternalFlight, externalSegment }
             };
+        }
+
+        public async Task<dynamic> GetFlightByGuidAsync(string flightGuid)
+        {
+            var flight = await _flightRepository.GetFlightByGuidAsync(flightGuid);
+            return flight;
+        }
+
+        public async Task<int> GetRouteIdByFlightGuidAsync(string flightGuid)
+        {
+            return await _flightRepository.GetRouteIdByFlightGuidAsync(flightGuid);
         }
     }
 }

@@ -1,4 +1,4 @@
-﻿using AirDreams.API.Models.Dtos;
+﻿using AirDreams.API.DTOs;
 using AirDreams.API.Repositories;
 
 namespace AirDreams.API.Services
@@ -12,7 +12,7 @@ namespace AirDreams.API.Services
             _repository = repository;
         }
 
-        public async Task<LuggageTotalResponse> CalculateTotalsAsync(LuggageTotalRequest request)
+        public async Task<LuggageTotalResponse> CalculateTotalsAsync(LuggageTotalRequestDTO request)
         {
             decimal totalChecked = 0;
             decimal totalCarryOn = 0;

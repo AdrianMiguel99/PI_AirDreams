@@ -1,4 +1,4 @@
-using AirDreams.API.Models.Dtos;
+using AirDreams.API.DTOs;
 using AirDreams.API.Services;
 using NUnit.Framework;
 using QuestPDF.Infrastructure;
@@ -15,7 +15,7 @@ public class PdfServiceTests
 
         var service = new PdfService();
 
-        var dto = new ConfirmPurchaseDto
+        var dto = new ConfirmPurchaseDTO
         {
             TransactionId = "TXN-TEST",
             BuyerName = "Alexa Alpizar",
@@ -23,9 +23,9 @@ public class PdfServiceTests
             SeatClass = "FirstClass",
             PricePerPassenger = 60,
             PassengerCount = 1,
-            Passengers = new List<PassengerDto>
+            Passengers = new List<PassengerDTO>
             {
-                new PassengerDto
+                new PassengerDTO
                 {
                     NamePassenger = "Alexa",
                     LastnamesPassenger = "Alpizar",
@@ -33,9 +33,9 @@ public class PdfServiceTests
                     Country = "CRC"
                 }
             },
-            Segments = new List<FlightSegmentDto>
+            Segments = new List<FlightSegmentDTO>
             {
-                new FlightSegmentDto
+                new FlightSegmentDTO
                 {
                     FlightNumber = "AD13220260610",
                     RouteId = 13,
@@ -43,17 +43,17 @@ public class PdfServiceTests
                     ArrivalDate = new DateTime(2026, 6, 10),
                     DepartureTime = "01:30:00",
                     ArrivalTime = "08:30:00",
-                    Duration = "08:00:00",
+                    Duration = new TimeSpan(7, 0, 0),
                     CheckedPrice = 60,
                     CarryOnPrice = 30,
                     Multiplier = 0.2m,
-                    DepartureAirport = new AirportInfoDto
+                    DepartureAirport = new AirportDTO
                     {
                         Name = "AEROPUERTO COSTA RICA",
                         Code = "SJO",
                         City = "San José"
                     },
-                    ArrivalAirport = new AirportInfoDto
+                    ArrivalAirport = new AirportDTO
                     {
                         Name = "AEROPUERTO ARGENTINA",
                         Code = "ARG",
@@ -66,16 +66,16 @@ public class PdfServiceTests
                 new LuggagePerPassengerDto
                 {
                     PassengerIndex = 1,
-                    LuggageItems = new List<LuggageItemDto>
+                    LuggageItems = new List<LuggageItemDTO>
                     {
-                        new LuggageItemDto
+                        new LuggageItemDTO
                         {
                             Type = "checked",
                             Quantity = 1,
                             UnitPrice = 60,
                             Subtotal = 60
                         },
-                        new LuggageItemDto
+                        new LuggageItemDTO
                         {
                             Type = "carryOn",
                             Quantity = 1,

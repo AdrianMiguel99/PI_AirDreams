@@ -1,8 +1,8 @@
 using System.ComponentModel.DataAnnotations;
 
-namespace AirDreams.API.Models.Dto
+namespace AirDreams.API.DTOs
 {
-    public class DestinationSearchDto
+    public class DestinationSearchDTO
     {
         [Required(ErrorMessage = "Destino es requerido")]
         [StringLength(3, MinimumLength = 3, ErrorMessage = "El código del destino debe tener exactamente 3 caracteres")]

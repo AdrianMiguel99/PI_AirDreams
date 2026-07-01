@@ -11,7 +11,7 @@ public class ReservationService : IReservationService
         _reservationRepository = reservationRepository;
     }
 
-    public async Task<ReservationDetailsDto?> GetReservationDetailsAsync(string reservationCode)
+    public async Task<ReservationDetailsDTO?> GetReservationDetailsAsync(string reservationCode)
     {
         if (string.IsNullOrWhiteSpace(reservationCode))
         {

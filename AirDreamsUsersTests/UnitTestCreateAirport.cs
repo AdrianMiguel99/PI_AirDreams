@@ -1,9 +1,10 @@
 ﻿using Moq;
 using NUnit.Framework;                       
-using AirDreams.API.Models.Dtos;
+using AirDreams.API.DTOs;
 using AirDreams.API.Models.Entities;
 using AirDreams.API.Repositories;
 using AirDreams.API.Services;
+
 
 namespace Test1
 {
@@ -22,7 +23,7 @@ namespace Test1
         [Test]
         public void CreateAsync_ValidAirport_ReturnsAirportDto()
         {
-            var dto = new CreateAirportDto
+            var dto = new CreateAirportDTO
             {
                 Code = "MAD",
                 Name = "Barajas",
@@ -56,7 +57,7 @@ namespace Test1
         [Test]
         public void CreateAsync_DuplicateCode_ThrowsInvalidOperationException()
         {
-            var dto = new CreateAirportDto
+            var dto = new CreateAirportDTO
             {
                 Code = "MAD",
                 Name = "Barajas",

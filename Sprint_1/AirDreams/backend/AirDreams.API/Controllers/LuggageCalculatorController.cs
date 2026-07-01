@@ -1,5 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using AirDreams.API.Models.Dtos;
+using AirDreams.API.DTOs;
 using AirDreams.API.Services;
 
 namespace AirDreams.API.Controllers
@@ -16,7 +16,7 @@ namespace AirDreams.API.Controllers
         }
 
         [HttpPost("total")]
-        public async Task<IActionResult> CalculateTotal([FromBody] LuggageTotalRequest request)
+        public async Task<IActionResult> CalculateTotal([FromBody] LuggageTotalRequestDTO request)
         {
             if (!ModelState.IsValid) return BadRequest(ModelState);
 

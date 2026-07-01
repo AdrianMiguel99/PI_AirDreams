@@ -35,6 +35,12 @@
             @add-luggage="goToExtraLuggage"
           />
         </div>
+
+          <div class="pay-button-wrapper">
+            <button class="btn-continue" @click="$router.push('/')">
+              Inicio
+            </button>
+          </div>
       </section>
     </main>
   </div>
@@ -146,7 +152,7 @@ export default {
         }
 
         const response = await fetch(
-          `${API_URL}/Reservation/${encodeURIComponent(reservationCode)}`
+          `${API_URL}/api/Reservation/${encodeURIComponent(reservationCode)}`
         );
 
         if (!response.ok) {
@@ -179,7 +185,7 @@ export default {
       this.cancellationLoading = true;
 
       try {
-        const response = await fetch(`${API_URL}/cancellations/request`, {
+        const response = await fetch(`${API_URL}/api/cancellations/request`, {
           method: "POST",
           headers: {
             "Content-Type": "application/json"
@@ -372,6 +378,26 @@ export default {
 </script>
 
 <style scoped>
+.pay-button-wrapper {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 24px;
+}
+
+.btn-continue {
+  border: none;
+  border-radius: 999px;
+  padding: 12px 32px;
+  background-color: #384467;
+  color: white;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.btn-continue:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
 .reservation-details-page {
   min-height: 100vh;
   color: #032056;
