@@ -1,7 +1,7 @@
 CREATE OR ALTER PROCEDURE dbo.sp_GetFlightsReport
     @Origin VARCHAR(3) = NULL,
     @Destination VARCHAR(3) = NULL,
-    @SeatClass VARCHAR(20) = NULL,   
+    @SeatClass VARCHAR(20) = NULL,  
     @FromDate DATE = NULL,
     @ToDate DATE = NULL
 AS
@@ -80,7 +80,7 @@ BEGIN
                 te.externalFlightNumber,
                 SUM(CASE WHEN i.seatClass = 'FirstClass' THEN 1 ELSE 0 END) AS firstClassCount,
                 SUM(CASE WHEN i.seatClass = 'Turista' THEN 1 ELSE 0 END) AS touristCount,
-                SUM(i.amount) AS passengerRevenue  
+                SUM(i.amount) AS passengerRevenue   
             FROM TieneExternal te
             JOIN Itinerary i ON i.transactionId = te.transactionId
             WHERE i.seatClass IS NOT NULL
@@ -107,6 +107,32 @@ BEGIN
           AND (@ToDate IS NULL OR e.departureDateTime < DATEADD(DAY, 1, @ToDate))
     ) AS ReportData
     ORDER BY flightDate, origin, destination;
+END
+GO
+
+CREATE OR ALTER PROCEDURE dbo.sp_GetFlightsReportFilters
+AS
+BEGIN
+    SET NOCOUNT ON;
+
+    SELECT DISTINCT codeAirportSalida AS Code FROM Route
+    UNION
+    SELECT DISTINCT departureAirportCode FROM ExternalFlight
+    ORDER BY Code;
+
+    SELECT DISTINCT codeAirportLlegada AS Code FROM Route
+    UNION
+    SELECT DISTINCT arrivalAirportCode FROM ExternalFlight
+    ORDER BY Code;
+
+    SELECT
+        MIN(flightDate) AS minDate,
+        MAX(flightDate) AS maxDate
+    FROM (
+        SELECT departureDate AS flightDate FROM Flight
+        UNION ALL
+        SELECT departureDateTime FROM ExternalFlight
+    ) AS AllDates;
 END
 GO
 
