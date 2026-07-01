@@ -1,5 +1,6 @@
 <template>
   <HeaderLogoNoAdmin />
+
   <main class="add-luggage-page">
     <h2 class="section-title">Agregar maletas</h2>
 
@@ -42,8 +43,12 @@
         ← Volver
       </button>
 
-      <button class="btn-continue" @click="continueToPay">
-        Pagar
+      <button
+        class="btn-continue"
+        :disabled="loading"
+        @click="continueToPay"
+      >
+        {{ loading ? 'Procesando...' : 'Pagar' }}
       </button>
     </div>
 
@@ -191,6 +196,11 @@ export default {
 
         this.pageState.flights = (luggageData.segments || []).map((segment) => {
           const partnerName = String(segment.partnerName || segment.airlineName || '').trim();
+          const airlineName = partnerName.toLowerCase();
+
+          const isAirDreams =
+            segment.isAirDreams === true ||
+            airlineName === 'airdreams';
 
           return {
             id: String(segment.flightNumber || '').trim(),
@@ -199,12 +209,11 @@ export default {
             carryOnPrice: Number(segment.carryOnPrice || 0),
             multiplier: Number(segment.multiplier || 0.5),
             partnerName,
-            isAirDreams:
-              segment.isAirDreams === true ||
-              !partnerName ||
-              partnerName.toLowerCase() === 'airdreams'
+            isAirDreams
           };
         });
+
+        console.log('Vuelos detectados para equipaje:', this.pageState.flights);
 
         for (const item of reservationLuggage) {
           const passenger = this.pageState.passengers.find((currentPassenger) => {
@@ -342,7 +351,19 @@ export default {
 
       const partnerName = String(flight.partnerName || '').trim().toLowerCase();
 
-      return !partnerName || partnerName === 'airdreams';
+      return partnerName === 'airdreams';
+    },
+
+    hasExternalFlights() {
+      return this.pageState.flights.some((flight) => {
+        return !this.isAirDreamsFlight(flight);
+      });
+    },
+
+    getAirDreamsFlights() {
+      return this.pageState.flights.filter((flight) => {
+        return this.isAirDreamsFlight(flight) && flight.id && flight.routeId;
+      });
     },
 
     async continueToPay() {
@@ -357,9 +378,11 @@ export default {
           return;
         }
 
-        const airDreamsFlights = this.pageState.flights.filter((flight) => {
-          return this.isAirDreamsFlight(flight) && flight.id && flight.routeId;
-        });
+        const airDreamsFlights = this.getAirDreamsFlights();
+        const hasExternalFlights = this.hasExternalFlights();
+
+        console.log('Vuelos AirDreams:', airDreamsFlights);
+        console.log('¿Tiene vuelos externos?', hasExternalFlights);
 
         for (const flight of airDreamsFlights) {
           const validation = await this.validateWeights(
@@ -405,22 +428,24 @@ export default {
           }
         }
 
-        const updateResponse = await fetch(`${API_URL}/api/Luggage/update`, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify({
-            transactionId: this.reservationCode,
-            luggageWeight: totalCheckedWeight || 0,
-            carryOnWeight: totalCarryOnWeight || 0
-          })
-        });
+        if (airDreamsFlights.length > 0 && !hasExternalFlights) {
+          const updateResponse = await fetch(`${API_URL}/api/Luggage/update`, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+              transactionId: this.reservationCode,
+              luggageWeight: totalCheckedWeight || 0,
+              carryOnWeight: totalCarryOnWeight || 0
+            })
+          });
 
-        const updateData = await this.readResponseData(updateResponse);
+          const updateData = await this.readResponseData(updateResponse);
 
-        if (!updateResponse.ok) {
-          throw new Error(updateData.message || 'No se pudo actualizar el peso del vuelo.');
+          if (!updateResponse.ok) {
+            throw new Error(updateData.message || 'No fue posible actualizar el peso del vuelo.');
+          }
         }
 
         this.popupType = 'success';
