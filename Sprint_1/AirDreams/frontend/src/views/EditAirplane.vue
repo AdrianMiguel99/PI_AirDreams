@@ -62,51 +62,47 @@ export default {
   methods: {
 
     getAirplane() {
-
-      const modelo =
-        this.$route.params.modelo;
-
+      const modelo = this.$route.params.modelo;
+    
       axios
-        .get(`${API_BASE}/api/Airplane/${modelo}`).then(response => {
-
+        .get(`${API_BASE}/api/Airplane/${encodeURIComponent(modelo)}`)
+        .then(response => {
           this.airplane = response.data;
           delete this.airplane.cantPasajeros;
-        }).catch(error => {
-          console.error(
-            error.response?.data
-          );
-
+        })
+        .catch(error => {
+          console.error(error.response?.data || error.message);
         });
     },
 
     updateAirplane(updatedAirplane) {
-  const modeloOriginal = this.$route.params.modelo;
+      const modeloOriginal = this.$route.params.modelo;
 
-  axios
-    .put(
-      `${API_BASE}/api/Airplane/${encodeURIComponent(modeloOriginal)}`,
-      updatedAirplane
-    )
-    .then(() => {
-      this.showPopup = true;
-      this.popupType = 'success';
-      this.popupTitle = 'Éxito';
-      this.popupMessage = 'Aeronave actualizada correctamente';
-      this.popupActionText = 'Volver a la lista';
-
-      this.getAirplane();
-    })
-    .catch(error => {
-      console.error(error.response?.data || error.message);
-
-      this.showPopup = true;
-      this.popupType = 'error';
-      this.popupTitle = 'Error';
-      this.popupMessage =
-        error.response?.data?.message ||
-        error.response?.data ||
-        'Error al actualizar la aeronave';
-      this.popupActionText = '';
+    axios
+      .put(
+        `${API_BASE}/api/Airplane/${encodeURIComponent(modeloOriginal)}`,
+        updatedAirplane
+      )
+      .then(() => {
+        this.showPopup = true;
+        this.popupType = 'success';
+        this.popupTitle = 'Éxito';
+        this.popupMessage = 'Aeronave actualizada correctamente';
+        this.popupActionText = 'Volver a la lista';
+  
+        this.getAirplane();
+      })
+      .catch(error => {
+        console.error(error.response?.data || error.message);
+  
+        this.showPopup = true;
+        this.popupType = 'error';
+        this.popupTitle = 'Error';
+        this.popupMessage =
+          error.response?.data?.message ||
+          error.response?.data ||
+          'Error al actualizar la aeronave';
+        this.popupActionText = '';
     });
 },
 
