@@ -46,7 +46,7 @@ public class OperatorUpdateUserTests
             IsOperator = true
         };
 
-        var updateDto = new UpdateUserDto
+        var updateDto = new UpdateUserDTO
         {
             FirstName = "Intento",
             LastName = "NoPermitido"

@@ -80,7 +80,7 @@ namespace AirDreams.API.Repositories
                 }, transaction);
 
                 var passengerItineraryValues = passengerMappings
-                    .Select(pm => $"({pm.IdPassenger}, '{dto.TransactionId}', '{dto.Passengers[pm.PassengerIndex - 1].seatNumber}')");
+                    .Select(pm => $"({pm.IdPassenger}, '{dto.TransactionId}', '{dto.Passengers[pm.PassengerIndex - 1].SeatNumber}')");
                 var sqlPassengerItinerary = $@"
                     INSERT INTO PassengerItinerary (idPassenger, transactionId, seatNumber)
                     VALUES {string.Join(", ", passengerItineraryValues)}";

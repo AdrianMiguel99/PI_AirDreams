@@ -22,7 +22,7 @@ namespace PassengerTests
         [Test]
         public async Task CreateAsync_ValidPassenger_ReturnsPassengerdto()
         {
-            var dto = new CreatePassengerDto
+            var dto = new CreatePassengerDTO
             {
                 IdPassenger = 99999,
                 NamePassenger = "Jouse",
@@ -59,7 +59,7 @@ namespace PassengerTests
         [Test]
         public void CreateAsync_DuplicatePassenger_ThrowsInvalidOperationException()
         {
-            var dto = new CreatePassengerDto
+            var dto = new CreatePassengerDTO
             {
                 IdPassenger = 99999,
                 NamePassenger = "Josue",

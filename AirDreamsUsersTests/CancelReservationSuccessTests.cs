@@ -12,7 +12,12 @@ public class CancelReservationSuccessTests
     public async Task CancelReservationAsync_WhenReservationExists_ShouldCancelReservation()
     {
         var repositoryMock = new Mock<ICancellationRepository>();
-        var service = new CancellationService(repositoryMock.Object);
+        var emailServiceMock = new Mock<IEmailService>();
+
+        var service = new CancellationService(
+            repositoryMock.Object,
+            emailServiceMock.Object
+        );
 
         var transactionId = "TXN-TEST";
 
