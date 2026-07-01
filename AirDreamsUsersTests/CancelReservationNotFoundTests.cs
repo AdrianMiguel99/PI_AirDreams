@@ -12,7 +12,12 @@ public class CancelReservationNotFoundTests
     public void CancelReservationAsync_WhenReservationDoesNotExist_ShouldThrowKeyNotFoundException()
     {
         var repositoryMock = new Mock<ICancellationRepository>();
-        var service = new CancellationService(repositoryMock.Object);
+        var emailServiceMock = new Mock<IEmailService>();
+
+        var service = new CancellationService(
+            repositoryMock.Object,
+            emailServiceMock.Object
+        );
 
         var transactionId = "TXN-NOT-FOUND";
 
