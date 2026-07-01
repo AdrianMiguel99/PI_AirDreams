@@ -178,6 +178,11 @@ export default {
       return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(Number(value || 0))
     },
 
+    cleanTelephone(value) {
+      const digits = String(value || '').replace(/\D/g, '')
+      return digits ? Number(digits) : null
+    },
+    
     normalizeSeatClass(value) {
       return value === 'FirstClass' || value === 'firstClass' ? 'FirstClass' : 'Turista'
     },
@@ -306,7 +311,7 @@ export default {
             lastnamesPassenger: p.lastnamesPassenger,
             birthDate: p.birthDate || null,
             emailPassenger: p.emailPassenger || '',
-            telephone: p.telephone || '',
+            telephone: this.cleanTelephone(p.telephone),
             country: p.country || '',
             seatNumber: this.generateRandomSeat(index)
           })),
