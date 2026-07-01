@@ -21,5 +21,8 @@ namespace AirDreams.API.Services.Interfaces
             int quantityOfPassengers
             
         );
+
+        Task<dynamic> GetFlightByGuidAsync(string flightGuid);
+        Task<int> GetRouteIdByFlightGuidAsync(string flightGuid);
     }
 }

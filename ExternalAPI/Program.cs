@@ -9,6 +9,7 @@ builder.Services.AddHttpClient("InternalAPI", client =>
 
 builder.Services.AddScoped<IFlightService, FlightService>();
 builder.Services.AddScoped<ISecurityService, SecurityService>();
+builder.Services.AddScoped<IPurchaseService, PurchaseService>();
 
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
