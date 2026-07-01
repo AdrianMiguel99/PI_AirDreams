@@ -25,7 +25,7 @@ namespace AirDreams.API.Services
             string token,
             string role)
         {
-            var frontendUrl = "http://localhost:5173";
+            var frontendUrl = "https://www.airdreams.lat";
 
             var registerLink =
                 $"{frontendUrl}/completar-registro?token={token}";
@@ -132,7 +132,7 @@ namespace AirDreams.API.Services
             string toEmail,
             string token)
         {
-            var frontendUrl = "http://localhost:5173";
+            var frontendUrl = "https://www.airdreams.lat";
 
             var cancellationLink =
                 $"{frontendUrl}/cancel-reservation?token={token}";
