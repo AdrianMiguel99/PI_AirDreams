@@ -50,14 +50,10 @@ BEGIN
         DECLARE @LuggageNumber VARCHAR(100);
 
         SET @LuggageNumber = CONCAT(
-            'LUG-EXTRA-',
-            @TransactionId,
+            'LX-',
+            @idPassenger,
             '-',
-            @IdPassenger,
-            '-',
-            @Type,
-            '-',
-            FORMAT(GETDATE(), 'yyyyMMddHHmmss')
+            LEFT(REPLACE(CONVERT(VARCHAR(36), NEWID()), '-', ''), 8)
         );
 
         INSERT INTO Luggage (
