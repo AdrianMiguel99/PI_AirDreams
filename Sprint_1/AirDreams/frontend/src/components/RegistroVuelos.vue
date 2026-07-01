@@ -418,58 +418,128 @@
         this.loadAirports();
     },
     methods: {
-        getToken() {
-            return localStorage.getItem("token");
-        },
+  getToken() {
+    return localStorage.getItem("token");
+  },
 
-        async loadAirports(){
-            try {
-                const token = localStorage.getItem("token");
-                const res = await axios.get('/api/airports', {
-                headers: { 'Authorization': `Bearer ${token}` }
-            });
-            
-            this.airports = res.data.filter(a => a.isActive !== false) .map((a, i) => ({ id: i+1, code: a.code || a.Code || a.CodeAirport, name: a.name || a.Name || a.NameAirport }));
-            } catch (e) {
-            console.error('No se pudieron cargar aeropuertos', e);
-            }
-        },
-        async loadAircrafts(){
-            try {
-            const token = localStorage.getItem("token");
-            const res = await axios.get('/api/Airplane', {
-                headers: { 'Authorization': `Bearer ${token}` }
-            });
-            this.aircrafts = res.data.map((a, i) => ({
-                id: i+1,
-                modelo: a.aircraftModel || a.modelo || a.Model
-            }));
-            } catch (e) {
-                console.error('No se pudieron cargar los aviones', e);
-            }
-        },
-        filterAirports(queryValue) {
-            const query = queryValue.trim().toLowerCase();
-            if (!query) return [];
+  getArrayResponse(data) {
+    if (Array.isArray(data)) {
+      return data;
+    }
 
-            return this.airports.filter(
-                (airport) => {
-                const code = String(airport.code || "").toLowerCase();
-                const name = String(airport.name || "").toLowerCase();
-                return code.includes(query) || name.includes(query);
-                }
-            );
-        },
-        filterAircrafts(){
-            const query = this.aircraftQuery.trim().toLowerCase();
-            if (!query) return [];
-            
-            return this.aircrafts.filter((aircraft) => {
-                const aircraftModel = String(aircraft.modelo || "").toLowerCase();
-                return aircraftModel.includes(query);
-                }
-            );
-        },
+    if (Array.isArray(data?.data)) {
+      return data.data;
+    }
+
+    if (Array.isArray(data?.result)) {
+      return data.result;
+    }
+
+    if (Array.isArray(data?.items)) {
+      return data.items;
+    }
+
+    if (Array.isArray(data?.airports)) {
+      return data.airports;
+    }
+
+    if (Array.isArray(data?.aircrafts)) {
+      return data.aircrafts;
+    }
+
+    if (Array.isArray(data?.planes)) {
+      return data.planes;
+    }
+
+    return [];
+  },
+
+  async loadAirports() {
+    try {
+      const token = this.getToken();
+
+      const res = await axios.get(`${API_BASE}/api/airports`, {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      });
+
+      console.log("Airports response:", res.data);
+
+      const airportsRaw = this.getArrayResponse(res.data);
+
+      this.airports = airportsRaw
+        .filter(a => a.isActive !== false && a.active !== false)
+        .map((a, i) => ({
+          id: a.id || a.idAirport || i + 1,
+          code: a.code || a.Code || a.codeAirport || a.CodeAirport || "",
+          name: a.name || a.Name || a.nameAirport || a.NameAirport || ""
+        }));
+    } catch (e) {
+      console.error("No se pudieron cargar aeropuertos", {
+        status: e.response?.status,
+        data: e.response?.data,
+        message: e.message
+      });
+    }
+  },
+
+  async loadAircrafts() {
+    try {
+      const token = this.getToken();
+
+      const res = await axios.get(`${API_BASE}/api/Airplane`, {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      });
+
+      console.log("Aircraft response:", res.data);
+
+      const aircraftsRaw = this.getArrayResponse(res.data);
+
+      this.aircrafts = aircraftsRaw
+        .filter(a => a.isActive !== false && a.active !== false)
+        .map((a, i) => ({
+          id: a.id || a.idAircraft || i + 1,
+          modelo:
+            a.aircraftModel ||
+            a.modelo ||
+            a.model ||
+            a.Model ||
+            a.Modelo ||
+            ""
+        }))
+        .filter(a => a.modelo);
+    } catch (e) {
+      console.error("No se pudieron cargar los aviones", {
+        status: e.response?.status,
+        data: e.response?.data,
+        message: e.message
+      });
+    }
+  },
+
+  filterAirports(queryValue) {
+    const query = queryValue.trim().toLowerCase();
+    if (!query) return [];
+
+    return this.airports.filter((airport) => {
+      const code = String(airport.code || "").toLowerCase();
+      const name = String(airport.name || "").toLowerCase();
+      return code.includes(query) || name.includes(query);
+    });
+  },
+
+  filterAircrafts() {
+    const query = this.aircraftQuery.trim().toLowerCase();
+    if (!query) return [];
+
+    return this.aircrafts.filter((aircraft) => {
+      const aircraftModel = String(aircraft.modelo || "").toLowerCase();
+      return aircraftModel.includes(query);
+    });
+  },
         onAircraftInput(){
             this.showAircraftResults = true;
             this.formData.aircraftModel = "";
