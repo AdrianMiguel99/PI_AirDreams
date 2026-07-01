@@ -32,6 +32,7 @@
             :loading="cancellationLoading"
             :disabled="reservation.isCancelled"
             @cancel-reservation="requestCancellation"
+            @add-luggage="goToExtraLuggage"
           />
         </div>
       </section>
@@ -203,6 +204,23 @@ export default {
       } finally {
         this.cancellationLoading = false;
       }
+    },
+
+    goToExtraLuggage() {
+      const reservationCode =
+        this.reservation.reservationCode || this.$route.query.reservationCode;
+
+      if (!reservationCode) {
+        this.errorMessage = "No se encontró el código de reserva.";
+        return;
+      }
+
+      this.$router.push({
+        name: "ExtraLuggage",
+        query: {
+          reservationCode
+        }
+      });
     },
 
     mapReservationDetails(reservationCode, data) {

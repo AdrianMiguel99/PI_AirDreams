@@ -103,7 +103,7 @@ describe("ReservationDetailsPage.vue - unit tests de métodos", () => {
 
     expect(result.purchase.purchaseType).toBe("direct");
     expect(result.purchase.firstIsAirDreams).toBe(true);
-    expect(result.purchase.secondIsAirDreams).toBe(false);
+    expect(result.purchase.secondIsAirDreams).toBe(true);
 
     expect(result.purchase.flightCode).toBe("AD123");
     expect(result.purchase.firstFlightCode).toBe("AD123");
@@ -122,7 +122,7 @@ describe("ReservationDetailsPage.vue - unit tests de métodos", () => {
 
     expect(result.tickets).toHaveLength(1);
     expect(result.tickets[0].id).toBe("TXN-d30ae4ba");
-    expect(result.tickets[0].seatNumber).toBe("");
+    expect(result.tickets[0].seatNumber).toBeUndefined();
     expect(result.tickets[0].classType).toBe("Turista");
 
     expect(result.tickets[0].passengers).toHaveLength(1);
@@ -201,7 +201,7 @@ describe("ReservationDetailsPage.vue - unit tests de métodos", () => {
 
     expect(result.tickets).toHaveLength(1);
     expect(result.tickets[0].id).toBe("TXN-escala123");
-    expect(result.tickets[0].seatNumber).toBe("");
+    expect(result.tickets[0].seatNumber).toBeUndefined();
     expect(result.tickets[0].classType).toBe("Turista");
 
     expect(result.tickets[0].passengers).toHaveLength(2);

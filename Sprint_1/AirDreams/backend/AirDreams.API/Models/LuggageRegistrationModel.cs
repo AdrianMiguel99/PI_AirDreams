@@ -4,7 +4,8 @@ namespace AirDreams.API.Models
 {
     public class LuggageRegistrationModel
     {
-        [Required(ErrorMessage = "Nombre completo del pasajero es requerido")]
+        public int? IdPassenger { get; set; }
+
         public string FullName { get; set; } = string.Empty;
 
         [Required(ErrorMessage = "ID de itinerario es requerido")]

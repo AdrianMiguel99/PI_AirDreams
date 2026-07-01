@@ -1,3 +1,4 @@
+using AirDreams.API.DTOs;
 using AirDreams.API.Models;
 using AirDreams.API.Repositories;
 using AirDreams.API.Services.Interfaces;
@@ -19,13 +20,22 @@ namespace AirDreams.API.Services
         {
             try
             {
-                var passenger = await _passengerService.GetPassengerByNameAsync(model.FullName);
-                
-                if (passenger == null)
-                {
-                    return (false, "Pasajero no encontrado");
-                }
+                int idPassenger;
 
+                if (model.IdPassenger.HasValue)
+                {
+                    idPassenger = model.IdPassenger.Value;
+                }
+                else
+                {
+                    var passenger = await _passengerService.GetPassengerByNameAsync(model.FullName);
+                    if (passenger == null)
+                    {
+                        return (false, "Pasajero no encontrado");
+                    }
+                    idPassenger = passenger.IdPassenger;
+                }
+                
                 int registeredCount = 0;
 
                 foreach (var item in model.LuggageItems)
@@ -41,7 +51,7 @@ namespace AirDreams.API.Services
                     }
 
                     var luggageRegistered = await _luggageRepository.RegisterLuggageAsync(
-                        passenger.IdPassenger,
+                        idPassenger,
                         model.TransactionIdItinerary,
                         luggageNumber
                     );
@@ -112,6 +122,11 @@ namespace AirDreams.API.Services
             {
                 return (false, ex.Message);
             }
+        }
+
+        public async Task<ReservationLuggageResponseDto> GetReservationLuggageAsync(string transactionId)
+        {
+            return await _luggageRepository.GetReservationLuggageAsync(transactionId);
         }
     }
 }

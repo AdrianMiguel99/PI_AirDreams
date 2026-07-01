@@ -1,5 +1,6 @@
-using System.Data;
+using AirDreams.API.DTOs;
 using Dapper;
+using System.Data;
 
 namespace AirDreams.API.Repositories
 {
@@ -16,20 +17,22 @@ namespace AirDreams.API.Repositories
         {
             try
             {
-                string query = @"
-                    INSERT INTO Luggage (type, quantity)
-                    OUTPUT INSERTED.luggageNumber
-                    VALUES (@type, @quantity)";
+                var luggageNumber = "LUG-" + Guid.NewGuid().ToString("N").Substring(0, 8);
 
-                var luggageNumber = await _connection.ExecuteScalarAsync<string>(query, new 
-                { 
-                    type, 
-                    quantity 
+                string query = @"
+            INSERT INTO Luggage (luggageNumber, type, quantity)
+            VALUES (@luggageNumber, @type, @quantity)";
+
+                var affectedRows = await _connection.ExecuteAsync(query, new
+                {
+                    luggageNumber,
+                    type,
+                    quantity
                 });
 
-                return luggageNumber;
+                return affectedRows > 0 ? luggageNumber : null;
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 return null;
             }
@@ -126,6 +129,51 @@ namespace AirDreams.API.Repositories
             {
                 return false;
             }
+        }
+
+        public async Task<ReservationLuggageResponseDto> GetReservationLuggageAsync(string transactionId)
+        {
+            string luggageQuery = @"
+                SELECT
+                    r.idPassenger AS IdPassenger,
+                    r.transactionIdItinerary AS TransactionIdItinerary,
+                    l.luggageNumber AS LuggageNumber,
+                    l.type AS Type,
+                    l.quantity AS Quantity
+                FROM Registra r
+                INNER JOIN Luggage l
+                    ON l.luggageNumber = r.luggageNumber
+                WHERE r.transactionIdItinerary = @transactionId";
+
+            string segmentsQuery = @"
+                SELECT
+                    f.numberFlight AS FlightNumber,
+                    f.routeId AS RouteId,
+                    rt.luggagePrice AS CheckedPrice,
+                    rt.carryOnPrice AS CarryOnPrice,
+                    rt.porcentageMultiplier AS Multiplier
+                FROM Tiene t
+                INNER JOIN Flight f
+                    ON f.numberFlight = t.flightNumber
+                INNER JOIN Route rt
+                    ON rt.idRoute = f.routeId
+                WHERE t.transactionId = @transactionId";
+
+            var luggage = await _connection.QueryAsync<ReservationLuggageDto>(
+                luggageQuery,
+                new { transactionId }
+            );
+
+            var segments = await _connection.QueryAsync<ReservationLuggageSegmentDto>(
+                segmentsQuery,
+                new { transactionId }
+            );
+
+            return new ReservationLuggageResponseDto
+            {
+                Luggage = luggage,
+                Segments = segments
+            };
         }
     }
 }

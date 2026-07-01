@@ -3,7 +3,7 @@
     <section>
       <h2>Opciones de viaje</h2>
 
-      <button class="option-button" type="button" @click="showComingSoon">
+      <button class="option-button" type="button" :disabled="disabled" @click="$emit('add-luggage')">
         <span class="option-left">
           <img
             class="option-icon"
@@ -56,12 +56,9 @@ export default {
     }
   },
 
-  emits: ["cancel-reservation"],
+  emits: ["cancel-reservation", "add-luggage"],
 
   methods: {
-    showComingSoon() {
-      alert("Funcionalidad pendiente de implementar.");
-    }
   }
 };
 </script>
