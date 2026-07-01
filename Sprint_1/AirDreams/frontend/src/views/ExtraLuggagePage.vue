@@ -386,7 +386,7 @@ export default {
         }
 
         for (const passengerLuggage of luggageByPassenger) {
-          const response = await fetch(`${API_URL}/api/Luggage/register`, {
+          const response = await fetch(`${API_URL}/api/Luggage/register-extra`, {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json'
