@@ -13,7 +13,7 @@ namespace AirDreams.API.Services
             _repository = repository;
         }
 
-        public async Task<PassengerDto> CreateAsync(CreatePassengerDto dto)
+        public async Task<PassengerDTO> CreateAsync(CreatePassengerDTO dto)
         {
             if (await _repository.ExistsAsync(dto.IdPassenger))
                 throw new InvalidOperationException("El pasajero ya existe.");
@@ -34,13 +34,13 @@ namespace AirDreams.API.Services
             return MapToDto(created);
         }
 
-        public async Task<PassengerDto?> GetByIdAsync(int idPassenger)
+        public async Task<PassengerDTO?> GetByIdAsync(int idPassenger)
         {
             var passenger = await _repository.GetByIdAsync(idPassenger);
             return passenger is null ? null : MapToDto(passenger);
         }
 
-        public async Task<PassengerDto?> GetPassengerByNameAsync(string fullName)
+        public async Task<PassengerDTO?> GetPassengerByNameAsync(string fullName)
         {
             var names = fullName.Trim().Split(' ', 2);
 
@@ -54,7 +54,7 @@ namespace AirDreams.API.Services
             return passenger is null ? null : MapToDto(passenger);
         }
 
-        private static PassengerDto MapToDto(Passenger passenger) => new()
+        private static PassengerDTO MapToDto(Passenger passenger) => new()
         {
             IdPassenger = passenger.IdPassenger,
             NamePassenger = passenger.NamePassenger,

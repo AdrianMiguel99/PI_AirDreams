@@ -1,13 +1,13 @@
-﻿using AirDreams.API.Models.Dtos;
+﻿using AirDreams.API.DTOs;
 
 namespace AirDreams.API.Services
 {
     public interface IAirportService
     {
-        Task<List<AirportDto>> GetAllAsync();
-        Task<AirportDto?> GetByCodeAsync(string code);
-        Task<AirportDto> CreateAsync(CreateAirportDto dto, byte adminId);
-        Task UpdateAsync(string code, UpdateAirportDto dto);
+        Task<List<AirportDTO>> GetAllAsync();
+        Task<AirportDTO?> GetByCodeAsync(string code);
+        Task<AirportDTO> CreateAsync(CreateAirportDTO dto, byte adminId);
+        Task UpdateAsync(string code, UpdateAirportDTO dto);
         Task<(bool success, string message)> DeleteAsync(string code);
     }
 }

@@ -1,4 +1,4 @@
-﻿using AirDreams.API.Models.Dtos;
+﻿using AirDreams.API.DTOs;
 using AirDreams.API.Repositories;
 using AirDreams.API.Services;
 using AirDreams.API.Services.Interfaces;
@@ -34,7 +34,7 @@ public class PurchaseService : IPurchaseService
         );
     }
 
-    public async Task<PaymentResponseDto> ConfirmPurchaseAsync(ConfirmPurchaseDto dto)
+    public async Task<PaymentResponseDTO> ConfirmPurchaseAsync(ConfirmPurchaseDTO dto)
     {
         string? lastFour = null;
         if (dto.PaymentMethod.Equals("Card", StringComparison.OrdinalIgnoreCase) &&
@@ -117,7 +117,7 @@ public class PurchaseService : IPurchaseService
             });
         }
 
-        return new PaymentResponseDto
+        return new PaymentResponseDTO
         {
             Success = true,
             Message = "Compra confirmada y pago procesado correctamente."

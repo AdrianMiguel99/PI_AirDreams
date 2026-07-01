@@ -1,3 +1,6 @@
+Use AirDreams
+GO
+
 CREATE OR ALTER PROCEDURE dbo.GetReservationDetails
     @ReservationCode VARCHAR(20)
 AS

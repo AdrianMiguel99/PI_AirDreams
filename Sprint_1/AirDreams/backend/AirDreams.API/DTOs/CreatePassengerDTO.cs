@@ -1,7 +1,7 @@
 using System.ComponentModel.DataAnnotations;
 namespace AirDreams.API.DTOs
 {
-    public class CreatePassengerDto
+    public class CreatePassengerDTO
     {
         [Required]
         [Range(1, 99999)]

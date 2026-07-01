@@ -335,7 +335,7 @@ namespace AirDreams.API.Services
             return hashOfInput == hash;
         }
 
-        public async Task<bool> UpdateUserAsync(byte employeeId, UpdateUserDto updateDto, string currentUserEmail)
+        public async Task<bool> UpdateUserAsync(byte employeeId, UpdateUserDTO updateDto, string currentUserEmail)
         {
             var currentUserId = await _userRepository.GetCurrentUserIdFromEmailAsync(currentUserEmail);
             var currentUser = await _userRepository.GetAirlineEmployeeByIdAsync(currentUserId);

@@ -1,5 +1,4 @@
 using AirDreams.API.DTOs;
-using AirDreams.API.Models.Dtos;
 using Dapper;
 using Microsoft.Data.SqlClient;
 using System.Data;
@@ -26,7 +25,7 @@ namespace AirDreams.API.Repositories
             return result == 1;
         }
 
-        public async Task ConfirmPurchaseAsync(ConfirmPurchaseDto dto, string? cardLastFour)
+        public async Task ConfirmPurchaseAsync(ConfirmPurchaseDTO dto, string? cardLastFour)
         {
             if (_connection.State == ConnectionState.Closed)
                 _connection.Open();
@@ -58,8 +57,8 @@ namespace AirDreams.API.Repositories
                     commandType: CommandType.StoredProcedure
                 );
 
-                var passengerMappings = (await spResult.ReadAsync<PassengerMappingDto>()).ToList();
-                var luggageMappings = (await spResult.ReadAsync<LuggageMappingDto>()).ToList();
+                var passengerMappings = (await spResult.ReadAsync<PassengerMappingDTO>()).ToList();
+                var luggageMappings = (await spResult.ReadAsync<LuggageMappingDTO>()).ToList();
 
                 if (!passengerMappings.Any())
                     throw new InvalidOperationException("No se registraron pasajeros para la compra.");
@@ -143,7 +142,7 @@ namespace AirDreams.API.Repositories
             }
         }
 
-        private static DataTable BuildPassengerTable(ConfirmPurchaseDto dto)
+        private static DataTable BuildPassengerTable(ConfirmPurchaseDTO dto)
         {
             var table = new DataTable();
             table.Columns.Add("PassengerIndex", typeof(int));
@@ -167,8 +166,8 @@ namespace AirDreams.API.Repositories
                     i + 1,
                     p.NamePassenger,
                     p.LastnamesPassenger,
-                    string.IsNullOrWhiteSpace(p.EmailPassenger) ? DBNull.Value : p.EmailPassenger.Trim().ToLower(),
-                    p.Telephone ?? string.Empty,
+                    p.EmailPassenger ?? string.Empty,
+                    p.Telephone ?? (object)DBNull.Value ,
                     p.Country,
                     birth ?? (object)DBNull.Value
                 );
@@ -176,7 +175,7 @@ namespace AirDreams.API.Repositories
             return table;
         }
 
-        private static DataTable BuildLuggageTable(ConfirmPurchaseDto dto)
+        private static DataTable BuildLuggageTable(ConfirmPurchaseDTO dto)
         {
             var table = new DataTable();
             table.Columns.Add("PassengerIndex", typeof(int));
@@ -198,7 +197,7 @@ namespace AirDreams.API.Repositories
             return table;
         }
 
-        private static DataTable BuildSegmentTable(ConfirmPurchaseDto dto)
+        private static DataTable BuildSegmentTable(ConfirmPurchaseDTO dto)
         {
             var table = new DataTable();
             table.Columns.Add("FlightNumber", typeof(string));

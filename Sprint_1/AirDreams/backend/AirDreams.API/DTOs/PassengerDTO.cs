@@ -1,15 +1,15 @@
 namespace AirDreams.API.DTOs
 {
-    public class PassengerDto
+    public class PassengerDTO
     {
         public int IdPassenger { get; set; }
         public string NamePassenger { get; set; } = string.Empty;
         public string LastnamesPassenger { get; set; } = string.Empty;
-        public string EmailPassenger { get; set; } = string.Empty;
+        public string? EmailPassenger { get; set; } = string.Empty;
         public long? Telephone { get; set; }
         public string Country { get; set; } = string.Empty;
 
-        public String BirthDate { get; set; } = string.Empty;
+        public string? BirthDate { get; set; } = string.Empty;
 
     }
 }

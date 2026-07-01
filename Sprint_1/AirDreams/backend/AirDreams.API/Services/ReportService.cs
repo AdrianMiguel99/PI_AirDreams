@@ -44,7 +44,7 @@ namespace AirDreams.API.Services
             return await _reportRepository.GetIncomeReportFiltersAsync();
         }
 
-        public async Task<IEnumerable<FlightsReportRowDto>> GetFlightsReportAsync(
+        public async Task<IEnumerable<FlightsReportRowDTO>> GetFlightsReportAsync(
             string? origin,
             string? destination,
             string? seatClass,
@@ -54,7 +54,7 @@ namespace AirDreams.API.Services
             return await _reportRepository.GetFlightsReportAsync(origin, destination, seatClass, fromDate, toDate);
         }
 
-        public async Task<FlightsReportFiltersDto> GetFlightsReportFiltersAsync()
+        public async Task<FlightsReportFiltersDTO> GetFlightsReportFiltersAsync()
         {
             return await _reportRepository.GetFlightsReportFiltersAsync();
         }

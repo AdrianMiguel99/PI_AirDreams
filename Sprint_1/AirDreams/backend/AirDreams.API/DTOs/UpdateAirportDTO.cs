@@ -1,8 +1,8 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace AirDreams.API.Models.Dtos
+namespace AirDreams.API.DTOs
 {
-    public class UpdateAirportDto
+    public class UpdateAirportDTO
     {
         [Required(ErrorMessage = "El nombre es obligatorio.")]
         [MaxLength(200, ErrorMessage = "El nombre no puede exceder los 200 caracteres.")]

@@ -53,7 +53,7 @@ namespace AirDreams.API.Controllers
         }
 
         [HttpPost("update")]
-        public async Task<IActionResult> UpdateFlightWeight([FromBody] UpdateFlightWeightDto dto)
+        public async Task<IActionResult> UpdateFlightWeight([FromBody] UpdateFlightWeightDTO dto)
         {
             var result = await _luggageService.UpdateFlightWeightAsync(
                 dto.TransactionId,

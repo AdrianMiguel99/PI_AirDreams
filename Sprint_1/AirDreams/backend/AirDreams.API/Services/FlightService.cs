@@ -1,6 +1,5 @@
 using AirDreams.API.DTOs;
 using AirDreams.ExternalAPI.DTOs;
-using AirDreams.API.Models.Dtos;
 using AirDreams.API.Repositories;
 using AirDreams.API.Services.Interfaces;
 
@@ -303,7 +302,7 @@ namespace AirDreams.API.Services
             };
         }
 
-        private FlightItineraryDTO MapConnectedFlightToItinerary(ConnectedFlightDto connected)
+        private FlightItineraryDTO MapConnectedFlightToItinerary(ConnectedFlightDTO connected)
         {
             var departureDateTime = DateTime.Parse(connected.ExternalFlight.departureTime);
             var arrivalDateTime = DateTime.Parse(connected.ExternalFlight.arrivalTime);

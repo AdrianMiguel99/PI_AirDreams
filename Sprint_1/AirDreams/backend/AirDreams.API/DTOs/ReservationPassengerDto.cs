@@ -1,6 +1,6 @@
 ﻿namespace AirDreams.API.DTOs
 {
-    public class ReservationPassengerDto
+    public class ReservationPassengerDTO
     {
         public string TransactionId { get; set; } = string.Empty;
         public int IdPassenger { get; set; }

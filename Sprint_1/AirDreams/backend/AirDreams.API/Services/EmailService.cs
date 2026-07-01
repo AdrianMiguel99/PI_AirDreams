@@ -3,7 +3,7 @@ using MailKit.Security;
 using Microsoft.Extensions.Options;
 using MimeKit;
 using AirDreams.API.Models;
-using AirDreams.API.Models.Dtos;
+using AirDreams.API.DTOs;
 
 namespace AirDreams.API.Services
 {
@@ -78,7 +78,7 @@ namespace AirDreams.API.Services
 
         public async Task SendPurchaseConfirmationEmail(
             string toEmail,
-            ConfirmPurchaseDto purchase,
+            ConfirmPurchaseDTO purchase,
             byte[] invoicePdf,
             byte[] itineraryPdf
         )
