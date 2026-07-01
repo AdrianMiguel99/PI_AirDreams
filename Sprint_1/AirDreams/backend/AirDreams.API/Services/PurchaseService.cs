@@ -166,14 +166,14 @@ public class PurchaseService : IPurchaseService
         return basePrice * ((decimal)Math.Pow(1 + (double)multiplier, quantity) - 1) / multiplier;
     }
 
-    private async Task<ConfirmPurchaseDto> MapToConfirmPurchaseDto(ExternalOrderRequestDto dto)
+    private async Task<ConfirmPurchaseDTO> MapToConfirmPurchaseDto(ExternalOrderRequestDto dto)
     {
         var flight = await _flightService.GetFlightByGuidAsync(dto.flightGUID);
 
         if (flight == null)
             throw new InvalidOperationException("Flight not found.");
 
-        return new ConfirmPurchaseDto
+        return new ConfirmPurchaseDTO
         {
             TransactionId = $"TXN-{Guid.NewGuid().ToString("N")[..8]}",
             BuyerName = $"{dto.buyer.firstName} {dto.buyer.lastName}",
@@ -187,26 +187,26 @@ public class PurchaseService : IPurchaseService
 
             Segments = new()
 {
-            new FlightSegmentDto
+            new FlightSegmentDTO
             {
                 FlightNumber = flight.FlightGUID,
                 DepartureDate = flight.DepartureDate,
                 ArrivalDate = flight.ArrivalDate,
                 DepartureTime = Convert.ToString(flight.DepartureTime),
                 ArrivalTime = Convert.ToString(flight.ArrivalTime),
-                Duration = Convert.ToString(flight.Duration),
+                Duration = flight.Duration,
                 CheckedPrice = flight.CheckedPrice,
                 CarryOnPrice = flight.CarryOnPrice,
                 Multiplier = flight.Multiplier,
 
-                DepartureAirport = new AirportInfoDto
+                DepartureAirport = new AirportDTO
                 {
                     Code = flight.DepartureAirportCode,
                     Name = flight.DepartureAirportName,
                     City = flight.DepartureCity
                 },
 
-                ArrivalAirport = new AirportInfoDto
+                ArrivalAirport = new AirportDTO
                 {
                     Code = flight.ArrivalAirportCode,
                     Name = flight.ArrivalAirportName,
@@ -215,7 +215,7 @@ public class PurchaseService : IPurchaseService
             }
         },
 
-            Passengers = dto.passengers.Select(p => new AirDreams.API.Models.Dtos.PassengerDto
+            Passengers = dto.passengers.Select(p => new PassengerDTO
             {
                 NamePassenger = p.firstName,
 
@@ -224,7 +224,7 @@ public class PurchaseService : IPurchaseService
 
                 EmailPassenger = dto.buyer.email,
 
-                Telephone = dto.buyer.phoneNumber,
+                Telephone = Convert.ToInt64(dto.buyer.phoneNumber),
 
                 Country = p.passportCountry,
 
@@ -239,13 +239,13 @@ public class PurchaseService : IPurchaseService
 
                     LuggageItems = new()
                     {
-                        new LuggageItemDto
+                        new LuggageItemDTO
                         {
                             Type = "carryOn",
                             Quantity = p.carryOn ? 1 : 0
                         },
 
-                        new LuggageItemDto
+                        new LuggageItemDTO
                         {
                             Type = "checked",
                             Quantity = p.Checked
@@ -255,7 +255,7 @@ public class PurchaseService : IPurchaseService
         };
     }
 
-    private async Task<ExternalPaymentResponseDto> MapToExternalPaymentResponse(ConfirmPurchaseDto purchase, ExternalOrderRequestDto request)
+    private async Task<ExternalPaymentResponseDto> MapToExternalPaymentResponse(ConfirmPurchaseDTO purchase, ExternalOrderRequestDto request)
     {
         var flight = purchase.Segments.First();
         var luggageTotal = purchase.Luggage?.SelectMany(l => l.LuggageItems).Sum(i => i.Subtotal) ?? 0;
@@ -274,7 +274,7 @@ public class PurchaseService : IPurchaseService
                     $"{flight.DepartureDate:yyyy-MM-dd}T{flight.DepartureTime}",
                 arrivalTime =
                     $"{flight.ArrivalDate:yyyy-MM-dd}T{flight.ArrivalTime}",
-                duration = flight.Duration,
+                duration = Convert.ToString(flight.Duration),
 
                 departureAirport = new ExternalAirportDto
                 {
