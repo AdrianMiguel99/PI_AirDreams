@@ -69,44 +69,44 @@ BEGIN
             e.arrivalAirportCode AS destination,
             e.flightNumber,
             e.partnerName AS airline,
-            NULL AS firstClassPassengers,
-            NULL AS touristPassengers,
-            NULL AS passengerRevenue,
-            NULL AS luggageRevenue,
-            NULL AS totalRevenue
+            ISNULL(pax.firstClassCount, 0) AS firstClassPassengers,
+            ISNULL(pax.touristCount, 0) AS touristPassengers,
+            ISNULL(pax.passengerRevenue, 0) AS passengerRevenue,
+            ISNULL(lug.luggageRevenue, 0) AS luggageRevenue,
+            ISNULL(pax.passengerRevenue, 0) + ISNULL(lug.luggageRevenue, 0) AS totalRevenue
         FROM ExternalFlight e
+        LEFT JOIN (
+            SELECT
+                te.externalFlightNumber,
+                SUM(CASE WHEN i.seatClass = 'FirstClass' THEN 1 ELSE 0 END) AS firstClassCount,
+                SUM(CASE WHEN i.seatClass = 'Turista' THEN 1 ELSE 0 END) AS touristCount,
+                SUM(i.amount) AS passengerRevenue  
+            FROM TieneExternal te
+            JOIN Itinerary i ON i.transactionId = te.transactionId
+            WHERE i.seatClass IS NOT NULL
+            GROUP BY te.externalFlightNumber
+        ) pax ON pax.externalFlightNumber = e.flightNumber
+        LEFT JOIN (
+            SELECT
+                te.externalFlightNumber,
+                SUM(
+                    CASE WHEN l.type = 'checked'
+                        THEN dbo.fn_TotalLuggageCost(e2.checkedPrice, e2.porcentageMultiplier, l.quantity)
+                        ELSE dbo.fn_TotalLuggageCost(e2.carryOnPrice, e2.porcentageMultiplier, l.quantity)
+                    END
+                ) AS luggageRevenue
+            FROM TieneExternal te
+            JOIN Registra rg ON te.transactionId = rg.transactionIdItinerary
+            JOIN Luggage l ON rg.luggageNumber = l.luggageNumber
+            JOIN ExternalFlight e2 ON te.externalFlightNumber = e2.flightNumber
+            GROUP BY te.externalFlightNumber
+        ) lug ON lug.externalFlightNumber = e.flightNumber
         WHERE (@Origin IS NULL OR e.departureAirportCode = @Origin)
           AND (@Destination IS NULL OR e.arrivalAirportCode = @Destination)
           AND (@FromDate IS NULL OR e.departureDateTime >= @FromDate)
           AND (@ToDate IS NULL OR e.departureDateTime < DATEADD(DAY, 1, @ToDate))
     ) AS ReportData
     ORDER BY flightDate, origin, destination;
-END
-GO
-
-CREATE OR ALTER PROCEDURE dbo.sp_GetFlightsReportFilters
-AS
-BEGIN
-    SET NOCOUNT ON;
-
-    SELECT DISTINCT codeAirportSalida AS Code FROM Route
-    UNION
-    SELECT DISTINCT departureAirportCode FROM ExternalFlight
-    ORDER BY Code;
-
-    SELECT DISTINCT codeAirportLlegada AS Code FROM Route
-    UNION
-    SELECT DISTINCT arrivalAirportCode FROM ExternalFlight
-    ORDER BY Code;
-
-    SELECT
-        MIN(flightDate) AS minDate,
-        MAX(flightDate) AS maxDate
-    FROM (
-        SELECT departureDate AS flightDate FROM Flight
-        UNION ALL
-        SELECT departureDateTime FROM ExternalFlight
-    ) AS AllDates;
 END
 GO
 
