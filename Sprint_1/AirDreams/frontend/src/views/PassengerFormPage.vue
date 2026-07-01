@@ -143,6 +143,7 @@
 import axios from 'axios'; 
 import StepperLayout from '../components/StepperLayout.vue';
 import PopupMessage from '../components/PopupMessage.vue';
+const API_BASE = import.meta.env.VITE_API_URL;
 
 export default {
   name: 'PassengerFormPage',
@@ -182,7 +183,7 @@ export default {
   methods: {
     async loadCountries() {
       try {
-        const response = await axios.get('http://localhost:5276/api/locations/countries');
+        const response = await axios.get(`${API_BASE}/api/locations/countries`);
         this.countries = response.data;
       } catch (error) {
         console.error('Error al cargar paises:', error);
@@ -291,7 +292,7 @@ export default {
       }));
 
       try {
-        const res = await axios.post('http://localhost:5276/api/passengers/validate-duplicate', {
+        const res = await axios.post(`${API_BASE}/api/passengers/validate-duplicate`, {
           passengers: passengersToCheck,
           flightNumbers: flightNumbers
         });

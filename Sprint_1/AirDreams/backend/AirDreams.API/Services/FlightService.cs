@@ -205,6 +205,7 @@ namespace AirDreams.API.Services
                         ArrivalTime = flight.FirstArrivalTime,
                         CarryOnPrice = flight.FirstCarryOnPrice,
                         CheckedPrice = flight.FirstCheckedPrice,
+                        Multiplier = flight.PorcentageMultiplier ?? 0.5m,
                         Duration = flight.FirstDuration,
                         DepartureAirport = new AirportDTO
                         {
@@ -229,6 +230,7 @@ namespace AirDreams.API.Services
                         ArrivalTime = flight.SecondArrivalTime,
                         CarryOnPrice = flight.SecondCarryOnPrice,
                         CheckedPrice = flight.SecondCheckedPrice,
+                        Multiplier = flight.PorcentageMultiplier ?? 0.5m,
                         Duration = flight.SecondDuration,
                         DepartureAirport = new AirportDTO
                         {
@@ -286,6 +288,7 @@ namespace AirDreams.API.Services
                 ArrivalTime = flight.ArrivalTime,
                 CarryOnPrice = flight.CarryOnPrice,
                 CheckedPrice = flight.CheckedPrice,
+                Multiplier = flight.PorcentageMultiplier ?? 0.5m,
                 TouristPrice = flight.TouristPrice,
                 FirstClassPrice = flight.FirstClassPrice,
                 Duration = flight.Duration,
@@ -318,6 +321,7 @@ namespace AirDreams.API.Services
                 ArrivalTime = arrivalDateTime.ToString("HH:mm:ss"),
                 CarryOnPrice = connected.ExternalFlight.carryOnPrice,
                 CheckedPrice = connected.ExternalFlight.checkedPrice,
+                Multiplier = connected.ExternalFlight.porcentageMultiplier,
                 DepartureAirport = new AirportDTO
                 {
                     Code = connected.ExternalFlight.departureAirport.code,

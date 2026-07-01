@@ -299,6 +299,7 @@ import HeaderLogo from '../components/HeaderLogo.vue'
 import NavigationReports from '../components/NavigationReports.vue'
 import axios from 'axios'
 import ExcelJS from 'exceljs'
+const API_BASE = import.meta.env.VITE_API_URL;
 
 export default {
   name: 'ReportsPage',
@@ -380,7 +381,7 @@ export default {
         if (this.incomeFilters.year) params.year = this.incomeFilters.year
         if (this.incomeFilters.airline) params.airline = this.incomeFilters.airline
 
-        const response = await axios.get('http://localhost:5276/api/reports/income', {
+        const response = await axios.get(`${API_BASE}/api/reports/income`, {
           params
         })
         this.incomeReport = response.data
@@ -393,7 +394,7 @@ export default {
 
     async getIncomeReportFilters() {
       try {
-        const response = await axios.get('http://localhost:5276/api/reports/income/filters')
+        const response = await axios.get(`${API_BASE}/api/reports/income/filters`)
         this.incomeFilterOptions = {
           origins: response.data.origins || [],
           destinations: response.data.destinations || [],
@@ -573,7 +574,7 @@ export default {
         const params = { ...this.flightsFilters }
         if (!params.fromDate) delete params.fromDate
         if (!params.toDate) delete params.toDate
-        const response = await axios.get('http://localhost:5276/api/reports/flights', { params })
+        const response = await axios.get(`${API_BASE}/api/reports/flights`, { params })
         this.flightsReport = response.data
       } catch (error) {
         this.flightsError = error.response?.data?.error || 'Error al cargar el reporte de vuelos.'
@@ -584,7 +585,7 @@ export default {
 
     async getFlightsReportFilters() {
       try {
-        const res = await axios.get('http://localhost:5276/api/reports/flights/filters')
+        const res = await axios.get(`${API_BASE}/api/reports/flights/filters`)
         this.flightsFilterOptions.origins = res.data.origins || []
         this.flightsFilterOptions.destinations = res.data.destinations || []
         if (res.data.minDate) this.flightsFilterOptions.minDate = res.data.minDate

@@ -38,6 +38,7 @@ import axios from 'axios';
 import AirplaneForm from '../components/Airplane/AirplaneForm.vue';
 import PopupMessage from '../components/PopupMessage.vue';
 import ButtomNavigationAirplanes from '../components/Airplane/ButtomNavigationAirplanes.vue';
+const API_BASE = import.meta.env.VITE_API_URL;
 
 export default {
 
@@ -66,7 +67,7 @@ export default {
         this.$route.params.modelo;
 
       axios
-        .get(`http://localhost:5276/api/Airplane/${modelo}`).then(response => {
+        .get(`${API_BASE}/api/Airplane/${modelo}`).then(response => {
 
           this.airplane = response.data;
           delete this.airplane.cantPasajeros;
@@ -82,7 +83,7 @@ export default {
 
       axios
         .put(
-          `http://localhost:5276/api/Airplane/${updatedAirplane.modelo}`,updatedAirplane).then(() => {
+          `${API_BASE}/api/Airplane/${updatedAirplane.modelo}`,updatedAirplane).then(() => {
           this.showPopup = true;
           this.popupType = 'success';
           this.popupTitle = 'Éxito';

@@ -21,9 +21,9 @@
     
 
     <div class="links">
-      <a href="/">Buscar Vuelos</a>
-      <a href="/">Consultar Vuelos</a>
-      <a href="/">Contacto</a>
+      <router-link to="/">Buscar Vuelos</router-link>
+      <router-link to="consultar-reserva">Consultar Vuelos</router-link>
+      <router-link to="/">Contacto</router-link>
 
       <router-link v-if="!usuario" to="/login">
         <button class="login-btn">Iniciar Sesión</button>

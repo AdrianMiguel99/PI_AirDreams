@@ -1,7 +1,11 @@
 <template>
   <main class="cancel-page">
     <section class="cancel-card">
-      <div class="plane-icon">✈</div>
+      <img
+        class="logo-img"
+        :src="logo"
+        alt="AirDreams logo"
+      >
 
       <h1>Cancelar reserva</h1>
 
@@ -16,10 +20,10 @@
       <button
         v-if="!confirmed && !errorMessage"
         class="primary-button"
-        @click="confirmCancellation"
         :disabled="loading"
+        @click="confirmCancellation"
       >
-        {{ loading ? 'Cancelando...' : 'Confirmar cancelación' }}
+        {{ loading ? "Cancelando..." : "Confirmar cancelación" }}
       </button>
 
       <p v-if="successMessage" class="success">
@@ -38,55 +42,69 @@
 </template>
 
 <script>
+import logo from "../assets/logo.png";
+const API_BASE = import.meta.env.VITE_API_URL;
 export default {
-  name: 'CancelReservation',
+  name: "CancelReservation",
 
   data() {
     return {
+      logo,
       loading: false,
       confirmed: false,
-      successMessage: '',
-      errorMessage: ''
+      successMessage: "",
+      errorMessage: ""
     };
   },
 
   methods: {
     async confirmCancellation() {
       this.loading = true;
-      this.errorMessage = '';
+      this.errorMessage = "";
+      this.successMessage = "";
 
-      const token = String(this.$route.query.token || '').trim();
+      const token = String(this.$route.query.token || "").trim();
 
       if (!token) {
-        this.errorMessage = 'Token de cancelación inválido.';
+        this.errorMessage = "Token de cancelación inválido.";
         this.loading = false;
         return;
       }
 
       try {
         const response = await fetch(
-          'http://localhost:5276/api/cancellations/confirm',
+          `${API_BASE}/api/cancellations/confirm`,
           {
-            method: 'POST',
+            method: "POST",
             headers: {
-              'Content-Type': 'application/json'
+              "Content-Type": "application/json"
             },
             body: JSON.stringify({ token })
           }
         );
 
-        const data = await response.json();
+        const responseText = await response.text();
+
+        let data = null;
+
+        if (responseText) {
+          try {
+            data = JSON.parse(responseText);
+          } catch {
+            data = { message: responseText };
+          }
+        }
 
         if (!response.ok) {
-          throw new Error(data.message || 'No se pudo cancelar la reserva.');
+          throw new Error(data?.message || "No se pudo cancelar la reserva.");
         }
 
         this.confirmed = true;
         this.successMessage =
-          data.message || 'Reserva cancelada correctamente.';
+          data?.message || "Reserva cancelada correctamente.";
       } catch (error) {
         this.errorMessage =
-          error.message || 'Error al cancelar la reserva.';
+          error.message || "Error al cancelar la reserva.";
       } finally {
         this.loading = false;
       }
@@ -117,22 +135,15 @@ export default {
   box-shadow: 0 12px 32px rgba(15, 23, 42, 0.08);
 }
 
-.plane-icon {
-  width: 42px;
-  height: 42px;
-  margin: 0 auto 18px;
-  border: 2px solid #2f3e5c;
-  border-radius: 50%;
-  color: #2f3e5c;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 20px;
-  font-weight: bold;
+.logo-img {
+  width: 130px;
+  height: auto;
+  display: block;
+  margin: 0 auto 24px;
 }
 
 h1 {
-  color: #1f2933;
+  color: #384467;
   font-size: 34px;
   font-weight: 700;
   margin-bottom: 20px;
@@ -165,7 +176,7 @@ h1 {
 }
 
 .primary-button:hover {
-  background: #2f3e5c;
+  background: #384467;
 }
 
 .primary-button:disabled {

@@ -65,7 +65,12 @@ builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowVueApp", policy =>
     {
-        policy.WithOrigins("http://localhost:5173")
+        policy.WithOrigins(
+            "http://localhost:5173",
+            "https://pi-air-dreams.vercel.app",
+            "https://airdreams.lat",
+            "https://www.airdreams.lat"
+            )
             .AllowAnyHeader()
             .AllowAnyMethod()
             .AllowCredentials();
@@ -133,6 +138,9 @@ builder.Services.AddHttpClient("AirDreams", client =>
 
 builder.Services.AddScoped<IPartnerFlightService, PartnerFlightService>();
 builder.Services.AddScoped<IFlightConnectorService, FlightConnectorService>();
+
+builder.Services.AddScoped<IReservationRepository, ReservationRepository>();
+builder.Services.AddScoped<IReservationService, ReservationService>();
 
 builder.Services.AddScoped<IExternalFlightRepository, ExternalFlightRepository>();
 builder.Services.AddScoped<IExternalFlightService, ExternalFlightService>();
