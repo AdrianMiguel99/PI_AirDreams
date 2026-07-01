@@ -43,7 +43,7 @@
                 class="delete-button"
                 
                 :disabled="deletingRouteId === route.routeID"
-                @click="deleteRoute(route)"
+                @click="confirmarEliminacion(route)"
               >
               <img 
                 src="https://i.ibb.co/FkMhvPdS/Chat-GPT-Image-5-may-2026-05-11-58-1.png"
@@ -59,12 +59,21 @@
     </div>
 
     <PopupMessage
-      :show="showPopup"
+      :show="showConfirmPopup"
+      type="warning"
+      title="¿Eliminar ruta?"
+      :message="deleteRouteMessage"
+      actionText="Eliminar"
+      @close="showConfirmPopup = false"
+      @action="eliminarRuta"
+    />
+
+    <PopupMessage
+      :show="showResultPopup"
       :type="popupType"
       :title="popupTitle"
       :message="popupMessage"
-      :actionText="popupActionText"
-      @close="showPopup = false"
+      @close="showResultPopup = false"
     />
   </div>
 </template>
@@ -83,17 +92,27 @@ export default {
     },
 data() {
     return {
-    routes: [],
-    loading: false,
-    errorMessage: '',
-    deletingRouteId: null,
-    showPopup: false,
-    popupType: 'success',
-    popupTitle: '',
-    popupMessage: '',
-    popupActionText: ''
+	    routes: [],
+	    loading: false,
+	    errorMessage: '',
+	    deletingRouteId: null,
+	    showConfirmPopup: false,
+	    routeToDelete: null,
+	    showResultPopup: false,
+	    popupType: 'success',
+	    popupTitle: '',
+	    popupMessage: ''
     }
 },
+    computed: {
+        deleteRouteMessage() {
+            if (!this.routeToDelete) {
+                return '¿Estás seguro de que deseas eliminar esta ruta? Esta acción no se puede deshacer.'
+            }
+
+            return `¿Estás seguro de que deseas eliminar la ruta ${this.routeToDelete.codeAirportSalida} a ${this.routeToDelete.codeAirportLlegada}? Esta acción no se puede deshacer.`
+        }
+    },
     methods: {
         irARegistro(){
             this.$router.push({ name: 'flightsRegister' });
@@ -120,8 +139,10 @@ async fetchRoutes() {
         // Normalizar cada ruta a los campos que usa la UI
         this.routes = raw.map(r => {
         const routeID =  r.id || null
-        const codeSalida = r.departureAirport.code + ' - ' + r.departureAirport.name  || ''
-        const codeLlegada = r.arrivalAirport.code + ' - ' + r.arrivalAirport.name || ''
+        const departure = r.departureAirport || {}
+        const arrival = r.arrivalAirport || {}
+        const codeSalida = `${departure.code || ''} - ${departure.name || ''}`
+        const codeLlegada = `${arrival.code || ''} - ${arrival.name || ''}`
         // tomar duración desde stimatedTime (puede venir como "hh:mm:ss" o TimeSpan)
         let flightDuration = ''
         const st = r.stimatedTime || r.StimatedTime || r.duration || r.Duracion || ''
@@ -156,27 +177,35 @@ async fetchRoutes() {
     }
 }
 ,
-async deleteRoute(route) {
-    if (!route?.routeID) {
-        this.showRoutePopup('error', 'Ruta inválida', 'No se pudo identificar la ruta seleccionada.')
-        return
-    }
+    confirmarEliminacion(route) {
+        if (!route?.routeID) {
+            this.showRoutePopup('error', 'Ruta inválida', 'No se pudo identificar la ruta seleccionada.')
+            return
+        }
 
-    const confirmed = window.confirm(`¿Deseas eliminar la ruta ${route.routeID}?`)
-    if (!confirmed) return
+        this.routeToDelete = route
+        this.showConfirmPopup = true
+    },
+	async eliminarRuta() {
+        this.showConfirmPopup = false
 
-    const token = localStorage.getItem("token")
-    if (!token) {
-        this.showRoutePopup('error', 'Sesión requerida', 'Debes iniciar sesión.')
-        return
-    }
+	    if (!this.routeToDelete?.routeID) {
+	        this.showRoutePopup('error', 'Ruta inválida', 'No se pudo identificar la ruta seleccionada.')
+	        return
+	    }
 
-    this.deletingRouteId = route.routeID
-
-    try {
-        const res = await axios.delete(`${API_BASE}/api/routes/${route.routeID}`, {
-            headers: { Authorization: `Bearer ${token}` }
-        })
+	    const token = localStorage.getItem("token")
+	    if (!token) {
+	        this.showRoutePopup('error', 'Sesión requerida', 'Debes iniciar sesión.')
+	        return
+	    }
+	
+	    this.deletingRouteId = this.routeToDelete.routeID
+	
+	    try {
+	        const res = await axios.delete(`${API_BASE}/api/routes/${this.routeToDelete.routeID}`, {
+	            headers: { Authorization: `Bearer ${token}` }
+	        })
 
         const message = res.data?.message || 'La ruta fue eliminada correctamente.'
 
@@ -186,17 +215,17 @@ async deleteRoute(route) {
         console.error('Error al eliminar ruta:', error)
         const message = error.response?.data?.message || 'No se pudo eliminar la ruta.'
         this.showRoutePopup('error', 'Error al eliminar ruta', message)
-    } finally {
-        this.deletingRouteId = null
-    }
-},
-showRoutePopup(type, title, message) {
-    this.popupType = type
-    this.popupTitle = title
-    this.popupMessage = message
-    this.popupActionText = ''
-    this.showPopup = true
-}
+	    } finally {
+	        this.deletingRouteId = null
+            this.routeToDelete = null
+	    }
+	},
+	showRoutePopup(type, title, message) {
+	    this.popupType = type
+	    this.popupTitle = title
+	    this.popupMessage = message
+	    this.showResultPopup = true
+	}
     },
     created() {
     this.fetchRoutes()
