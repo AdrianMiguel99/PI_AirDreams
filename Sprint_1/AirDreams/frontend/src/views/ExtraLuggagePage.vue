@@ -1,4 +1,5 @@
 <template>
+  <HeaderLogoNoAdmin />
   <main class="add-luggage-page">
     <h2 class="section-title">Agregar maletas</h2>
 
@@ -59,15 +60,17 @@
 <script>
 import axios from 'axios';
 import ExtraLuggagePassenger from '../components/reservations/ExtraLuggagePassenger.vue';
+import HeaderLogoNoAdmin from '../components/HeaderLogoNoAdmin.vue';
 import PopupMessage from '../components/PopupMessage.vue';
 
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5276/api';
+const API_URL = import.meta.env.VITE_API_URL;
 
 export default {
   name: 'ExtraLuggagePage',
 
   components: {
     ExtraLuggagePassenger,
+    HeaderLogoNoAdmin,
     PopupMessage
   },
 
@@ -146,7 +149,7 @@ export default {
 
       try {
         const reservationResponse = await axios.get(
-          `${API_URL}/Reservation/${encodeURIComponent(this.reservationCode)}`
+          `${API_URL}/api/Reservation/${encodeURIComponent(this.reservationCode)}`
         );
 
         const reservation = reservationResponse.data || {};
@@ -180,19 +183,28 @@ export default {
         }));
 
         const luggageResponse = await axios.get(
-          `${API_URL}/Luggage/reservation/${encodeURIComponent(this.reservationCode)}`
+          `${API_URL}/api/Luggage/reservation/${encodeURIComponent(this.reservationCode)}`
         );
 
         const luggageData = luggageResponse.data || {};
         const reservationLuggage = luggageData.luggage || [];
 
-        this.pageState.flights = (luggageData.segments || []).map((segment) => ({
-          id: String(segment.flightNumber || '').trim(),
-          routeId: segment.routeId,
-          checkedPrice: Number(segment.checkedPrice || 0),
-          carryOnPrice: Number(segment.carryOnPrice || 0),
-          multiplier: Number(segment.multiplier || 0.5)
-        }));
+        this.pageState.flights = (luggageData.segments || []).map((segment) => {
+          const partnerName = String(segment.partnerName || segment.airlineName || '').trim();
+
+          return {
+            id: String(segment.flightNumber || '').trim(),
+            routeId: segment.routeId,
+            checkedPrice: Number(segment.checkedPrice || 0),
+            carryOnPrice: Number(segment.carryOnPrice || 0),
+            multiplier: Number(segment.multiplier || 0.5),
+            partnerName,
+            isAirDreams:
+              segment.isAirDreams === true ||
+              !partnerName ||
+              partnerName.toLowerCase() === 'airdreams'
+          };
+        });
 
         for (const item of reservationLuggage) {
           const passenger = this.pageState.passengers.find((currentPassenger) => {
@@ -234,7 +246,7 @@ export default {
     async calculateLuggageTotal(checkedQuantity, carryOnQuantity) {
       if (this.pageState.flights.length === 0) return 0;
 
-      const response = await axios.post(`${API_URL}/luggage/calculate/total`, {
+      const response = await axios.post(`${API_URL}/api/luggage/calculate/total`, {
         checkedQuantity,
         carryOnQuantity,
         segments: this.pageState.flights.map((flight) => ({
@@ -323,6 +335,16 @@ export default {
         .filter((item) => item.luggageItems.length > 0);
     },
 
+    isAirDreamsFlight(flight) {
+      if (!flight) return false;
+
+      if (flight.isAirDreams === true) return true;
+
+      const partnerName = String(flight.partnerName || '').trim().toLowerCase();
+
+      return !partnerName || partnerName === 'airdreams';
+    },
+
     async continueToPay() {
       this.loading = true;
 
@@ -335,9 +357,11 @@ export default {
           return;
         }
 
-        for (const flight of this.pageState.flights) {
-          if (!flight.id || !flight.routeId) continue;
+        const airDreamsFlights = this.pageState.flights.filter((flight) => {
+          return this.isAirDreamsFlight(flight) && flight.id && flight.routeId;
+        });
 
+        for (const flight of airDreamsFlights) {
           const validation = await this.validateWeights(
             flight.id,
             flight.routeId,
@@ -362,7 +386,7 @@ export default {
         }
 
         for (const passengerLuggage of luggageByPassenger) {
-          const response = await fetch(`${API_URL}/Luggage/register`, {
+          const response = await fetch(`${API_URL}/api/Luggage/register`, {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json'
@@ -374,14 +398,14 @@ export default {
             })
           });
 
-          const data = await response.json();
+          const data = await this.readResponseData(response);
 
           if (!response.ok) {
             throw new Error(data.message || 'No se pudo registrar el equipaje.');
           }
         }
 
-        const updateResponse = await fetch(`${API_URL}/Luggage/update`, {
+        const updateResponse = await fetch(`${API_URL}/api/Luggage/update`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json'
@@ -393,7 +417,7 @@ export default {
           })
         });
 
-        const updateData = await updateResponse.json();
+        const updateData = await this.readResponseData(updateResponse);
 
         if (!updateResponse.ok) {
           throw new Error(updateData.message || 'No se pudo actualizar el peso del vuelo.');
@@ -413,9 +437,16 @@ export default {
       }
     },
 
-    async validateWeights(flightId, routeId, checkedWeight, carryOnWeight) {
+    async validateWeights(flightId, routeId, luggageWeight, carryOnWeight) {
       try {
-        const response = await fetch(`${API_URL}/luggage/availability`, {
+        if (!flightId || !routeId) {
+          return {
+            success: true,
+            message: 'Vuelo omitido en validación de peso.'
+          };
+        }
+
+        const response = await fetch(`${API_URL}/api/luggage/availability`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json'
@@ -423,36 +454,55 @@ export default {
           body: JSON.stringify({
             flightId,
             routeId,
-            luggageWeight: checkedWeight || 0,
-            carryOnWeight: carryOnWeight || 0
+            luggageWeight,
+            carryOnWeight
           })
         });
 
-        const data = await response.json();
+        const data = await this.readResponseData(response);
 
         if (!response.ok) {
           return {
             success: false,
-            message: data.message || 'Error en la validación'
+            message:
+              data.message ||
+              data.error ||
+              'No se pudo validar la disponibilidad de equipaje.'
           };
         }
 
         return {
-          success: data.success,
-          message: data.message || 'Validación exitosa'
+          success: data.success ?? true,
+          message: data.message || 'Validación exitosa.'
         };
       } catch (error) {
         return {
           success: false,
-          message: 'Error de conexión: ' + error.message
+          message: error.message || String(error)
+        };
+      }
+    },
+
+    async readResponseData(response) {
+      const rawText = await response.text();
+
+      if (!rawText || !rawText.trim()) {
+        return {};
+      }
+
+      try {
+        return JSON.parse(rawText);
+      } catch {
+        return {
+          message: rawText
         };
       }
     },
 
     formatCurrency(value) {
-      return new Intl.NumberFormat('es-CR', {
+      return new Intl.NumberFormat('en-US', {
         style: 'currency',
-        currency: 'CRC',
+        currency: 'USD',
         maximumFractionDigits: 0
       }).format(Number(value || 0));
     },
