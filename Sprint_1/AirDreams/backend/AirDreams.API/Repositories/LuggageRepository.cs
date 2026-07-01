@@ -107,25 +107,15 @@ namespace AirDreams.API.Repositories
         {
             try
             {
-                string query = @"
-                    UPDATE f
-                    SET
-                        occupiedLuggage = occupiedLuggage + @luggageWeight,
-                        occupiedCarryOn = occupiedCarryOn + @carryOnWeight
-                    FROM Flight f
-                    INNER JOIN Tiene t
-                        ON t.flightNumber = f.numberFlight
-                    WHERE t.transactionId = @transactionId";
+                var result = await _connection.ExecuteScalarAsync<int>(
+                    "UpdateItineraryFlightWeight",
+                    new { transactionId, luggageWeight, carryOnWeight },
+                    commandType: CommandType.StoredProcedure
+                );
 
-                var rows = await _connection.ExecuteAsync(query, new {
-                        transactionId,
-                        luggageWeight,
-                        carryOnWeight
-                    });
-
-                return rows > 0;
+                return result == 1;
             }
-            catch
+            catch (Exception)
             {
                 return false;
             }

@@ -35,5 +35,6 @@ namespace AirDreams.API.Repositories
         );
 
         Task<dynamic> GetFlightByGuidAsync(string flightGuid);
+        Task<int> GetRouteIdByFlightGuidAsync(string flightGuid);
     }
 }

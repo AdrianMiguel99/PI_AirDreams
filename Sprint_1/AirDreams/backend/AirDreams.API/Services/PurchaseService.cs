@@ -13,6 +13,8 @@ public class PurchaseService : IPurchaseService
     private readonly IPartnerFlightService _partnerFlightService;
     private readonly IExternalFlightService _externalFlightService;
     private readonly IFlightService _flightService;
+    private readonly ILuggageService _luggageService;
+    private readonly IPassengerValidationService _passengerValidationService;
 
     public PurchaseService(
         IPurchaseRepository repository,
@@ -20,7 +22,8 @@ public class PurchaseService : IPurchaseService
         IPdfService pdfService,
         IPartnerFlightService partnerFlightService,
         IExternalFlightService externalFlightService,
-        IFlightService flightService)
+        IFlightService flightService,
+        ILuggageService luggageService)
         {
             _repository = repository;
             _emailService = emailService;
@@ -28,6 +31,7 @@ public class PurchaseService : IPurchaseService
             _partnerFlightService = partnerFlightService;
             _externalFlightService = externalFlightService;
             _flightService = flightService;
+            _luggageService = luggageService;
         }
     public async Task<bool> CheckFlightAvailabilityAsync( string numberFlight, string seatClass, int requestedSeats)
     {
@@ -131,6 +135,26 @@ public class PurchaseService : IPurchaseService
     public async Task<ExternalPaymentResponseDto> ConfirmExternalPurchaseAsync(ExternalOrderRequestDto dto)
     {        
         var purchase = await MapToConfirmPurchaseDto(dto);
+        var seatClass = purchase.SeatClass == "Turista" ? "Turist" : purchase.SeatClass;
+
+        bool available = await CheckFlightAvailabilityAsync(purchase.Segments.First().FlightNumber, seatClass, purchase.PassengerCount);
+
+        if (!available)
+        {
+            throw new InvalidOperationException("Not enough seats");
+        }
+
+        decimal luggageWeight = dto.passengers.Sum(p => p.Checked * 23m);
+        decimal carryOnWeight = dto.passengers.Sum(p => p.carryOn ? 10m : 0m);
+        int routeId = await _flightService.GetRouteIdByFlightGuidAsync(dto.flightGUID);
+
+        var luggageResult = await _luggageService.CheckAvailabilityAsync(dto.flightGUID, routeId, luggageWeight, carryOnWeight);
+
+        if (!luggageResult.success)
+        {
+            throw new InvalidOperationException("Luggage overweight");
+        }
+
         await ConfirmPurchaseAsync(purchase);
         return await MapToExternalPaymentResponse(purchase, dto);
     }
@@ -147,7 +171,7 @@ public class PurchaseService : IPurchaseService
         var flight = await _flightService.GetFlightByGuidAsync(dto.flightGUID);
 
         if (flight == null)
-            throw new Exception("Flight not found.");
+            throw new InvalidOperationException("Flight not found.");
 
         return new ConfirmPurchaseDto
         {

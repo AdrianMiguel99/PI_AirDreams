@@ -351,5 +351,10 @@ namespace AirDreams.API.Services
             var flight = await _flightRepository.GetFlightByGuidAsync(flightGuid);
             return flight;
         }
+
+        public async Task<int> GetRouteIdByFlightGuidAsync(string flightGuid)
+        {
+            return await _flightRepository.GetRouteIdByFlightGuidAsync(flightGuid);
+        }
     }
 }

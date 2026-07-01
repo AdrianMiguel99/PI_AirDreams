@@ -575,5 +575,15 @@ namespace AirDreams.API.Repositories
 
             return await _connection.QueryFirstOrDefaultAsync(sql, new { flightGuid });
         }
+
+        public async Task<int> GetRouteIdByFlightGuidAsync(string flightGuid)
+        {
+            const string sql = @"
+                SELECT routeId
+                FROM Flight
+                WHERE numberFlight = @flightGuid";
+
+            return await _connection.ExecuteScalarAsync<int>(sql, new { flightGuid });
+        }
     }
 }
