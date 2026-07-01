@@ -80,31 +80,35 @@ export default {
     },
 
     updateAirplane(updatedAirplane) {
+  const modeloOriginal = this.$route.params.modelo;
 
-      axios
-        .put(
-          `${API_BASE}/api/Airplane/${updatedAirplane.modelo}`,updatedAirplane).then(() => {
-          this.showPopup = true;
-          this.popupType = 'success';
-          this.popupTitle = 'Éxito';
-          this.popupMessage = 'Aeronave actualizada correctamente';
-          this.popupActionText = 'Volver a la lista';
-          this.getAirplane();
+  axios
+    .put(
+      `${API_BASE}/api/Airplane/${encodeURIComponent(modeloOriginal)}`,
+      updatedAirplane
+    )
+    .then(() => {
+      this.showPopup = true;
+      this.popupType = 'success';
+      this.popupTitle = 'Éxito';
+      this.popupMessage = 'Aeronave actualizada correctamente';
+      this.popupActionText = 'Volver a la lista';
 
-        })
+      this.getAirplane();
+    })
+    .catch(error => {
+      console.error(error.response?.data || error.message);
 
-        .catch(error => {
-
-          console.error(
-            error.response?.data
-          );
-          this.showPopup = true;
-          this.popupType = 'error';
-          this.popupTitle = 'Error';
-          this.popupMessage = 'Error al actualizar la aeronave';
-          this.popupActionText = '';
-        });
-    },
+      this.showPopup = true;
+      this.popupType = 'error';
+      this.popupTitle = 'Error';
+      this.popupMessage =
+        error.response?.data?.message ||
+        error.response?.data ||
+        'Error al actualizar la aeronave';
+      this.popupActionText = '';
+    });
+},
 
     goBack() {
       this.$router.push('/managementPlanes');
