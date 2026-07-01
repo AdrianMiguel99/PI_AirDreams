@@ -1,4 +1,4 @@
-﻿using AirDreams.API.Models.Dtos;
+﻿using AirDreams.API.DTOs;
 using AirDreams.API.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -18,14 +18,14 @@ namespace AirDreams.API.Controllers
         }
 
         [HttpGet]   
-        public async Task<ActionResult<List<AirportDto>>> GetAll()
+        public async Task<ActionResult<List<AirportDTO>>> GetAll()
         {
             var airports = await _airportService.GetAllAsync();
             return Ok(airports);
         }
 
         [HttpGet("{code}")]   
-        public async Task<ActionResult<AirportDto>> GetByCode(string code)
+        public async Task<ActionResult<AirportDTO>> GetByCode(string code)
         {
             var airport = await _airportService.GetByCodeAsync(code.ToUpperInvariant());
             if (airport is null)
@@ -35,7 +35,7 @@ namespace AirDreams.API.Controllers
 
         [HttpPost]
         [Authorize(Roles = "Admin")]   
-        public async Task<IActionResult> Create([FromBody] CreateAirportDto dto)
+        public async Task<IActionResult> Create([FromBody] CreateAirportDTO dto)
         {
             if (!ModelState.IsValid) return BadRequest(ModelState);
 
@@ -57,7 +57,7 @@ namespace AirDreams.API.Controllers
 
         [HttpPut("{code}")]
         [Authorize(Roles = "Admin")]
-        public async Task<IActionResult> Update(string code, [FromBody] UpdateAirportDto dto)
+        public async Task<IActionResult> Update(string code, [FromBody] UpdateAirportDTO dto)
         {
             if (!ModelState.IsValid) return BadRequest(ModelState);
             try

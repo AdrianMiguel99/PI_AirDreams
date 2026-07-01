@@ -27,10 +27,10 @@ namespace AirDreams.API.Repositories
                     JOIN Tiene t ON i.transactionId = t.transactionId
                     JOIN Flight f ON t.flightNumber = f.numberFlight
                     WHERE p.namePassenger = @Name
-                      AND p.lastnamesPassenger = @Lastnames
-                      AND p.country = @Country
-                      AND p.birthDate = @BirthDate  
-                      AND f.numberFlight IN @FlightNumbers";
+                        AND p.lastnamesPassenger = @Lastnames
+                        AND p.country = @Country
+                        AND p.birthDate = @BirthDate  
+                        AND f.numberFlight IN @FlightNumbers";
 
                 var count = await _connection.ExecuteScalarAsync<int>(sql, new
                 {

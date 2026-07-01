@@ -1,15 +1,18 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using System.Diagnostics.CodeAnalysis;
 
-namespace AirDreams.API.Models.Dtos
+namespace AirDreams.API.DTOs
+
 {
-    public class LuggageTotalRequest
+    public class LuggageTotalRequestDTO
     {
         [Required] public int CheckedQuantity { get; set; }
         [Required] public int CarryOnQuantity { get; set; }
-        [Required] public List<SegmentPricing> Segments { get; set; }
+        [Required]
+        public List<SegmentPricingDTO> Segments { get; set; } 
     }
 
-    public class SegmentPricing
+    public class SegmentPricingDTO
     {
         public decimal CheckedPrice { get; set; }
         public decimal CarryOnPrice { get; set; }

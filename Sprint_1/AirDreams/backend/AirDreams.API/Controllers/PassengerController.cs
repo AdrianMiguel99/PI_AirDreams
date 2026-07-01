@@ -16,7 +16,7 @@ namespace AirDreams.API.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Create([FromBody] CreatePassengerDto dto)
+        public async Task<IActionResult> Create([FromBody] CreatePassengerDTO dto)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);

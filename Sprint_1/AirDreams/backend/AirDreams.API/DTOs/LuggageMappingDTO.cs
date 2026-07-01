@@ -1,6 +1,6 @@
 namespace AirDreams.API.DTOs
 {
-    public class LuggageMappingDto
+    public class LuggageMappingDTO
     {
         public int PassengerIndex { get; set; }
         public string LuggageNumber {get; set; } = string.Empty;

@@ -1,9 +1,9 @@
-﻿using AirDreams.API.Models.Dtos;
+﻿using AirDreams.API.DTOs;
 
 namespace AirDreams.API.Services
 {
     public interface IPaymentService
     {
-        Task<PaymentResponseDto> ProcessPaymentAsync(PaymentRequestDto dto);
+        Task<PaymentResponseDTO> ProcessPaymentAsync(PaymentRequestDTO dto);
     }
 }

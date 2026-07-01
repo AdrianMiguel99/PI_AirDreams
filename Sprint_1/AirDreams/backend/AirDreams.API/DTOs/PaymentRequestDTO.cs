@@ -1,8 +1,9 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace AirDreams.API.Models.Dtos
+namespace AirDreams.API.DTOs
+
 {
-    public class PaymentRequestDto
+    public class PaymentRequestDTO
     {
         [Required]
         public string TransactionId { get; set; }

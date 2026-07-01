@@ -1,4 +1,4 @@
-using AirDreams.API.Models.Dtos;
+using AirDreams.API.DTOs;
 using QuestPDF.Fluent;
 using QuestPDF.Helpers;
 using QuestPDF.Infrastructure;
@@ -8,7 +8,7 @@ public class PdfService : IPdfService
     private const string Primary = "#032056";
     private const string LightBackground = "#F4F7FB";
 
-    public byte[] GenerateInvoice(ConfirmPurchaseDto dto)
+    public byte[] GenerateInvoice(ConfirmPurchaseDTO dto)
     {
         var flightTotal = dto.PricePerPassenger * dto.PassengerCount;
         var luggageTotal = CalculateLuggageTotal(dto);
@@ -54,7 +54,7 @@ public class PdfService : IPdfService
         }).GeneratePdf();
     }
 
-    public byte[] GenerateItinerary(ConfirmPurchaseDto dto)
+    public byte[] GenerateItinerary(ConfirmPurchaseDTO dto)
     {
         return Document.Create(document =>
         {
@@ -137,7 +137,7 @@ public class PdfService : IPdfService
             });
     }
 
-    private void BuildInfoCard(IContainer container, ConfirmPurchaseDto dto)
+    private void BuildInfoCard(IContainer container, ConfirmPurchaseDTO dto)
     {
         container
             .Background(LightBackground)
@@ -161,7 +161,7 @@ public class PdfService : IPdfService
             });
     }
 
-    private void BuildTripSummary(IContainer container, ConfirmPurchaseDto dto)
+    private void BuildTripSummary(IContainer container, ConfirmPurchaseDTO dto)
     {
         var firstSegment = dto.Segments.FirstOrDefault();
         var lastSegment = dto.Segments.LastOrDefault();
@@ -189,7 +189,7 @@ public class PdfService : IPdfService
             });
     }
 
-    private void BuildFlightCard(IContainer container, FlightSegmentDto segment)
+    private void BuildFlightCard(IContainer container, FlightSegmentDTO segment)
     {
         var originCode = Safe(segment.DepartureAirport?.Code, "Origen");
         var destinationCode = Safe(segment.ArrivalAirport?.Code, "Destino");
@@ -212,9 +212,10 @@ public class PdfService : IPdfService
                         .Bold()
                         .FontColor(Primary);
 
-                    row.ConstantItem(120).AlignRight().Text(Safe(segment.Duration, "Duración N/D"))
-                        .FontSize(10)
-                        .FontColor(Colors.Grey.Darken2);
+                    row.ConstantItem(120).AlignRight()
+                    .Text(segment.Duration.ToString(@"hh\:mm"))
+                    .FontSize(10)
+                    .FontColor(Colors.Grey.Darken2);
                 });
 
                 column.Item().Row(row =>
@@ -246,7 +247,7 @@ public class PdfService : IPdfService
             });
     }
 
-    private void BuildPassengersTable(IContainer container, ConfirmPurchaseDto dto)
+    private void BuildPassengersTable(IContainer container, ConfirmPurchaseDTO dto)
     {
         container.Table(table =>
         {
@@ -273,7 +274,7 @@ public class PdfService : IPdfService
         });
     }
 
-    private void BuildLuggageTable(IContainer container, ConfirmPurchaseDto dto)
+    private void BuildLuggageTable(IContainer container, ConfirmPurchaseDTO dto)
     {
         container.Table(table =>
         {
@@ -365,7 +366,7 @@ public class PdfService : IPdfService
             .Text(text);
     }
 
-    private decimal CalculateLuggageTotal(ConfirmPurchaseDto dto)
+    private decimal CalculateLuggageTotal(ConfirmPurchaseDTO dto)
     {
         if (dto.Luggage == null)
             return 0;
@@ -375,7 +376,7 @@ public class PdfService : IPdfService
             .Sum(item => item.Subtotal);
     }
 
-    private decimal GetLuggageSubtotal(ConfirmPurchaseDto dto, LuggageItemDto item)
+    private decimal GetLuggageSubtotal(ConfirmPurchaseDTO dto, LuggageItemDTO item)
     {
         if (item.Subtotal > 0)
             return item.Subtotal;

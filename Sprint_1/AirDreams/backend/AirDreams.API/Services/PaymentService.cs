@@ -1,4 +1,4 @@
-﻿using AirDreams.API.Models.Dtos;
+﻿using AirDreams.API.DTOs;
 using AirDreams.API.Repositories;
 
 namespace AirDreams.API.Services
@@ -12,7 +12,7 @@ namespace AirDreams.API.Services
             _paymentRepository = paymentRepository;
         }
 
-        public async Task<PaymentResponseDto> ProcessPaymentAsync(PaymentRequestDto dto)
+        public async Task<PaymentResponseDTO> ProcessPaymentAsync(PaymentRequestDTO dto)
         {
             string? lastFour = null;
             if (dto.PaymentMethod.Equals("Card", StringComparison.OrdinalIgnoreCase) &&
@@ -32,7 +32,7 @@ namespace AirDreams.API.Services
             if (!success)
                 throw new Exception("No se encontró el itinerario o no se pudo actualizar el pago.");
 
-            return new PaymentResponseDto { Success = true, Message = "Pago procesado correctamente" };
+            return new PaymentResponseDTO { Success = true, Message = "Pago procesado correctamente" };
         }
     }
 }

@@ -4,9 +4,9 @@ namespace AirDreams.API.Services
 {
     public interface IPassengerService
     {
-        Task<PassengerDto> CreateAsync(CreatePassengerDto dto);
-        Task<PassengerDto?> GetByIdAsync(int idPassenger);
+        Task<PassengerDTO> CreateAsync(CreatePassengerDTO dto);
+        Task<PassengerDTO?> GetByIdAsync(int idPassenger);
 
-        Task<PassengerDto?> GetPassengerByNameAsync(string fullName);
+        Task<PassengerDTO?> GetPassengerByNameAsync(string fullName);
     }
 }

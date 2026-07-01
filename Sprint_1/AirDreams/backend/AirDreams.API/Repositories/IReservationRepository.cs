@@ -4,6 +4,6 @@ namespace AirDreams.API.Repositories
 {
     public interface IReservationRepository
     {
-        Task<ReservationDetailsDto?> GetReservationDetailsAsync(string reservationCode);
+        Task<ReservationDetailsDTO?> GetReservationDetailsAsync(string reservationCode);
     }
 }

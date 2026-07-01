@@ -159,8 +159,8 @@ async fetchRoutes() {
 
         return {
             routeID,
-            codeAirportSalida: codeSalida,
-            codeAirportLlegada: codeLlegada,
+            codeAirportSalida: `${departure.code || ''} - ${departure.name || ''}`,
+            codeAirportLlegada: `${arrival.code || ''} - ${arrival.name || ''}`,
             flightDuration,
             basePrice
         }

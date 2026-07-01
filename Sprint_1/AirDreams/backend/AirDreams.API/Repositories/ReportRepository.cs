@@ -52,14 +52,14 @@ namespace AirDreams.API.Repositories
                 Airlines = airlines
             };
         }
-        public async Task<IEnumerable<FlightsReportRowDto>> GetFlightsReportAsync(
+        public async Task<IEnumerable<FlightsReportRowDTO>> GetFlightsReportAsync(
             string? origin,
             string? destination,
             string? seatClass,
             DateTime? fromDate,
             DateTime? toDate)
         {
-            return await _connection.QueryAsync<FlightsReportRowDto>(
+            return await _connection.QueryAsync<FlightsReportRowDTO>(
                 "dbo.sp_GetFlightsReport",
                 new
                 {
@@ -72,7 +72,7 @@ namespace AirDreams.API.Repositories
                 commandType: CommandType.StoredProcedure);
         }
 
-        public async Task<FlightsReportFiltersDto> GetFlightsReportFiltersAsync()
+        public async Task<FlightsReportFiltersDTO> GetFlightsReportFiltersAsync()
         {
             using var results = await _connection.QueryMultipleAsync(
                 "dbo.sp_GetFlightsReportFilters",
@@ -82,7 +82,7 @@ namespace AirDreams.API.Repositories
             var destinations = await results.ReadAsync<string>();
             var range = await results.ReadSingleOrDefaultAsync();
 
-            return new FlightsReportFiltersDto
+            return new FlightsReportFiltersDTO
             {
                 Origins = origins,
                 Destinations = destinations,

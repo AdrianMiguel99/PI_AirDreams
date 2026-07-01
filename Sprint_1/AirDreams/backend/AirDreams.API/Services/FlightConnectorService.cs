@@ -1,21 +1,31 @@
 using AirDreams.ExternalAPI.DTOs;
 using AirDreams.API.DTOs;
-using AirDreams.API.Models.Dtos;
+
 
 public class FlightConnectorService : IFlightConnectorService
 {
     private const int MinLayoverHours = 2; 
     private const int MaxLayoverHours = 12;
 
-    public List<ConnectedFlightDto> ConnectFlights(
+    public List<ConnectedFlightDTO> ConnectFlights(
         IEnumerable<FlightSegmentDTO> internalFlights,
         IEnumerable<ExternalResponseFlightDTO> externalFlights)
     {
-        var results = new List<ConnectedFlightDto>();
+        var results = new List<ConnectedFlightDTO>();
 
         foreach (var internalFlight in internalFlights)
         {
-            var internalArrival = CombineDateAndTime(internalFlight.ArrivalDate, internalFlight.ArrivalTime);
+            
+                if (!internalFlight.ArrivalDate.HasValue)
+                    {
+                        continue;
+                    }
+
+
+                var internalArrival = CombineDateAndTime(
+                    internalFlight.ArrivalDate.Value,
+                    internalFlight.ArrivalTime
+                );
 
             foreach (var externalFlight in externalFlights)
             {
@@ -36,7 +46,7 @@ public class FlightConnectorService : IFlightConnectorService
                     continue;
                 }
 
-                results.Add(new ConnectedFlightDto
+                results.Add(new ConnectedFlightDTO
                 {
                     InternalFlight = internalFlight,
                     ExternalFlight = externalFlight,
