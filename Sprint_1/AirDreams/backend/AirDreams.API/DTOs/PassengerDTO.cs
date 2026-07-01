@@ -10,6 +10,7 @@ namespace AirDreams.API.DTOs
         public string Country { get; set; } = string.Empty;
 
         public string? BirthDate { get; set; } = string.Empty;
+        public string SeatNumber { get; set; } = string.Empty;
 
     }
 }
