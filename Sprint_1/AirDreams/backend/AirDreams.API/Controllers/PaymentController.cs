@@ -46,5 +46,21 @@ namespace AirDreams.API.Controllers
             });
         }
 
+        [HttpPost("external-purchase")]
+        public async Task<IActionResult> ExternalPurchase([FromBody] ExternalOrderRequestDto dto)
+        {
+            try{
+                var result = await _purchaseService.ConfirmExternalPurchaseAsync(dto);
+                return Ok(result);
+            }
+            catch (InvalidOperationException ex)
+            {
+                return BadRequest(new
+                {
+                    code = "FLIGHT_NOT_AVAILABLE",
+                    description = ex.Message
+                });
+            }
+        }
     }
 }
