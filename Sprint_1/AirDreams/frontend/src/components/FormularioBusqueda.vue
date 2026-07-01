@@ -103,6 +103,7 @@
 
 <script>
 import PopupMessage from './PopupMessage.vue';
+const API_BASE = import.meta.env.VITE_API_URL;
 
 export default {
   data() {
@@ -157,7 +158,7 @@ export default {
     },
     async loadAirports() {
       try {
-        const response = await fetch('http://localhost:5276/api/airports');
+        const response = await fetch(`${API_BASE}/api/airports`);
         if (!response.ok) return;
 
         const airports = await response.json();
@@ -272,7 +273,7 @@ export default {
           includeStops: data.includeStops
         });
 
-        const response = await fetch(`http://localhost:5276/api/flights/search?${params.toString()}`);
+        const response = await fetch(`${API_BASE}/api/flights/search?${params.toString()}`);
         const result = await response.json();
 
         if (!response.ok) {

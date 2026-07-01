@@ -64,6 +64,8 @@ import axios from 'axios'
 import AdminHeader from './AdminHeader.vue'         
 import PopupMessage from './PopupMessage.vue' 
 
+const API_BASE = import.meta.env.VITE_API_URL
+
 export default {
   name: 'AirportEdit',
   components: { AdminHeader, PopupMessage },
@@ -97,7 +99,7 @@ export default {
       }
       this.loading = true
       try {
-        const res = await axios.get(`http://localhost:5276/api/airports/${code}`)
+        const res = await axios.get(`${API_BASE}/api/airports/${code}`)
         this.airport = res.data
       } catch (e) {
         console.error('Error al cargar aeropuerto:', e)
@@ -119,7 +121,7 @@ export default {
 
       try {
         await axios.put(
-          `http://localhost:5276/api/airports/${this.airport.code}`,
+          `${API_BASE}/api/airports/${this.airport.code}`, 
           { name: this.airport.name },
           {
             headers: {

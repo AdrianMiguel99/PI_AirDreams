@@ -43,7 +43,7 @@
 
 <script>
 import logo from "../assets/logo.png";
-
+const API_BASE = import.meta.env.VITE_API_URL;
 export default {
   name: "CancelReservation",
 
@@ -73,7 +73,7 @@ export default {
 
       try {
         const response = await fetch(
-          "http://localhost:5276/api/cancellations/confirm",
+          `${API_BASE}/api/cancellations/confirm`,
           {
             method: "POST",
             headers: {

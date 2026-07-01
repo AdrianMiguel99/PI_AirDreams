@@ -33,6 +33,8 @@
 </template>
 
 <script>
+const API_BASE = import.meta.env.VITE_API_URL;
+
 export default {
   data() {
     return {
@@ -61,7 +63,7 @@ export default {
       this.cargando = true;
 
       try {
-        const response = await fetch("http://localhost:5276/api/auth/login", {
+        const response = await fetch(`${API_BASE}/api/auth/login`, {
           method: "POST",
           headers: {
             "Content-Type": "application/json"

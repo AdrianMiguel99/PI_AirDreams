@@ -5,5 +5,7 @@
         public string TransactionId { get; set; } = string.Empty;
         public int IdPassenger { get; set; }
         public string PassengerName { get; set; } = string.Empty;
+
+        public string seatNumber { get; set; } = string.Empty;
     }
 }

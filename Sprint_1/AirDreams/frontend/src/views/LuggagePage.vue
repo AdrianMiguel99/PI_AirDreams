@@ -35,6 +35,7 @@ import axios from 'axios';
 import StepperLayout from '../components/StepperLayout.vue';
 import LuggagePassenger from '../components/LuggagePassenger.vue';
 import PopupMessage from '../components/PopupMessage.vue';
+const API_BASE = import.meta.env.VITE_API_URL;
 
 export default {
   name: 'LuggagePage',
@@ -128,30 +129,37 @@ export default {
     async handleLuggageChange({ passengerIndex, checkedCount, carryOnCount }) {
       if (checkedCount === 0 && carryOnCount === 0) {
         this.luggageSelections[passengerIndex] = {
-          checkedCount: 0,
-          carryOnCount: 0,
-          passengerTotal: 0
+          checkedCount: 0, carryOnCount: 0, passengerTotal: 0
         };
         return;
       }
+
+      const representativeSegment = this.segmentsPricing.find(seg =>
+        (checkedCount > 0 && seg.checkedPrice > 0) ||
+        (carryOnCount > 0 && seg.carryOnPrice > 0)
+      ) || this.segmentsPricing[0]; 
+
+      if (!representativeSegment) {
+        this.luggageSelections[passengerIndex] = {
+          checkedCount, carryOnCount, passengerTotal: 0
+        };
+        return;
+      }
+
       try {
-        const res = await axios.post('http://localhost:5276/api/luggage/calculate/total', {
+        const res = await axios.post(`${API_BASE}/api/luggage/calculate/total`, {
           checkedQuantity: checkedCount,
           carryOnQuantity: carryOnCount,
-          segments: this.segmentsPricing
+          segments: [representativeSegment] 
         });
         const total = (res.data.checkedTotal || 0) + (res.data.carryOnTotal || 0);
         this.luggageSelections[passengerIndex] = {
-          checkedCount,
-          carryOnCount,
-          passengerTotal: total
+          checkedCount, carryOnCount, passengerTotal: total
         };
       } catch (e) {
         console.error('Error al calcular equipaje:', e);
         this.luggageSelections[passengerIndex] = {
-          checkedCount,
-          carryOnCount,
-          passengerTotal: 0
+          checkedCount, carryOnCount, passengerTotal: 0
         };
       }
     },
@@ -281,7 +289,7 @@ export default {
 
     async validateWeights(flightId, routeId, checkedWeight, carryOnWeight) {
       try {
-        const response = await fetch('http://localhost:5276/api/luggage/availability', {
+        const response = await fetch(`${API_BASE}/api/luggage/availability`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json'

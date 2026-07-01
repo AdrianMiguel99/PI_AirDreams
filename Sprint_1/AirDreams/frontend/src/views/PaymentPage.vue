@@ -100,7 +100,7 @@
 import axios from 'axios'
 import StepperLayout from '../components/StepperLayout.vue'
 import PopupMessage from '../components/PopupMessage.vue'
-
+const API_BASE = import.meta.env.VITE_API_URL;
 export default {
   name: 'PaymentPage',
   components: { StepperLayout, PopupMessage },
@@ -185,6 +185,14 @@ export default {
     formatDate(value) {
       const date = new Date(value)
       return date.toLocaleDateString('es-ES', { day: '2-digit', month: 'long', year: 'numeric' })
+    },
+
+    generateRandomSeat(index) {
+      const letters = ["A", "B", "C", "D", "E", "F"];
+      const row = (index % 30) + 1;
+      const letter = letters[index % letters.length];
+
+      return `${row}${letter}`;
     },
 
 
@@ -293,14 +301,14 @@ export default {
           seatClass,
           pricePerPassenger: purchase.price,
           passengerCount: purchase.passengerCount,
-          passengers: passengers.map(p => ({
+          passengers: passengers.map((p, index) => ({
             namePassenger: p.namePassenger,
             lastnamesPassenger: p.lastnamesPassenger,
             birthDate: p.birthDate || null,
             emailPassenger: p.emailPassenger || '',
             telephone: p.telephone || '',
             country: p.country || '',
-            birthDate: p.birthDate || ''
+            seatNumber: this.generateRandomSeat(index)
           })),
           luggage: luggage ? luggage.map(l => ({
             passengerIndex: l.passenger.index,
@@ -309,7 +317,7 @@ export default {
         }
 
         for (const segment of payload.segments) {
-          const availabilityResponse = await axios.post('http://localhost:5276/api/payment/check-availability', {
+          const availabilityResponse = await axios.post(`${API_BASE}/api/payment/check-availability`, {
             numberFlight: segment.flightNumber,
             seatClass: payload.seatClass,
             requestedSeats: payload.passengerCount
@@ -330,9 +338,10 @@ export default {
             return
           };
         }
-        await axios.post('http://localhost:5276/api/payment', payload)
+        await axios.post(`${API_BASE}/api/payment`, payload)
         await this.updateFlightWeight(this.payment.transactionId)
         const purchasewindowData = this.createStructForPage()
+        purchasewindowData.passengers = payload.passengers
         sessionStorage.removeItem('transactionId')
         sessionStorage.removeItem('luggageWeights')
 
@@ -365,7 +374,7 @@ export default {
 
       try {
         await axios.post(
-          'http://localhost:5276/api/luggage/update',
+          `${API_BASE}/api/luggage/update`,
           {
             transactionId,
             luggageWeight: weights.luggageWeight || 0,
@@ -375,7 +384,7 @@ export default {
       } catch (error) {
         console.error('Ha ocurrido un error al actualizar el peso del equipaje:', error)
       }
-    }
+    },
   }
 }
 </script>

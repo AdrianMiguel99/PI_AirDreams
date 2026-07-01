@@ -30,6 +30,8 @@
 </template>
 
 <script>
+const API_BASE = import.meta.env.VITE_API_URL;
+
 export default {
   data() {
     return {
@@ -66,7 +68,7 @@ export default {
 
       try {
         const token = localStorage.getItem("token");
-        const response = await fetch("http://localhost:5276/api/auth/invite", {
+        const response = await fetch(`${API_BASE}/api/auth/invite`, {
           method: "POST",
           headers: {
             'Authorization': `Bearer ${token}`,

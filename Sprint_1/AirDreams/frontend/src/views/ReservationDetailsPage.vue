@@ -32,6 +32,7 @@
             :loading="cancellationLoading"
             :disabled="reservation.isCancelled"
             @cancel-reservation="requestCancellation"
+            @add-luggage="goToExtraLuggage"
           />
         </div>
       </section>
@@ -116,7 +117,10 @@ export default {
           destinationTerminal: "",
 
           firstAircraft: "",
-          secondAircraft: ""
+          secondAircraft: "",
+
+          firstAirlineName: "",
+          secondAirlineName: ""
         },
 
         tickets: []
@@ -202,6 +206,23 @@ export default {
       }
     },
 
+    goToExtraLuggage() {
+      const reservationCode =
+        this.reservation.reservationCode || this.$route.query.reservationCode;
+
+      if (!reservationCode) {
+        this.errorMessage = "No se encontró el código de reserva.";
+        return;
+      }
+
+      this.$router.push({
+        name: "ExtraLuggage",
+        query: {
+          reservationCode
+        }
+      });
+    },
+
     mapReservationDetails(reservationCode, data) {
       const passengers = data.passengers || [];
       const flights = data.flights || [];
@@ -210,6 +231,8 @@ export default {
       const lastFlight = flights[flights.length - 1];
 
       const hasLayover = flights.length > 1;
+      const itineraryStatus = firstFlight?.itineraryStatus || "Confirmada";
+      const normalizedStatus = itineraryStatus.trim().toLowerCase();
 
       return {
         reservationCode: reservationCode,
@@ -221,14 +244,14 @@ export default {
         departureDate: this.formatDate(firstFlight?.departureDate),
         passengerCount: passengers.length,
 
-        status: "Confirmada",
-        isCancelled: false,
+        status: itineraryStatus,
+        isCancelled: normalizedStatus === "cancelled",
 
         purchase: {
           purchaseType: hasLayover ? "layover" : "direct",
 
-          firstIsAirDreams: true,
-          secondIsAirDreams: hasLayover,
+          firstIsAirDreams: flights[0]?.isAirDreams !== false,
+          secondIsAirDreams: flights[1]?.isAirDreams !== false,
 
           flightCode: flights.map(flight => flight.flightNumber).join(" / "),
           firstFlightCode: flights[0]?.flightNumber || "",
@@ -268,14 +291,19 @@ export default {
           secondDepartureTime: "",
           secondArrivalTime: "",
 
-          totalDuration: "",
+          totalDuration: flights
+            .map(flight => this.formatDuration(flight.duration))
+            .join(" + "),
           layoverDuration: "",
 
           originTerminal: "",
           destinationTerminal: "",
 
           firstAircraft: flights[0]?.aircraftModel || "",
-          secondAircraft: flights[1]?.aircraftModel || ""
+          secondAircraft: flights[1]?.aircraftModel || "",
+
+          firstAirlineName: flights[0]?.airlineName || "",
+          secondAirlineName: flights[1]?.airlineName || ""
         },
 
         tickets: [
@@ -283,10 +311,10 @@ export default {
             id: reservationCode,
             passengers: passengers.map(passenger => ({
               id: passenger.idPassenger,
-              name: passenger.passengerName
+              name: passenger.passengerName,
+              seatNumber: passenger.seatNumber || ""
             })),
-            seatNumber: "",
-            classType: "Turista"
+            classType: firstFlight?.seatClass || "Turista"
           }
         ]
       };
@@ -313,6 +341,19 @@ export default {
         month: "short",
         day: "2-digit"
       });
+    },
+    formatDuration(value) {
+      if (!value) return "No disponible";
+
+      const parts = String(value).split(":");
+      const hours = Number(parts[0] || 0);
+      const minutes = Number(parts[1] || 0);
+
+      if (hours && minutes) return `${hours}h ${minutes}m`;
+      if (hours) return `${hours}h`;
+      if (minutes) return `${minutes}m`;
+
+    return "No disponible";
     },
 
     calculateDaysLeft(departureDate) {

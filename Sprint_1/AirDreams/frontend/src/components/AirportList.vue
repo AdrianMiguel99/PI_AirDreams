@@ -74,6 +74,8 @@ import ButtomNavigationAirports from './ButtomNavigationAirports.vue'
 import HeaderLogo from '../components/HeaderLogo.vue'
 import PopupMessage from '../components/PopupMessage.vue'
 
+const API_BASE = import.meta.env.VITE_API_URL
+
 export default {
   name: 'AirportList',
   components: { ButtomNavigationAirports, HeaderLogo, PopupMessage },
@@ -100,7 +102,7 @@ export default {
       this.loading = true
       this.errorMessage = ''
       try {
-        const res = await axios.get('http://localhost:5276/api/airports')
+        const res = await axios.get(`${API_BASE}/api/airports`)
         this.airports = res.data
       } catch (error) {
         console.error('Error al obtener aeropuertos:', error)
@@ -127,7 +129,7 @@ export default {
           this.popupMessage = 'Debes iniciar sesión como administrador.'
           return
         }
-        const res = await axios.delete(`http://localhost:5276/api/airports/${this.airportToDelete}`, {
+        const res = await axios.delete(`${API_BASE}/api/airports/${this.airportToDelete}`, {
           headers: { Authorization: `Bearer ${token}` }
         })
         this.showResultPopup = true
