@@ -74,7 +74,7 @@
 import axios from 'axios'
 import AdminHeader from './AdminHeader.vue'
 import PopupMessage from './PopupMessage.vue'
-
+const API_BASE = import.meta.env.VITE_API_URL;
 export default {
     name: 'ListaRutas',
     components: {
@@ -108,8 +108,7 @@ async fetchRoutes() {
             return
         }
         try {
-        // usa la URL relativa para aprovechar proxy Vite si lo tienes: '/api/routes'
-        const res = await axios.get('http://localhost:5276/api/routes', {
+        const res = await axios.get(`${API_BASE}/api/routes`, {
             headers: { Authorization: `Bearer ${token}` }
         })
         const raw = res.data || []
@@ -175,7 +174,7 @@ async deleteRoute(route) {
     this.deletingRouteId = route.routeID
 
     try {
-        const res = await axios.delete(`http://localhost:5276/api/routes/${route.routeID}`, {
+        const res = await axios.delete(`${API_BASE}/api/routes/${route.routeID}`, {
             headers: { Authorization: `Bearer ${token}` }
         })
 

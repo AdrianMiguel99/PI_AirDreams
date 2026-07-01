@@ -114,6 +114,7 @@ import axios from 'axios';
 import { useRouter } from "vue-router";
 import AdminHeader from "./AdminHeader.vue";
 import PopupMessage from "./PopupMessage.vue";
+const API_BASE = import.meta.env.VITE_API_URL;
 
 export default {
   name: "UserList",
@@ -148,7 +149,7 @@ export default {
 
       const token = localStorage.getItem("token");
 
-      axios.get("http://localhost:5276/api/User", {
+      axios.get(`${API_BASE}/api/User`, {
         headers: {
           Authorization: `Bearer ${token}`
         }
@@ -176,7 +177,7 @@ export default {
 
         const token = localStorage.getItem("token");
 
-        axios.get("http://localhost:5276/api/User/search", {
+        axios.get(`${API_BASE}/api/User/search`, {
           params: {
             searchTerm: this.searchTerm
           },
@@ -224,7 +225,7 @@ export default {
         updateData.isOperator = (this.selectedRole === "Operator");
       }
 
-      axios.put(`http://localhost:5276/api/User/${this.editForm.userId}`, updateData, {
+      axios.put(`${API_BASE}/api/User/${this.editForm.userId}`, updateData, {
         headers: { Authorization: `Bearer ${token}` }
       })
       .then(() => {
@@ -253,7 +254,7 @@ export default {
         const token = localStorage.getItem("token");
 
         await axios.delete(
-          `http://localhost:5276/api/User/${user.id}`,
+          `${API_BASE}/api/User/${user.id}`,
           {
             headers: {
               Authorization: `Bearer ${token}`

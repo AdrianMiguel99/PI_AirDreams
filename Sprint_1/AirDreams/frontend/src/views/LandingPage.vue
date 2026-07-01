@@ -46,6 +46,7 @@ import FormularioBusqueda from "../components/FormularioBusqueda.vue";
 import ListaVuelos from "../components/ListaVuelos.vue";
 import Paginacion from "../components/Paginacion.vue";
 import PopupMessage from "../components/PopupMessage.vue";
+const API_BASE = import.meta.env.VITE_API_URL;
 
 export default {
   components: {
@@ -103,7 +104,7 @@ export default {
 
       for (const segment of selection.flight.segments) {
         
-        const response = await fetch("http://localhost:5276/api/payment/check-availability", {
+        const response = await fetch(`${API_BASE}/api/payment/check-availability`, {
           method: "POST",
           headers: {
             "Content-Type": "application/json"

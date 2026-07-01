@@ -11,6 +11,7 @@ namespace AirDreams.API.DTOs
         public string ArrivalTime { get; set; } = string.Empty;
         public decimal CarryOnPrice { get; set; }
         public decimal CheckedPrice { get; set; }
+        public decimal Multiplier { get; set; }
         public decimal TouristPrice { get; set; }
         public decimal FirstClassPrice { get; set; }
         public AirportDTO DepartureAirport { get; set; } = new AirportDTO();

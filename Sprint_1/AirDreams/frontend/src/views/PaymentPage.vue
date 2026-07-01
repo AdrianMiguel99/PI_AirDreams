@@ -100,7 +100,7 @@
 import axios from 'axios'
 import StepperLayout from '../components/StepperLayout.vue'
 import PopupMessage from '../components/PopupMessage.vue'
-
+const API_BASE = import.meta.env.VITE_API_URL;
 export default {
   name: 'PaymentPage',
   components: { StepperLayout, PopupMessage },
@@ -317,7 +317,7 @@ export default {
         }
 
         for (const segment of payload.segments) {
-          const availabilityResponse = await axios.post('http://localhost:5276/api/payment/check-availability', {
+          const availabilityResponse = await axios.post(`${API_BASE}/api/payment/check-availability`, {
             numberFlight: segment.flightNumber,
             seatClass: payload.seatClass,
             requestedSeats: payload.passengerCount
@@ -338,7 +338,7 @@ export default {
             return
           };
         }
-        await axios.post('http://localhost:5276/api/payment', payload)
+        await axios.post(`${API_BASE}/api/payment`, payload)
         await this.updateFlightWeight(this.payment.transactionId)
         const purchasewindowData = this.createStructForPage()
         purchasewindowData.passengers = payload.passengers
@@ -374,7 +374,7 @@ export default {
 
       try {
         await axios.post(
-          'http://localhost:5276/api/luggage/update',
+          `${API_BASE}/api/luggage/update`,
           {
             transactionId,
             luggageWeight: weights.luggageWeight || 0,
