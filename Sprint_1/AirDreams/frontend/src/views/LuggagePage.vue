@@ -235,7 +235,11 @@ export default {
 
         for (const segment of segments) {
           const flightId = (segment.flightNumber || '').trim();
-          const routeId = segment.routeId;
+          const routeId = segment.routeId || segment.idRoute || null;
+
+          if (!flightId || !routeId || !flightId.startsWith('AD')) {
+            continue;
+          }
 
           if (!flightId) {
             throw new Error('No se encontró el número de vuelo');
@@ -289,6 +293,13 @@ export default {
 
     async validateWeights(flightId, routeId, checkedWeight, carryOnWeight) {
       try {
+        if (!flightId || !routeId || !flightId.startsWith('AD')) {
+          return {
+            success: true,
+            message: 'Vuelo externo omitido en validación de peso'
+          };
+        }
+
         const response = await fetch(`${API_BASE}/api/luggage/availability`, {
           method: 'POST',
           headers: {
