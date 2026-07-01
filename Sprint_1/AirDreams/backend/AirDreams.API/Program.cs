@@ -65,7 +65,12 @@ builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowVueApp", policy =>
     {
-        policy.WithOrigins("http://localhost:5173")
+        policy.WithOrigins(
+            "http://localhost:5173",
+            "https://pi-air-dreams.vercel.app",
+            "https://airdreams.lat",
+            "https://www.airdreams.lat"
+            )
             .AllowAnyHeader()
             .AllowAnyMethod()
             .AllowCredentials();

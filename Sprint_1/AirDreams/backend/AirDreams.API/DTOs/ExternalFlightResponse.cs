@@ -17,6 +17,9 @@ namespace AirDreams.ExternalAPI.DTOs
         public decimal firstClassPrice { get; set; }
         public decimal carryOnPrice { get; set; }
         public decimal checkedPrice { get; set; }
+        public decimal porcentageMultiplier { get; set; }
+        public decimal luggageMaxWeight { get; set; }
+        public decimal carryOnMaxWeight { get; set; }
     }
 
     public class ExternalResponseAirportDTO
