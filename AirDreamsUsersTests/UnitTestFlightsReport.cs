@@ -21,9 +21,9 @@ namespace Test1
         [Test]
         public void GetFlightsReport_WithFilters_ReturnsFilteredData()
         {
-            var expectedData = new List<FlightsReportRowDto>
+            var expectedData = new List<FlightsReportRowDTO>
             {
-                new FlightsReportRowDto
+                new FlightsReportRowDTO
                 {
                     FlightDate = new DateTime(2026, 6, 25),
                     Origin = "SJO",
@@ -53,10 +53,10 @@ namespace Test1
         [Test]
         public void GetFlightsReport_NoFilters_ReturnsAllData()
         {
-            var allData = new List<FlightsReportRowDto>
+            var allData = new List<FlightsReportRowDTO>
             {
-                new FlightsReportRowDto { NumberFlight = "AD001" },
-                new FlightsReportRowDto { NumberFlight = "AD002" }
+                new FlightsReportRowDTO { NumberFlight = "AD001" },
+                new FlightsReportRowDTO { NumberFlight = "AD002" }
             };
 
             _reportRepositoryMock
@@ -72,7 +72,7 @@ namespace Test1
         [Test]
         public void GetFlightsReportFilters_ReturnsFilters()
         {
-            var filters = new FlightsReportFiltersDto
+            var filters = new FlightsReportFiltersDTO
             {
                 Origins = new List<string> { "SJO", "CDG" },
                 Destinations = new List<string> { "CDG", "JFK" },

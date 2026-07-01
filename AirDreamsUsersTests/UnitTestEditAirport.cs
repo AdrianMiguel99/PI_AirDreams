@@ -1,6 +1,6 @@
 ﻿using Moq;
 using NUnit.Framework;
-using AirDreams.API.Models.Dtos;
+using AirDreams.API.DTOs;
 using AirDreams.API.Models.Entities;
 using AirDreams.API.Repositories;
 using AirDreams.API.Services;
@@ -23,7 +23,7 @@ namespace Test1
         public void UpdateAsync_ExistingAirport_UpdatesSuccessfully()
         {
             var code = "SJO";
-            var dto = new UpdateAirportDto
+            var dto = new UpdateAirportDTO
             {
                 Name = "Aeropuerto Internacional Juan Santamaría"
             };
@@ -51,7 +51,7 @@ namespace Test1
         public void UpdateAsync_NonExistingAirport_ThrowsKeyNotFoundException()
         {
             var code = "XYZ";
-            var dto = new UpdateAirportDto { Name = "Nuevo Nombre" };
+            var dto = new UpdateAirportDTO { Name = "Nuevo Nombre" };
 
             _repositoryMock.Setup(r => r.GetByCodeAsync(code))
                            .ReturnsAsync((Airport?)null);

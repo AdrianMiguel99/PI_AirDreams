@@ -5,6 +5,8 @@ using NUnit.Framework;
 
 namespace AirDreamsUsersTests;
 
+
+
 [TestFixture]
 public class CancelReservationAlreadyCancelledTests
 {
@@ -12,7 +14,12 @@ public class CancelReservationAlreadyCancelledTests
     public void CancelReservationAsync_WhenReservationIsAlreadyCancelled_ShouldThrowInvalidOperationException()
     {
         var repositoryMock = new Mock<ICancellationRepository>();
-        var service = new CancellationService(repositoryMock.Object);
+        var emailServiceMock = new Mock<IEmailService>();
+
+        var service = new CancellationService(
+            repositoryMock.Object,
+            emailServiceMock.Object
+        );
 
         var transactionId = "TXN-CANCELLED";
 
