@@ -88,5 +88,37 @@ namespace AirDreams.API.Controllers
 
             return Ok(luggageData);
         }
+
+        [HttpPost("register-extra")]
+        public async Task<IActionResult> RegisterExtraLuggage([FromBody] RegisterExtraLuggageDto request)
+        {
+            try
+            {
+                var success = await _luggageService.RegisterExtraLuggageAsync(request);
+
+                if (!success)
+                {
+                    return BadRequest(new
+                    {
+                        success = false,
+                        message = "No se pudo registrar el equipaje adicional."
+                    });
+                }
+
+                return Ok(new
+                {
+                    success = true,
+                    message = "Equipaje adicional registrado correctamente."
+                });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new
+                {
+                    success = false,
+                    message = ex.Message
+                });
+            }
+        }
     }
 }

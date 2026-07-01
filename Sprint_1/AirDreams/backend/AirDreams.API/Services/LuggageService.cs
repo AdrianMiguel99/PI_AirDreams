@@ -128,5 +128,35 @@ namespace AirDreams.API.Services
         {
             return await _luggageRepository.GetReservationLuggageAsync(transactionId);
         }
+
+        public async Task<bool> RegisterExtraLuggageAsync(RegisterExtraLuggageDto request)
+        {
+            if (request == null)
+                throw new Exception("La solicitud no puede estar vacía.");
+
+            if (request.IdPassenger <= 0)
+                throw new Exception("El pasajero es requerido.");
+
+            if (string.IsNullOrWhiteSpace(request.TransactionIdItinerary))
+                throw new Exception("El código de reserva es requerido.");
+
+            if (request.LuggageItems == null || !request.LuggageItems.Any())
+                throw new Exception("Debe registrar al menos una maleta.");
+
+            foreach (var item in request.LuggageItems)
+            {
+                if (string.IsNullOrWhiteSpace(item.Type) || item.Quantity <= 0)
+                    throw new Exception("El tipo y la cantidad de maleta son requeridos.");
+
+                await _luggageRepository.RegisterExtraLuggageAsync(
+                    request.IdPassenger,
+                    request.TransactionIdItinerary,
+                    item.Type,
+                    item.Quantity
+                );
+            }
+
+            return true;
+        }
     }
 }

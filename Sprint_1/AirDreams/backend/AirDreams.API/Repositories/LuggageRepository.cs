@@ -175,5 +175,28 @@ namespace AirDreams.API.Repositories
                 Segments = segments
             };
         }
+
+        public async Task<bool> RegisterExtraLuggageAsync(
+            int idPassenger,
+            string transactionIdItinerary,
+            string type,
+            int quantity
+        )
+                {
+                    var parameters = new DynamicParameters();
+
+                    parameters.Add("@TransactionId", transactionIdItinerary);
+                    parameters.Add("@IdPassenger", idPassenger);
+                    parameters.Add("@Type", type);
+                    parameters.Add("@Quantity", quantity);
+
+                    await _connection.ExecuteAsync(
+                        "dbo.sp_RegisterExtraLuggage",
+                        parameters,
+                        commandType: CommandType.StoredProcedure
+                    );
+
+            return true;
+        }
     }
 }
